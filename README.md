@@ -9,9 +9,9 @@ Ncloud Resource Explorer 는
 
 ## 개발환경
 * K8S : minikube v1.27.4
-* os : Windows 11 22H2
-* container: Docker v24.0.5
-* helm chart: spaceone v1.11.16
+* Os : Windows 11 22H2
+* Container: Docker v24.0.5
+* Helm chart: spaceone v1.11.16
 * Language : Python 3.8
 * Pip packages
      | Name          | Version            |
