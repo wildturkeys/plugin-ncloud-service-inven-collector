@@ -9,9 +9,7 @@ Ncloud Resource Explorer 는
 * os : Windows 11 22H2
 * container: Docker v24.0.5
 * helm chart: spaceone v1.11.16
-* Language : Python 3.8
-  
-
+* Language : Python 3.8  
      | Name          | Version            |
      |---------------| ------------------ |
      | spaceone-core |1.12.29 |
