@@ -1,6 +1,6 @@
 # plugin-ncloud-service-inven-collector
 
-<p align="center"><img src="[image_src](https://github.com/chulgyujeon/plugin-ncloud-service-inven-collector/assets/101609006/05cc08b2-2bc2-4900-8882-e8fc12c92686)"></p>
+<p align="center"><img src="[image_src](https://github.com/chulgyujeon/plugin-ncloud-service-inven-collector/assets/101609006/05cc08b2-2bc2-4900-8882-e8fc12c92686)" width="20%" height="30%" ></p>
 
 
 ## Ncloud Resource Explorer
