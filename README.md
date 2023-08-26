@@ -11,7 +11,7 @@ Ncloud Resource Explorer 는
 * helm chart: spaceone v1.11.16
 * Language : Python 3.8
   
-    ### Pip packages
+
      | Name          | Version            |
      |---------------| ------------------ |
      | spaceone-core |1.12.29 |
