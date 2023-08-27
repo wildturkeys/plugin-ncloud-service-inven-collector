@@ -1,4 +1,5 @@
-spaceone-core
-spaceone-api
-schematics
-ncloud-sdk
+spaceone-core==1.12.29
+spaceone-api==1.12.27
+schematics==2.1.1
+ncloud-sdk==1.1.9
+boto3
