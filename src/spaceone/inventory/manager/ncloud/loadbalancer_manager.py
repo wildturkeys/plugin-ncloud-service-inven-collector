@@ -12,3 +12,6 @@ class NCloudServerManager(BaseManager):
         super().__init__(**kwargs)
         self.params = params
         self.server_connector: NCloudConnector = NCloudConnector()
+
+    def list_resources(self):
+        return []

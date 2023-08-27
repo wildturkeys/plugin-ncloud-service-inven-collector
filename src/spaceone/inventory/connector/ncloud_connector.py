@@ -1,5 +1,4 @@
 import logging
-
 import ncloud_server
 import ncloud_loadbalancer
 from ncloud_server.api.v2_api import V2Api as Server_V2Api
@@ -13,8 +12,9 @@ from typing import Any
 
 _LOGGER = logging.getLogger(__name__)
 DEFAULT_REGION = 'KR-KOREA-1'
+DEFAULT_API_RETRIES = 10
 
-SERVICE_CLASS = {
+SERVICE_CLASSES = {
 
     "Server": {"cls": ncloud_server,
                "api_cls": Server_V2Api},
@@ -22,35 +22,55 @@ SERVICE_CLASS = {
                      "api_cls": Loadbalancer_V2Api}
 }
 
-DEFAULT_API_RETRIES = 10
-
 
 class NCloudConnector(BaseConnector):
 
-    def __init__(self, *args, **kwargs):
-        self.ncloud_client = None
+    _secret_data: dict = None
+    _api_clients: dict = {}
 
-    def verify(self, secret_data, region_name):
-        self.set_connect(secret_data, region_name)
+    def __init__(self, *args, **kwargs):
+        self._api_clients: None
+
+    @property
+    def api_clients(self):
+        return self._api_clients
+
+    def verify(self, secret_data, region_name=None):
+        self.set_connect(secret_data)
+        self.get_api_client('Server')
         return "ACTIVE"
 
-    def set_connect(self, secret_data: dict, region_name=DEFAULT_REGION, service_name='Server'):
-        self.ncloud_client = self.get_api_client(secret_data, service_name)
+    def set_connect(self, secret_data: dict):
+        self._secret_data = secret_data
+        self._generate_api_clients()
 
-    def get_api_client(self, service_name: str, secret_data: dict):
+    def get_api_client(self, service_name: str):
 
-        if service_name in SERVICE_CLASS:
+        if self._api_clients:
+            return self._api_clients.get(service_name)
+        else:
+            return None
 
-            service = SERVICE_CLASS[service_name]
+    def _generate_api_clients(self):
 
-            service_cls = service.get('cls')
-            service_api_cls = service.get('cls_api')
+        if not self.secret_data:
+            raise
 
-            if service_cls:
-                configuration = service_cls.Configuration()
-                # to do : modify key name
-                configuration.access_key = secret_data['aws_access_key_id']
-                configuration.secret_key = secret_data['aws_secret_access_key']
+        for service_name, service_cls_info in SERVICE_CLASSES.items():
 
-                return service_api_cls(service_api_cls.ApiClient(configuration))
-        raise
+            service_api_cls = service_cls_info.get('cls_api')
+            service_cls = service_cls_info.get('cls')
+            configuration = self._get_configuration(service_cls)
+
+            self.api_clients[service_name] = service_api_cls(service_api_cls.ApiClient(configuration))
+
+    def _get_configuration(self, service_cls):
+
+        configuration = service_cls.Configuration()
+
+        # to do : modify key name
+        configuration.access_key = self.secret_data.get('aws_access_key_id')
+        configuration.secret_key = self.secret_data.get('aws_secret_access_key')
+
+        return configuration
+

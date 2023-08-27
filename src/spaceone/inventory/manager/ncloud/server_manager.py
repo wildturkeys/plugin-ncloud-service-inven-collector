@@ -13,7 +13,7 @@ class NCloudServerManager(BaseManager):
         if kwargs.get('connector'):
             self.server_connector: NCloudConnector = kwargs.get('connector')
 
-    def list_instances(self):
+    def list_resources(self):
 
         get_server_instance_list_request = ncloud_server.GetServerInstanceListRequest()
 

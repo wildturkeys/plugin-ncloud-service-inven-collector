@@ -47,8 +47,7 @@ class CollectorService(BaseService):
         """
         manager = self.locator.get_manager('CollectorManager')
         secret_data = params['secret_data']
-        region_name = params.get('region_name', DEFAULT_REGION)
-        active = manager.verify(secret_data, region_name)
+        active = manager.verify(secret_data)
 
         return {}
 
@@ -66,40 +65,18 @@ class CollectorService(BaseService):
         """
 
         start_time = time.time()
-        # parameter setting for multi threading
-        mp_params = self.set_params_for_regions(params)
+        # To Do
         resource_regions = []
-        collected_region_code = []
 
         for cloud_service_type in self.collector_manager.list_cloud_service_types():
             yield CloudServiceTypeResourceResponse({'resource': cloud_service_type})
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=NUMBER_OF_CONCURRENT) as executor:
-            future_executors = []
-            for mp_param in mp_params:
-                future_executors.append(executor.submit(self.collector_manager.list_resources, mp_param))
+
+            future_executors: list = [executor.submit(self.collector_manager.list_resources, **params)]
 
             for future in concurrent.futures.as_completed(future_executors):
                 for result in future.result():
-                    if result.resource_type == 'inventory.CloudService':
-                        try:
-                            collected_region = self.collector_manager.get_region_from_result(result.resource)
-
-                            if collected_region and collected_region.region_code not in collected_region_code:
-                                resource_regions.append(collected_region)
-                                collected_region_code.append(collected_region.region_code)
-                        except Exception as e:
-                            _LOGGER.error(f'[collect] {e}')
-
-                            if type(e) is dict:
-                                error_resource_response = ErrorResourceResponse(
-                                    {'message': json.dumps(e), 'resource': {'resource_type': 'inventory.Region'}})
-                            else:
-                                error_resource_response = ErrorResourceResponse(
-                                    {'message': str(e), 'resource': {'resource_type': 'inventory.Region'}})
-
-                            yield error_resource_response
-
                     yield result
 
         for resource_region in resource_regions:
@@ -107,37 +84,6 @@ class CollectorService(BaseService):
 
         _LOGGER.debug(f'[collect] TOTAL FINISHED {time.time() - start_time} Sec')
 
-    def set_params_for_regions(self, params):
-        params_for_regions = []
-
-        (query, instance_ids, filter_region_name) = self._check_query(params['filter'])
-        query.append({'Name': 'instance-state-name', 'Values': ['running', 'shutting-down', 'stopping', 'stopped']})
-
-        target_regions = self.get_all_regions(params['secret_data'], filter_region_name)
-
-        for target_region in target_regions:
-            params_for_regions.append({
-                'region_name': target_region,
-                'query': query,
-                'secret_data': params['secret_data'],
-                'instance_ids': instance_ids
-            })
-
-        return params_for_regions
-
-    def get_all_regions(self, secret_data, filter_region_name):
-        """ Find all region name
-        Args:
-            secret_data: secret data
-            filter_region_name (list): list of region_name if wanted
-
-        Returns: list of region name
-        """
-        if filter_region_name:
-            return filter_region_name
-
-        regions = self.collector_manager.list_regions(secret_data, DEFAULT_REGION)
-        return [region.get('RegionName') for region in regions if region.get('RegionName')]
 
     @staticmethod
     def _check_query(query):
