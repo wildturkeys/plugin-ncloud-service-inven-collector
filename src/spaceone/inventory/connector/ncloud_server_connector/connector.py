@@ -26,8 +26,14 @@ class ServerConnector(NCloudBaseConnector):
         csr = []
 
         for instance in self.list_instances():
-            csr.append(CloudServiceResponse({'resource': CloudServiceResource(
-                {'data': instance})}))
+            csr.append(CloudServiceResponse(
+                    {'resource': CloudServiceResource(
+                        {'data': instance, "cloud_service_group": self.cloud_service_group,
+                         "cloud_service_type": self.cloud_service_type}
+                        )
+                    }
+                )
+            )
 
         resources.extend(self.set_cloud_service_types())
         resources.extend(csr)

@@ -15,6 +15,8 @@ cst_server.provider = 'ncloud'
 cst_server.group = 'Instance'
 cst_server.labels = []
 cst_server.service_code = 'ncloudServer'
+cst_server.is_primary = True
+cst_server.is_major = True
 
 
 cst_server._metadata = CloudServiceTypeMeta.set_meta(
