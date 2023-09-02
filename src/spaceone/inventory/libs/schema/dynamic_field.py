@@ -1,7 +1,7 @@
 import math
 from schematics import Model
 from schematics.types import ModelType, StringType, PolyModelType, DictType, ListType, BooleanType
-from .metadata_dynamic_search import BaseDynamicSearch
+from .dynamic_search import BaseDynamicSearch
 
 
 BACKGROUND_COLORS = [
@@ -261,14 +261,11 @@ class ListDyField(BaseDynamicField):
         return cls(_data_source)
 
 
-class EnumOptionDyField(FieldViewOption):
-    items = DictType(PolyModelType([StateItemDyField, BadgeItemDyField, ImageItemDyField, DatetimeItemDyField]),
-                     serialize_when_none=False, default={})
-
-
 class EnumDyField(BaseDynamicField):
     type = StringType(default="enum")
-    options = PolyModelType([EnumOptionDyField, FieldViewOption], serialize_when_none=False, default={})
+    options = DictType(PolyModelType([StateItemDyField, BadgeItemDyField, ImageItemDyField, DatetimeItemDyField]),
+                       serialize_when_none=False,
+                       default={})
 
     @classmethod
     def data_source(cls, name, key, **kwargs):
@@ -277,7 +274,7 @@ class EnumDyField(BaseDynamicField):
         _default_state = kwargs.get('default_state', {})
         _default_outline_badge = kwargs.get('default_outline_badge', [])
 
-        _options_item_dic = {}
+        _options_dic = {}
 
         for _key in _default_outline_badge:
             _round_index = len(TYPE_BADGE)
@@ -290,11 +287,11 @@ class EnumDyField(BaseDynamicField):
             if _round_index - 1 < _index:
                 _index = _index - _round_index
 
-            _options_item_dic[_key] = BadgeItemDyField.set({'outline_color': TYPE_BADGE[_index]})
+            _options_dic[_key] = BadgeItemDyField.set({'outline_color': TYPE_BADGE[_index]})
 
         for _key in _default_badge:
             for _badge in _default_badge[_key]:
-                _options_item_dic[_badge] = BadgeItemDyField.set({'background_color': _key})
+                _options_dic[_badge] = BadgeItemDyField.set({'background_color': _key})
 
         for _key in _default_state:
             for _state in _default_state[_key]:
@@ -311,17 +308,16 @@ class EnumDyField(BaseDynamicField):
                 elif _key == 'alert':
                     _state_options = {'text_color': 'red.500', 'icon': {'color': 'red.500'}}
 
-                _options_item_dic[_state] = StateItemDyField.set(_state_options)
+                _options_dic[_state] = StateItemDyField.set(_state_options)
 
-        _enum_options = {'items': _options_item_dic}
+        _data_source.update({'options': _options_dic})
 
         if 'options' in kwargs:
-            _enum_options.update(kwargs.get('options'))
+            _data_source.update({'options': kwargs.get('options')})
 
         if 'reference' in kwargs:
             _data_source.update({'reference': kwargs.get('reference')})
 
-        _data_source.update({'options': EnumOptionDyField(_enum_options)})
         return cls(_data_source)
 
 

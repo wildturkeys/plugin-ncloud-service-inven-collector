@@ -1,2 +1,1 @@
-from spaceone.inventory.connector.ec2_connector import EC2Connector
-from spaceone.inventory.connector.ncloud_connector import NCloudConnector
+from spaceone.inventory.connector.ncloud_server_connector.connector import ServerConnector

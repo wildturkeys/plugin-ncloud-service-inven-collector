@@ -1,76 +1,91 @@
 import logging
-import ncloud_server
-import ncloud_loadbalancer
-from ncloud_server.api.v2_api import V2Api as Server_V2Api
-from ncloud_loadbalancer.api.v2_api import V2Api as Loadbalancer_V2Api
 
-from spaceone.core.error import *
-from spaceone.core import utils
 from spaceone.core.connector import BaseConnector
 from spaceone.inventory.conf.cloud_service_conf import *
-from typing import Any
+from spaceone.inventory.libs.schema.resource import CloudServiceResponse, CloudServiceResource
+from typing import Any, List
 
 _LOGGER = logging.getLogger(__name__)
 DEFAULT_REGION = 'KR-KOREA-1'
 DEFAULT_API_RETRIES = 10
 
-SERVICE_CLASSES = {
 
-    "Server": {"cls": ncloud_server,
-               "api_cls": Server_V2Api},
-    "Loadbalancer": {"cls": ncloud_loadbalancer,
-                     "api_cls": Loadbalancer_V2Api}
-}
-
-
-class NCloudConnector(BaseConnector):
-
-    _secret_data: dict = None
-    _api_clients: dict = {}
+class NCloudBaseConnector(BaseConnector):
+    _ncloud_cls: Any = None
+    _ncloud_api: Any = None
+    _ncloud_api_v2: Any = None
+    _ncloud_configuration = None
 
     def __init__(self, *args, **kwargs):
-        self._api_clients: None
+
+        if self._ncloud_cls and kwargs.get("secret_data") and self._ncloud_configuration:
+
+            secret_data = kwargs.get("secret_data")
+            self._ncloud_configuration.access_key = secret_data.get("access_key")
+            self._ncloud_configuration.secret_key = secret_data.get("secret_key")
 
     @property
-    def api_clients(self):
-        return self._api_clients
+    def api_client(self):
+        return self._ncloud_cls.ApiClient(self._ncloud_configuration)
 
-    def verify(self, secret_data, region_name=None):
-        self.set_connect(secret_data)
-        self.get_api_client('Server')
-        return "ACTIVE"
+    @property
+    def api_client_v2(self):
+        return self._ncloud_api_v2(self.api_client)
 
-    def set_connect(self, secret_data: dict):
-        self._secret_data = secret_data
-        self._generate_api_clients()
+    def get_resources(self) -> List[CloudServiceResponse]:
+        raise NotImplementedError()
 
-    def get_api_client(self, service_name: str):
 
-        if self._api_clients:
-            return self._api_clients.get(service_name)
-        else:
-            return None
+    def collect_data(self):
+        return self.get_resources()
 
-    def _generate_api_clients(self):
 
-        if not self.secret_data:
-            raise
+    def set_cloud_service_types(self):
+        return self.cloud_service_types
 
-        for service_name, service_cls_info in SERVICE_CLASSES.items():
+    def collect_data_by_region(self, service_name, region_name, collect_resource_info):
+        '''
+        collect_resource_info = {
+            'request_method': self.request_something_like_data,
+            'resource': ResourceClass,
+            'response_schema': ResponseClass,
+            'kwargs': {}
+        }
+        '''
+        resources = []
+        additional_data = ['name', 'type', 'size', 'launched_at']
 
-            service_api_cls = service_cls_info.get('cls_api')
-            service_cls = service_cls_info.get('cls')
-            configuration = self._get_configuration(service_cls)
+        try:
+            for collected_dict in collect_resource_info['request_method'](region_name,
+                                                                          **collect_resource_info.get('kwargs', {})):
+                data = collected_dict['data']
 
-            self.api_clients[service_name] = service_api_cls(service_api_cls.ApiClient(configuration))
+                if getattr(data, 'resource_type', None) and data.resource_type == 'inventory.ErrorResource':
+                    # Error Resource
+                    resources.append(data)
+                else:
 
-    def _get_configuration(self, service_cls):
+                    resource_dict = {
+                        'data': data,
+                        'account': collected_dict.get('account'),
+                        'instance_size': float(collected_dict.get('instance_size', 0)),
+                        'instance_type': collected_dict.get('instance_type', ''),
+                        'launched_at': str(collected_dict.get('launched_at', '')),
+                        'tags': collected_dict.get('tags', {}),
+                        'region_code': region_name
+                    }
 
-        configuration = service_cls.Configuration()
+                    for add_field in additional_data:
+                        if add_field in collected_dict:
+                            resource_dict.update({add_field: collected_dict[add_field]})
 
-        # to do : modify key name
-        configuration.access_key = self.secret_data.get('aws_access_key_id')
-        configuration.secret_key = self.secret_data.get('aws_secret_access_key')
+                    resources.append(collect_resource_info['response_schema'](
+                        {'resource': collect_resource_info['resource'](resource_dict)}))
+        except Exception as e:
+            resource_id = ''
+            error_resource_response = self.generate_error(region_name, resource_id, e)
+            resources.append(error_resource_response)
 
-        return configuration
+        return resources
+
 

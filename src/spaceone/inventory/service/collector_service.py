@@ -1,12 +1,10 @@
-import json
-import time
-import logging
 import concurrent.futures
-
+import logging
+import time
+import json
 from spaceone.core.service import *
-from spaceone.inventory.manager.collector_manager import CollectorManager
-from spaceone.inventory.model.resource import CloudServiceTypeResourceResponse, ServerResourceResponse, \
-    RegionResourceResponse, ErrorResourceResponse
+from spaceone.inventory.conf.cloud_service_conf import *
+from spaceone.inventory.libs.schema.resource import RegionResource, RegionResponse, ErrorResourceResponse
 from spaceone.inventory.conf.cloud_service_conf import *
 
 _LOGGER = logging.getLogger(__name__)
@@ -16,9 +14,7 @@ _LOGGER = logging.getLogger(__name__)
 class CollectorService(BaseService):
     def __init__(self, metadata):
         super().__init__(metadata)
-        self.collector_manager: CollectorManager = self.locator.get_manager('CollectorManager')
 
-    @transaction
     @check_required(['options'])
     def init(self, params):
         """ init plugin by options
@@ -34,83 +30,125 @@ class CollectorService(BaseService):
     @transaction
     @check_required(['options', 'secret_data'])
     def verify(self, params):
-        """ verify options capability
-        Args:
-            params
-              - options
-              - secret_data: may be empty dictionary
-
-        Returns:
-
-        Raises:
-             ERROR_VERIFY_FAILED:
         """
-        manager = self.locator.get_manager('CollectorManager')
-        secret_data = params['secret_data']
-        active = manager.verify(secret_data)
+        Args:
+              params:
+                - options
+                - secret_data
+        """
+        options = params['options']
+        secret_data = params.get('secret_data', {})
+
 
         return {}
+
+    def add_account_region_params(self, params):
+        secret_data = params['secret_data']
+
+        params.update({
+            'account_id': self.get_account_id(secret_data),
+            'regions': self.get_regions(secret_data)
+        })
+
+        return params
+
+    def _get_target_execute_manger(self, options):
+        if 'cloud_service_types' in options:
+            execute_managers = self._match_execute_manager(options['cloud_service_types'])
+        else:
+            execute_managers = list(CLOUD_SERVICE_GROUP_MAP.values())
+
+        return execute_managers
 
     @transaction
     @check_required(['options', 'secret_data', 'filter'])
     def collect(self, params):
-        """ Get quick list of resources
+        """
         Args:
             params:
                 - options
                 - secret_data
                 - filter
-
-        Returns: list of resources
         """
-
         start_time = time.time()
-        # To Do
         resource_regions = []
+        collected_region_code = []
+        target_execute_managers = self._get_target_execute_manger(params.get('options', {}))
 
-        for cloud_service_type in self.collector_manager.list_cloud_service_types():
-            yield CloudServiceTypeResourceResponse({'resource': cloud_service_type})
+        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKER) as executor:
+            future_executors = []
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=NUMBER_OF_CONCURRENT) as executor:
+            for execute_manager in target_execute_managers:
+                _manager = self.locator.get_manager(execute_manager)
 
-            future_executors: list = [executor.submit(self.collector_manager.list_resources, **params)]
+                future_executors.append(executor.submit(_manager.collect_resources, **params))
 
             for future in concurrent.futures.as_completed(future_executors):
                 for result in future.result():
+                    try:
+
+                        if getattr(result, 'resource', None) and getattr(result.resource, 'region_code', None):
+                            collected_region = self.get_region_from_result(result.resource.region_code)
+
+                            if collected_region and collected_region.resource.region_code not in collected_region_code:
+                                resource_regions.append(collected_region)
+                                collected_region_code.append(collected_region.resource.region_code)
+
+                    except Exception as e:
+                        _LOGGER.error(f'[collect] {e}')
+
+                        if type(e) is dict:
+                            error_resource_response = ErrorResourceResponse(
+                                {'message': json.dumps(e), 'resource': {'resource_type': 'inventory.Region'}})
+                        else:
+                            error_resource_response = ErrorResourceResponse(
+                                {'message': str(e), 'resource': {'resource_type': 'inventory.Region'}})
+
+                        yield error_resource_response
+
                     yield result
 
-        for resource_region in resource_regions:
-            yield RegionResourceResponse({'resource': resource_region})
+        # ## This code for test without async job
+        # for execute_manager in self.execute_managers:
+        #     print(f'@@@ {execute_manager} @@@')
+        #     _manager = self.locator.get_manager(execute_manager)
+        #     result = _manager.collect_resources(**params)
 
-        _LOGGER.debug(f'[collect] TOTAL FINISHED {time.time() - start_time} Sec')
+        _LOGGER.debug(f'[collect] TOTAL FINISHED TIME : {time.time() - start_time} Seconds')
+        for resource_region in resource_regions:
+            yield resource_region
+
+    def get_region_from_result(self, region_code):
+        region_resource = self.match_region_info(region_code)
+
+        if region_resource:
+            return RegionResponse({'resource': region_resource})
+
+        return None
+
+    @staticmethod
+    def _match_execute_manager(cloud_service_groups):
+        return [CLOUD_SERVICE_GROUP_MAP[_cloud_service_group] for _cloud_service_group in cloud_service_groups
+                if _cloud_service_group in CLOUD_SERVICE_GROUP_MAP]
 
 
     @staticmethod
-    def _check_query(query):
-        """
-        Args:
-            query (dict): example
-                  {
-                      'instance_id': ['i-123', 'i-2222', ...]
-                      'instance_type': 'm4.xlarge',
-                      'region_name': ['aaaa']
-                  }
-        If there is region_name in query, this indicates searching only these regions
-        """
+    def match_region_info(region_name):
+        match_region_info = REGION_INFO.get(region_name, None)
+        if match_region_info is not None:
+            region_info = match_region_info.copy()
+            region_info.update({
+                'region_code': region_name
+            })
 
-        instance_ids = []
-        filters = []
-        region_name = []
-        for key, value in query.items():
-            if key == 'instance_id' and isinstance(value, list):
-                instance_ids = value
-            elif key == 'region_name' and isinstance(value, list):
-                region_name.extend(value)
-            else:
-                if not isinstance(value, list):
-                    value = [value]
+            return RegionResource(region_info, strict=False)
 
-                if len(value):
-                    filters.append({'Name': key, 'Values': value})
+        return None
 
-        return filters, instance_ids, region_name
+    def get_region_from_result(self, region_code):
+        region_resource = self.match_region_info(region_code)
+
+        if region_resource:
+            return RegionResponse({'resource': region_resource})
+
+        return None

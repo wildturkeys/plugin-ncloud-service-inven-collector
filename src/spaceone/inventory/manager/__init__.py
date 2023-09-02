@@ -1,1 +1,1 @@
-from spaceone.inventory.manager.collector_manager import CollectorManager
+from spaceone.inventory.manager.ncloud_server_manager import ServerConnectorManager

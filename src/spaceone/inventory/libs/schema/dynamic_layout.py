@@ -1,5 +1,6 @@
-from schematics.types import ListType
-from spaceone.inventory.model.metadata.metadata_dynamic_field import *
+from schematics import Model
+from schematics.types import ModelType, StringType, PolyModelType, DictType, ListType
+from .dynamic_field import BaseDynamicField, TextDyField
 
 
 class LayoutOptions(Model):
@@ -45,13 +46,13 @@ class RawLayoutOption(LayoutOptions):
         serialize_when_none = False
 
 
+class ListLayoutOption(LayoutOptions):
+    layouts = ListType(PolyModelType(BaseLayoutField))
+
+
 class HTMLLayoutOption(LayoutOptions):
     class Options:
         serialize_when_none = False
-
-
-class ListLayoutOption(LayoutOptions):
-    layouts = ListType(PolyModelType(BaseLayoutField))
 
 
 class ItemDynamicLayout(BaseLayoutField):
