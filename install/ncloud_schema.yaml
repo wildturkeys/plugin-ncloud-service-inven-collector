@@ -1,0 +1,21 @@
+---
+labels:
+- Ncloud
+name: ncloud_credentials
+schema:
+  properties:
+    access_key:
+      minLength: 4.0
+      title: Access Key
+      type: string
+    secret_key:
+      minLength: 4.0
+      title: Secret Key
+      type: string
+  required:
+  - access_key
+  - secret_key
+  type: object
+service_type: secret.credentials
+tags:
+  description: Naver Cloud Credentials

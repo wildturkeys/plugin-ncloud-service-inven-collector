@@ -1,0 +1,43 @@
+---
+capability:
+  supported_schema:
+  - ncloud_credentials
+metadata:
+  view:
+    layouts:
+      help:service_account:create:
+        name: Creation Help
+        options:
+          markdown:
+            en: '# Getting started with Naver Cloud
+
+              [Service Account Key](https://guide.ncloud-docs.com/docs/userguide-userguideaccount-5#%EC%9D%B8%EC%A6%9D%ED%82%A4-%EA%B4%80%EB%A6%AC)
+
+              '
+            ko: '# Naver Cloud 시작 가이드
+
+              ## 서비스 어카운트 키(JSON) 받기
+
+              [Service Account Key](https://guide.ncloud-docs.com/docs/userguide-userguideaccount-5#%EC%9D%B8%EC%A6%9D%ED%82%A4-%EA%B4%80%EB%A6%AC)
+
+              '
+        type: markdown
+name: Naver Cloud Platform
+provider: ncloud
+tags:
+  color: '#2485F4'
+  external_link_template: https://www.ncloud.com/
+    data.project_id %>
+  icon: https://chulgyujeon.github.io/images/ncloud-logo.svg
+  label: ncloud
+template:
+  service_account:
+    schema:
+      properties:
+        account_id:
+          minLength: 4.0
+          title: Account ID
+          type: string
+      required:
+      - account_id
+      type: object
