@@ -24,7 +24,8 @@ Ncloud Resource Explorer 는 오픈소스 Cloudforet(https://github.com/cloudfor
 
 ## Architecture
 
-Plugin
+![image](https://github.com/chulgyujeon/plugin-ncloud-service-inven-collector/assets/101609006/d57bf765-14d8-4d79-ad6c-2826ecae1bcc)
+
 
 ## 설치 화면
 ![image](https://github.com/chulgyujeon/plugin-ncloud-service-inven-collector/assets/101609006/304db630-b312-4179-9494-7af6ab06f7ef)
