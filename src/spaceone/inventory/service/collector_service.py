@@ -89,7 +89,6 @@ class CollectorService(BaseService):
 
                         if getattr(result, 'resource', None) and getattr(result.resource, 'region_code', None):
                             collected_region = self.get_region_from_result(result.resource.region_code)
-
                             if collected_region and collected_region.resource.region_code not in collected_region_code:
                                 resource_regions.append(collected_region)
                                 collected_region_code.append(collected_region.resource.region_code)

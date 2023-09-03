@@ -1,16 +1,13 @@
 ---
-cloud_service_group: Instance
+cloud_service_group: Compute
 cloud_service_type: Server
-name: Related Instance Total Count
+name: Total Count
 query:
   aggregate:
-    - unwind:
-        path: data.instances
     - group:
         fields:
           - name: value
             operator: count
-            key: data.instances
 options:
   value_options:
     key: value

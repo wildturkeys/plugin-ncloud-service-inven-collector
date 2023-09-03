@@ -1,0 +1,16 @@
+---
+capability:
+  supported_schema:
+  - ncloud_credentials
+image: finalck/ncloud-resource-explorer
+labels:
+- VM Instance
+name: Naver Cloud plugin
+provider: ncloud
+registry_config: {}
+registry_type: DOCKER_HUB
+service_type: inventory.Collector
+tags:
+  description: Naver Cloud Resource Plugin
+  icon: https://chulgyujeon.github.io/images/ncloud-logo.svg
+template: {}

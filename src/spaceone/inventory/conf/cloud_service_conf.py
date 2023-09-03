@@ -10,6 +10,6 @@ CLOUD_SERVICE_GROUP_MAP = {
 }
 
 REGION_INFO = {
-    'KR-KOREA-1': {'name': 'KR East (N. Virginia)',
-                  'tags': {'latitude': '39.028760', 'longitude': '-77.458263', 'continent': 'north_america'}}
+    'KR': {'name': 'Korea',
+           'tags': {'latitude': '126.734086', 'longitude': '127.269311', 'continent': 'east asia'}}
 }

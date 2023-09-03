@@ -4,22 +4,23 @@ from spaceone.core.connector import BaseConnector
 from spaceone.inventory.conf.cloud_service_conf import *
 from spaceone.inventory.libs.schema.resource import CloudServiceResponse, CloudServiceResource
 from typing import Any, List
+from schematics import Model
+from schematics.types import DateTimeType
 
 _LOGGER = logging.getLogger(__name__)
-DEFAULT_REGION = 'KR-KOREA-1'
-DEFAULT_API_RETRIES = 10
 
+DATETIME_KEYS: List[str] = ['uptime','create_date']
 
 class NCloudBaseConnector(BaseConnector):
     _ncloud_cls: Any = None
-    _ncloud_api: Any = None
     _ncloud_api_v2: Any = None
     _ncloud_configuration = None
 
     def __init__(self, *args, **kwargs):
 
-        if self._ncloud_cls and kwargs.get("secret_data") and self._ncloud_configuration:
+        self._ncloud_configuration = self._ncloud_cls.Configuration()
 
+        if self._ncloud_cls and kwargs.get("secret_data") and self._ncloud_configuration:
             secret_data = kwargs.get("secret_data")
             self._ncloud_configuration.access_key = secret_data.get("access_key")
             self._ncloud_configuration.secret_key = secret_data.get("secret_key")
@@ -35,57 +36,37 @@ class NCloudBaseConnector(BaseConnector):
     def get_resources(self) -> List[CloudServiceResponse]:
         raise NotImplementedError()
 
-
     def collect_data(self):
         return self.get_resources()
 
+    def _convert_cloud_service_response(self, objs: List):
 
-    def set_cloud_service_types(self):
-        return self.cloud_service_types
+        for obj in objs:
 
-    def collect_data_by_region(self, service_name, region_name, collect_resource_info):
-        '''
-        collect_resource_info = {
-            'request_method': self.request_something_like_data,
-            'resource': ResourceClass,
-            'response_schema': ResponseClass,
-            'kwargs': {}
-        }
-        '''
-        resources = []
-        additional_data = ['name', 'type', 'size', 'launched_at']
+            csr_dic = { "data": obj,
+                        "cloud_service_group": self.cloud_service_group,
+                        "cloud_service_type": self.cloud_service_type }
 
-        try:
-            for collected_dict in collect_resource_info['request_method'](region_name,
-                                                                          **collect_resource_info.get('kwargs', {})):
-                data = collected_dict['data']
+            if obj.get("region_code"):
+                csr_dic["region_code"] = obj.get("region_code")
 
-                if getattr(data, 'resource_type', None) and data.resource_type == 'inventory.ErrorResource':
-                    # Error Resource
-                    resources.append(data)
+            yield CloudServiceResponse({'resource': CloudServiceResource(csr_dic)})
+
+    def _create_model_obj(self, model_cls: Model, resource: Any, **kwargs) -> Model:
+
+        model_obj = model_cls()
+
+        if isinstance(resource, dict):
+            resource_dic = resource
+        else:
+            resource_dic = resource.to_dict()
+
+        for key, value in resource_dic.items():
+            if hasattr(model_obj, key):
+                if key in DATETIME_KEYS and value:
+                    dt_value = DateTimeType().to_native(value)
+                    setattr(model_obj, key, dt_value)
                 else:
+                    setattr(model_obj, key, value)
 
-                    resource_dict = {
-                        'data': data,
-                        'account': collected_dict.get('account'),
-                        'instance_size': float(collected_dict.get('instance_size', 0)),
-                        'instance_type': collected_dict.get('instance_type', ''),
-                        'launched_at': str(collected_dict.get('launched_at', '')),
-                        'tags': collected_dict.get('tags', {}),
-                        'region_code': region_name
-                    }
-
-                    for add_field in additional_data:
-                        if add_field in collected_dict:
-                            resource_dict.update({add_field: collected_dict[add_field]})
-
-                    resources.append(collect_resource_info['response_schema'](
-                        {'resource': collect_resource_info['resource'](resource_dict)}))
-        except Exception as e:
-            resource_id = ''
-            error_resource_response = self.generate_error(region_name, resource_id, e)
-            resources.append(error_resource_response)
-
-        return resources
-
-
+        return model_obj

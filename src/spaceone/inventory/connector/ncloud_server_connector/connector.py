@@ -6,70 +6,45 @@ from spaceone.inventory.connector.ncloud_server_connector.schema.data import Ser
 from spaceone.inventory.connector.ncloud_connector import NCloudBaseConnector
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_type import CLOUD_SERVICE_TYPES
 from spaceone.inventory.libs.schema.resource import CloudServiceResponse, CloudServiceResource
+from typing import Iterator, List
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class ServerConnector(NCloudBaseConnector):
-    service_name = 'Server'
-    cloud_service_group = 'Instance'
+
+    cloud_service_group = 'Compute'
     cloud_service_type = 'Server'
     cloud_service_types = CLOUD_SERVICE_TYPES
 
     _ncloud_cls = ncloud_server
     _ncloud_api_v2 = V2Api
-    _ncloud_configuration = ncloud_server.Configuration()
 
-    def get_resources(self):
+    def get_resources(self) -> List[CloudServiceResponse]:
 
         resources = []
-        csr = []
-
-        for instance in self.list_instances():
-            csr.append(CloudServiceResponse(
-                    {'resource': CloudServiceResource(
-                        {'data': instance, "cloud_service_group": self.cloud_service_group,
-                         "cloud_service_type": self.cloud_service_type}
-                        )
-                    }
-                )
-            )
-
-        resources.extend(self.set_cloud_service_types())
-        resources.extend(csr)
+        resources.extend(self.cloud_service_types)
+        resources.extend(self._convert_cloud_service_response(self.list_instances()))
 
         return resources
 
-    def list_instances(self):
-
-        instance_list = []
+    def list_instances(self) -> Iterator:
 
         try:
 
             response = self.api_client_v2.get_server_instance_list(ncloud_server.GetServerInstanceListRequest())
+            response_dict = response.to_dict()
 
-            if response:
-                response = response.to_dict()
+            if response_dict.get("server_instance_list"):
 
-            if response.get("server_instance_list"):
+                for server_instance in response_dict.get("server_instance_list"):
+                    region_code = server_instance.get("region").get("region_code")
 
-                for server_instance in response.get("server_instance_list"):
-                    instance_list.append(
-                        Server(
-                            {
-                                "server_name": server_instance.get("server_name"),
-                                "server_instance_type": server_instance.get("server_instance_type"),
-                                "server_instance_status_name": server_instance.get("server_instance_status_name"),
-                                "private_ip": server_instance.get("private_ip"),
-                                "memory_size": server_instance.get("memory_size"),
-                                "cpu_count": server_instance.get("cpu_count"),
-                                "server_image_name": server_instance.get("server_image_name"),
-                                "region": server_instance.get("region")
-                            }
-                        )
-                    )
+                    server = Server(self._create_model_obj(Server, server_instance))
+                    server.region_code = region_code
 
-            return instance_list
+                    yield server
+
 
         except ApiException as e:
             logging.error(e)
