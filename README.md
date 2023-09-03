@@ -1,6 +1,6 @@
 # plugin-ncloud-service-inven-collector
 
-## Ncloud Resource Explorer
+## Naver Cloud Platform Resource Explorer
 
 Ncloud Resource Explorer 는 오픈소스 Cloudforet(https://github.com/cloudforet-io) 기반의 Inventory Plugin 프로젝트입니다.
 
