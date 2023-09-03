@@ -2,7 +2,7 @@
 
 ## Ncloud Resource Explorer
 
-Ncloud Resource Explorer 는
+Ncloud Resource Explorer 는 Cloudforet 기반의 Inventory Plugin 프로젝트입니다.
 
 <p align="center"><img src="https://github.com/chulgyujeon/plugin-ncloud-service-inven-collector/assets/101609006/05cc08b2-2bc2-4900-8882-e8fc12c92686" ></p>
 
