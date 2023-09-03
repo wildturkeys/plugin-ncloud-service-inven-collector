@@ -22,4 +22,9 @@ class Server(Model):
     create_date = DateTimeType()
     uptime = DateTimeType()
 
+    def reference(self):
+        return {
+            "resource_id": self.server_instance_no,
+            "external_link": f"https://console.ncloud.com/server/server"
+        }
 

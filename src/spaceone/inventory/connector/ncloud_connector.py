@@ -2,7 +2,7 @@ import logging
 
 from spaceone.core.connector import BaseConnector
 from spaceone.inventory.conf.cloud_service_conf import *
-from spaceone.inventory.libs.schema.resource import CloudServiceResponse, CloudServiceResource
+from spaceone.inventory.libs.schema.resource import CloudServiceResponse, CloudServiceResource, ReferenceModel
 from typing import Any, List
 from schematics import Model
 from schematics.types import DateTimeType
@@ -49,6 +49,9 @@ class NCloudBaseConnector(BaseConnector):
 
             if obj.get("region_code"):
                 csr_dic["region_code"] = obj.get("region_code")
+
+            if hasattr(obj, "reference"):
+                csr_dic["reference"] = ReferenceModel(obj.reference())
 
             yield CloudServiceResponse({'resource': CloudServiceResource(csr_dic)})
 

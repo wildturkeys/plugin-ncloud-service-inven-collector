@@ -4,6 +4,7 @@ from spaceone.inventory.libs.schema.dynamic_widget import ChartWidget, CardWidge
 from spaceone.inventory.libs.schema.dynamic_field import TextDyField, SearchField, DateTimeDyField, EnumDyField, SizeField
 from spaceone.inventory.libs.schema.resource import CloudServiceTypeResource, CloudServiceTypeResponse, \
     CloudServiceTypeMeta
+from spaceone.inventory.conf.cloud_service_conf import *
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 
@@ -17,7 +18,9 @@ cst_server.labels = []
 cst_server.service_code = 'ncloudServer'
 cst_server.is_primary = True
 cst_server.is_major = True
-
+cst_server.tags = {
+    'spaceone:icon': f'{ASSET_URL}/Server.svg',
+}
 
 cst_server._metadata = CloudServiceTypeMeta.set_meta(
     fields=[
