@@ -6,7 +6,8 @@ DEFAULT_REGION = 'KR-KOREA-1'
 FILTER_FORMAT = []
 ASSET_URL = "https://chulgyujeon.github.io/images"
 CLOUD_SERVICE_GROUP_MAP = {
-    'Server': 'ServerConnectorManager'
+    'Server': 'ServerConnectorManager',
+    'Nas': 'NasConnectorManager'
 }
 
 REGION_INFO = {
