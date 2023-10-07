@@ -33,7 +33,7 @@ cst_nas_volume._metadata = CloudServiceTypeMeta.set_meta(
         # TextDyField.data_source('vCore', 'data.cpu_count'),
         # SizeField.data_source('Memory', 'data.memory_size', type="size", options={"source_unit": "BYTES", "display_unit":"GB"}),
         TextDyField.data_source('Instance Type', 'data.nas_volume_instance_status.code_name'),
-        TextDyField.data_source('Total Size', 'data.volume_instance_status.nas_volume_total_size'),
+        TextDyField.data_source('Total Size', 'data.volume_total_size'),
 
         DateTimeDyField.data_source("Created", "data.create_date")
 
