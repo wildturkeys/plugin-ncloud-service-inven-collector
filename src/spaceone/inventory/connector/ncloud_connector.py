@@ -56,7 +56,7 @@ class NCloudBaseConnector(BaseConnector):
 
 
     @property
-    def regions(self):
+    def regions(self) -> List:
         return self._regions
 
     @property

@@ -57,6 +57,7 @@ cst_server._metadata = CloudServiceTypeMeta.set_meta(
                               options={"source_unit": "BYTES", "display_unit": "GB"}),
         TextDyField.data_source('Instance Type', 'data.server_instance_type.code_name'),
         TextDyField.data_source('Image', 'data.server_image_name'),
+        TextDyField.data_source('Zone', 'data.zone_code'),
         DateTimeDyField.data_source("Created", "data.create_date")
     ],
     search=[

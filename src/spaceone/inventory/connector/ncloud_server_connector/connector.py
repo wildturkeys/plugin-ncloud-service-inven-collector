@@ -14,7 +14,6 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class ServerConnector(NCloudBaseConnector):
-
     cloud_service_group = 'Compute'
     cloud_service_type = 'Server'
     cloud_service_types = CLOUD_SERVICE_TYPES
@@ -30,7 +29,8 @@ class ServerConnector(NCloudBaseConnector):
         resources.extend(self.cloud_service_types)
 
         for region in self.regions:
-            resources.extend(self._convert_cloud_service_response(self.list_instances(region_no=region.get('region_no'))))
+            resources.extend(
+                self._convert_cloud_service_response(self.list_instances(region_no=region.get('region_no'))))
 
         return resources
 
