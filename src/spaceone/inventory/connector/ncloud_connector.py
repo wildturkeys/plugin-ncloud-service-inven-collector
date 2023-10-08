@@ -50,6 +50,9 @@ class NCloudBaseConnector(BaseConnector):
             if obj.get("region_code"):
                 csr_dic["region_code"] = obj.get("region_code")
 
+            if obj.get("name"):
+                csr_dic["name"] = obj.get("name")
+
             if hasattr(obj, "reference"):
                 csr_dic["reference"] = ReferenceModel(obj.reference())
 

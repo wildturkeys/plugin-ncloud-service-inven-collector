@@ -4,7 +4,7 @@ SUPPORTED_SCHEDULES = ['hours']
 SUPPORTED_RESOURCE_TYPE = ['inventory.CloudService', 'inventory.CloudServiceType', 'inventory.Region']
 DEFAULT_REGION = 'KR-KOREA-1'
 FILTER_FORMAT = []
-ASSET_URL = "https://chulgyujeon.github.io/images"
+ASSET_URL = "https://chulgyujeon.github.io/images/icon"
 CLOUD_SERVICE_GROUP_MAP = {
     'Server': 'ServerConnectorManager'
 }

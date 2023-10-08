@@ -22,6 +22,10 @@ class Server(Model):
     create_date = DateTimeType()
     uptime = DateTimeType()
 
+    @property
+    def name(self) -> str:
+        return self.server_name
+
     def reference(self):
         return {
             "resource_id": self.server_instance_no,

@@ -24,7 +24,7 @@ cst_server.tags = {
 
 cst_server._metadata = CloudServiceTypeMeta.set_meta(
     fields=[
-        TextDyField.data_source('Name', 'data.server_name'),
+        #TextDyField.data_source('Name', 'data.server_name'),
         TextDyField.data_source('Status', 'data.server_instance_status_name'),
         TextDyField.data_source('Private IP', 'data.private_ip'),
         TextDyField.data_source('vCore', 'data.cpu_count'),
