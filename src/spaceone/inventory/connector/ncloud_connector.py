@@ -9,9 +9,16 @@ from schematics.types import DateTimeType
 
 _LOGGER = logging.getLogger(__name__)
 
-DATETIME_KEYS: List[str] = ['uptime','create_date']
+DATETIME_KEYS: List[str] = ['uptime', 'create_date']
+
 
 class NCloudBaseConnector(BaseConnector):
+
+    cloud_service_group = None
+    cloud_service_type = None
+    cloud_service_types = None
+    cloud_service_details = None
+
     _ncloud_cls: Any = None
     _ncloud_api_v2: Any = None
     _ncloud_configuration = None
@@ -43,15 +50,18 @@ class NCloudBaseConnector(BaseConnector):
 
         for obj in objs:
 
-            csr_dic = { "data": obj,
-                        "cloud_service_group": self.cloud_service_group,
-                        "cloud_service_type": self.cloud_service_type }
+            csr_dic = {"data": obj,
+                       "cloud_service_group": self.cloud_service_group,
+                       "cloud_service_type": self.cloud_service_type}
 
-            if obj.get("region_code"):
+            if hasattr(obj, "region_code"):
                 csr_dic["region_code"] = obj.get("region_code")
 
-            if obj.get("name"):
+            if hasattr(obj, "name"):
                 csr_dic["name"] = obj.get("name")
+
+            if self.cloud_service_details:
+                csr_dic["metadata"] = self.cloud_service_details
 
             if hasattr(obj, "reference"):
                 csr_dic["reference"] = ReferenceModel(obj.reference())

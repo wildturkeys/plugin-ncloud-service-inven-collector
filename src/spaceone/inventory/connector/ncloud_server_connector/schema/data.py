@@ -11,6 +11,7 @@ class Server(Model):
 
     server_name = StringType(serialize_when_none=False)
     server_instance_type = DictType(StringType, serialize_when_none=False)
+    public_ip = StringType(serialize_when_none=False)
     private_ip = StringType(serialize_when_none=False)
     memory_size = IntType(serialize_when_none=False)
     cpu_count = IntType(serialize_when_none=False)
@@ -21,6 +22,9 @@ class Server(Model):
     zone_code = StringType(serialize_when_none=False)
     create_date = DateTimeType()
     uptime = DateTimeType()
+    port_forwarding_external_port = StringType(serialize_when_none=False)
+    port_forwarding_internal_port = StringType(serialize_when_none=False)
+    port_forwarding_public_ip = StringType(serialize_when_none=False)
 
     @property
     def name(self) -> str:
