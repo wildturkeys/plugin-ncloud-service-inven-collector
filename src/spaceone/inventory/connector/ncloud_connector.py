@@ -1,5 +1,6 @@
 import logging
-
+import ncloud_server
+from ncloud_server.api.v2_api import V2Api
 from spaceone.core.connector import BaseConnector
 from spaceone.inventory.conf.cloud_service_conf import *
 from spaceone.inventory.libs.schema.resource import CloudServiceResponse, CloudServiceResource, ReferenceModel
@@ -23,14 +24,40 @@ class NCloudBaseConnector(BaseConnector):
     _ncloud_api_v2: Any = None
     _ncloud_configuration = None
 
+    _regions = {}
+
     def __init__(self, *args, **kwargs):
 
         self._ncloud_configuration = self._ncloud_cls.Configuration()
 
         if self._ncloud_cls and kwargs.get("secret_data") and self._ncloud_configuration:
             secret_data = kwargs.get("secret_data")
+
             self._ncloud_configuration.access_key = secret_data.get("access_key")
             self._ncloud_configuration.secret_key = secret_data.get("secret_key")
+
+            self._set_region(secret_data.get("access_key"), secret_data.get("secret_key"))
+
+    def _set_region(self, access_key, secret_key):
+
+        configuration = ncloud_server.Configuration()
+        configuration.access_key = access_key
+        configuration.secret_key = secret_key
+
+        client = ncloud_server.ApiClient(configuration)
+
+        api = V2Api(client)
+        get_region_list_request = ncloud_server.GetRegionListRequest
+        response = api.get_region_list(get_region_list_request).to_dict()
+        self._regions = response.get("region_list")
+
+        _LOGGER.info(self._regions)
+
+
+
+    @property
+    def regions(self):
+        return self._regions
 
     @property
     def api_client(self):
@@ -40,7 +67,7 @@ class NCloudBaseConnector(BaseConnector):
     def api_client_v2(self):
         return self._ncloud_api_v2(self.api_client)
 
-    def get_resources(self) -> List[CloudServiceResponse]:
+    def get_resources(self, **kwargs) -> List[CloudServiceResponse]:
         raise NotImplementedError()
 
     def collect_data(self):

@@ -20,11 +20,20 @@ class Server(Model):
     server_instance_status_name = StringType(serialize_when_none=False)
     server_instance_no = StringType(serialize_when_none=False)
     zone_code = StringType(serialize_when_none=False)
+    login_key_name = StringType(serialize_when_none=False)
     create_date = DateTimeType()
     uptime = DateTimeType()
     port_forwarding_external_port = StringType(serialize_when_none=False)
     port_forwarding_internal_port = StringType(serialize_when_none=False)
     port_forwarding_public_ip = StringType(serialize_when_none=False)
+    base_block_storage_disk_detail_type = DictType(StringType, serialize_when_none=False)
+    base_block_storage_disk_type = DictType(StringType, serialize_when_none=False)
+    base_block_storage_size = IntType(serialize_when_none=False)
+    block_device_partition_list = ListType(StringType, serialize_when_none=False)
+    instance_tag_list = ListType(StringType, serialize_when_none=False)
+    is_fee_charging_monitoring = BooleanType(serialize_when_none=False)
+    is_protect_server_termination = BooleanType(serialize_when_none=False)
+
 
     @property
     def name(self) -> str:

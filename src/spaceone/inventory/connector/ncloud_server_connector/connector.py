@@ -28,17 +28,18 @@ class ServerConnector(NCloudBaseConnector):
         resources = []
 
         resources.extend(self.cloud_service_types)
-        resources.extend(self._convert_cloud_service_response(self.list_instances()))
+
+        for region in self.regions:
+            resources.extend(self._convert_cloud_service_response(self.list_instances(region_no=region.get('region_no'))))
 
         return resources
 
-    def list_instances(self) -> Iterator:
+    def list_instances(self, **kwargs) -> Iterator:
 
         try:
 
-            response = self.api_client_v2.get_server_instance_list(ncloud_server.GetServerInstanceListRequest())
+            response = self.api_client_v2.get_server_instance_list(ncloud_server.GetServerInstanceListRequest(**kwargs))
             response_dict = response.to_dict()
-
             if response_dict.get("server_instance_list"):
 
                 for server_instance in response_dict.get("server_instance_list"):
