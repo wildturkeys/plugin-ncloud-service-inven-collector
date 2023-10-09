@@ -2,7 +2,7 @@ import logging
 import ncloud_server
 from ncloud_server.api.v2_api import V2Api
 from ncloud_server.rest import ApiException
-from spaceone.inventory.connector.ncloud_server_connector.schema.data import Server
+from spaceone.inventory.connector.ncloud_server_connector.schema.data import Server, NCloudServer
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_connector import NCloudBaseConnector
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_type import CLOUD_SERVICE_TYPES
@@ -11,6 +11,23 @@ from spaceone.inventory.libs.schema.resource import CloudServiceResponse
 from typing import Iterator, List
 
 _LOGGER = logging.getLogger(__name__)
+
+INSTANCE_STATE_MAP = {
+    "init": "RUNNING",
+    "creating": "RUNNING",
+    "booting": "RUNNING",
+    "setting up": "RUNNING",
+    "running": "RUNNING",
+    "rebooting": "RUNNING",
+    "hard rebooting": "RUNNING",
+    "shutting down": "STOPPING",
+    "hard shutting down": "STOPPING",
+    "terminating": "SHUTTING-DOWN",
+    "changingSpec": "PENDING",
+    "copying": "PENDING",
+    "repairing": "PENDING",
+    "stopped": "STOPPED"
+}
 
 
 class ServerConnector(NCloudBaseConnector):
@@ -40,13 +57,34 @@ class ServerConnector(NCloudBaseConnector):
 
             response = self.api_client_v2.get_server_instance_list(ncloud_server.GetServerInstanceListRequest(**kwargs))
             response_dict = response.to_dict()
+
             if response_dict.get("server_instance_list"):
 
                 for server_instance in response_dict.get("server_instance_list"):
-                    region_code = server_instance.get("region").get("region_code")
 
-                    server = Server(self._create_model_obj(Server, server_instance))
-                    server.region_code = region_code
+                    server = Server(self._create_model_obj(NCloudServer, server_instance))
+
+                    region = server_instance.get("region")
+
+                    if region.get("region_code"):
+                        server.region_code = region.get("region_code")
+
+                    server.hardware = {
+                        'core': server.cpu_count,
+                        'memory': round(server.memory_size / 1024 / 1024 / 1024)
+                    }
+
+                    server.compute = {
+                        'az': server.zone.get('zone_code'),
+                        'instance_state': INSTANCE_STATE_MAP.get(server.server_instance_status_name),
+                        'instance_id': server.server_instance_no
+                    }
+
+                    server.os = {
+                        'os_distro': server.platform_type.get('code_name'),
+                    }
+
+                    server.primary_ip_address = server.private_ip
 
                     yield server
 

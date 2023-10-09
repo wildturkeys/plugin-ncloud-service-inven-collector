@@ -3,12 +3,10 @@ import logging
 from schematics import Model
 from schematics.types import ModelType, StringType, IntType, ListType, BooleanType, DictType, DateTimeType
 
-
 _LOGGER = logging.getLogger(__name__)
 
 
-class Server(Model):
-
+class NCloudServer(Model):
     server_name = StringType(serialize_when_none=False)
     server_instance_type = DictType(StringType, serialize_when_none=False)
     public_ip = StringType(serialize_when_none=False)
@@ -19,10 +17,8 @@ class Server(Model):
     region_code = StringType(serialize_when_none=False)
     server_instance_status_name = StringType(serialize_when_none=False)
     server_instance_no = StringType(serialize_when_none=False)
-    zone_code = StringType(serialize_when_none=False)
+    zone = DictType(StringType, serialize_when_none=False)
     login_key_name = StringType(serialize_when_none=False)
-    create_date = DateTimeType()
-    uptime = DateTimeType()
     port_forwarding_external_port = StringType(serialize_when_none=False)
     port_forwarding_internal_port = StringType(serialize_when_none=False)
     port_forwarding_public_ip = StringType(serialize_when_none=False)
@@ -33,7 +29,21 @@ class Server(Model):
     instance_tag_list = ListType(StringType, serialize_when_none=False)
     is_fee_charging_monitoring = BooleanType(serialize_when_none=False)
     is_protect_server_termination = BooleanType(serialize_when_none=False)
+    platform_type = DictType(StringType, serialize_when_none=False)
+    create_date = DateTimeType()
+    uptime = DateTimeType()
 
+
+class Server(NCloudServer):
+    hardware = DictType(StringType, serialize_when_none=False)
+    compute = DictType(StringType, serialize_when_none=False)
+    nics = ListType(DictType(StringType), serialize_when_none=False)
+    os = DictType(StringType, serialize_when_none=False)
+    primary_ip_address = StringType(serialize_when_none=False)
+
+    @property
+    def instance_type(self) -> str:
+        return self.server_instance_type.get('code_name', None)
 
     @property
     def name(self) -> str:
@@ -44,4 +54,3 @@ class Server(Model):
             "resource_id": self.server_instance_no,
             "external_link": f"https://console.ncloud.com/server/server"
         }
-

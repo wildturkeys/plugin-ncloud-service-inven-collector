@@ -17,7 +17,7 @@ cst_server = CloudServiceTypeResource()
 cst_server.name = 'Server'
 cst_server.provider = 'ncloud'
 cst_server.group = 'Compute'
-cst_server.labels = []
+cst_server.labels = ['Server']
 cst_server.service_code = 'ncloudServer'
 cst_server.is_primary = True
 cst_server.is_major = True
@@ -26,7 +26,7 @@ cst_server.tags = {
 }
 
 """
-- 서버 인스턴스 상태명
+# 서버 인스턴스 상태명
 init
 creating
 booting
@@ -57,7 +57,7 @@ cst_server._metadata = CloudServiceTypeMeta.set_meta(
                               options={"source_unit": "BYTES", "display_unit": "GB"}),
         TextDyField.data_source('Instance Type', 'data.server_instance_type.code_name'),
         TextDyField.data_source('Image', 'data.server_image_name'),
-        TextDyField.data_source('Zone', 'data.zone_code'),
+        TextDyField.data_source('Zone', 'data.zone.zone_code'),
         DateTimeDyField.data_source("Created", "data.create_date")
     ],
     search=[

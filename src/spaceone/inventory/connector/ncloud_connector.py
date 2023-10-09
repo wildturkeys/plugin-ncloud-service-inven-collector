@@ -84,6 +84,9 @@ class NCloudBaseConnector(BaseConnector):
             if hasattr(obj, "region_code"):
                 csr_dic["region_code"] = obj.get("region_code")
 
+            if hasattr(obj, "instance_type"):
+                csr_dic["instance_type"] = obj.get("instance_type")
+
             if hasattr(obj, "name"):
                 csr_dic["name"] = obj.get("name")
 
@@ -95,7 +98,12 @@ class NCloudBaseConnector(BaseConnector):
 
             yield CloudServiceResponse({'resource': CloudServiceResource(csr_dic)})
 
-    def _create_model_obj(self, model_cls: Model, resource: Any, **kwargs) -> Model:
+    @staticmethod
+    def _set_obj_key_value(obj: Any, key: str, value: Any) -> None:
+        setattr(obj, key, value)
+
+    @staticmethod
+    def _create_model_obj(model_cls: Model, resource: Any, **kwargs) -> Model:
 
         model_obj = model_cls()
 
