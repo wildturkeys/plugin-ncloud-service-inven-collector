@@ -40,9 +40,13 @@ class NasVolume(Model):
     # create_date = DateTimeType()
     # uptime = DateTimeType()
 
+    @property
+    def name(self) -> str:
+        return self.volume_name
+
     def reference(self):
         return {
             "resource_id": self.nas_volume_instance_no,
-            "external_link": f"https://console.ncloud.com/server/server"
+            "external_link": f"https://console.ncloud.com/nas/volume"
         }
 
