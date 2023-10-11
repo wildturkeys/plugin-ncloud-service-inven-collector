@@ -34,12 +34,52 @@ class NCloudServer(Model):
     uptime = DateTimeType()
 
 
+class NCloudBlock(Model):
+    block_storage_name = StringType(serialize_when_none=False)
+    block_storage_instance_description = StringType(serialize_when_none=False)
+    block_storage_type = DictType(StringType, serialize_when_none=False)
+    block_storage_instance_no = StringType(serialize_when_none=False)
+    block_storage_size = IntType(serialize_when_none=False)
+    device_name = StringType(serialize_when_none=False)
+    region_code = StringType(serialize_when_none=False)
+    server_instance_status_name = StringType(serialize_when_none=False)
+    server_instance_no = StringType(serialize_when_none=False)
+    server_name = StringType(serialize_when_none=False)
+    zone = DictType(StringType, serialize_when_none=False)
+    create_date = DateTimeType()
+    disk_detail_type = DictType(StringType, serialize_when_none=False)
+    max_iops_throughput = IntType(serialize_when_none=False)
+
+
+class NCloudNetworkInterface(Model):
+    network_interface_name = StringType(serialize_when_none=False)
+    network_interface_description = StringType(serialize_when_none=False)
+    network_interface_ip = StringType(serialize_when_none=False)
+    network_interface_no = StringType(serialize_when_none=False)
+    server_instance_no = StringType(serialize_when_none=False)
+    status_code = StringType(serialize_when_none=False)
+
+
+class NCloudAccessControlGroup(Model):
+    network_interface_name = StringType(serialize_when_none=False)
+
+
+class NCloudAccessControlGroupServerInstance(Model):
+    network_interface_name = StringType(serialize_when_none=False)
+
+
+class NCloudAccessControlRule(Model):
+    network_interface_name = StringType(serialize_when_none=False)
+
+
 class Server(NCloudServer):
     hardware = DictType(StringType, serialize_when_none=False)
     compute = DictType(StringType, serialize_when_none=False)
-    nics = ListType(DictType(StringType), serialize_when_none=False)
+    nics = ListType(ModelType(NCloudNetworkInterface), serialize_when_none=False)
     os = DictType(StringType, serialize_when_none=False)
     primary_ip_address = StringType(serialize_when_none=False)
+    disks = ListType(ModelType(NCloudBlock), serialize_when_none=False)
+    security_group = None
 
     @property
     def instance_type(self) -> str:

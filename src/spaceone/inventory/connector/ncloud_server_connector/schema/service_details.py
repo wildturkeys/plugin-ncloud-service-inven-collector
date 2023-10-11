@@ -6,6 +6,22 @@ from spaceone.inventory.libs.schema.dynamic_layout import ItemDynamicLayout, Sim
 
 # TAB
 details = ItemDynamicLayout.set_fields('Details', fields=[
+    EnumDyField.data_source('Status', 'data.server_instance_status_name',
+                            default_state={
+                                'safe': ['running'],
+                                'available': ['init', 'creating', 'booting', 'setting up', 'changingSpec'],
+                                'warning': ['warning', 'rebooting', 'hard rebooting', 'shutting down',
+                                            'hard shutting down', 'terminating', 'copying', 'repairing', ],
+                                'disable': ['stopped']}),
+    TextDyField.data_source('Public IP', 'data.public_ip'),
+    TextDyField.data_source('Private IP', 'data.private_ip'),
+    TextDyField.data_source('vCore', 'data.cpu_count'),
+    SizeField.data_source('Memory', 'data.memory_size', type="size",
+                          options={"source_unit": "BYTES", "display_unit": "GB"}),
+    TextDyField.data_source('Instance Type', 'data.server_instance_type.code_name'),
+    TextDyField.data_source('Image', 'data.server_image_name'),
+    TextDyField.data_source('Zone', 'data.zone.zone_code'),
+    DateTimeDyField.data_source("Created", "data.create_date"),
     TextDyField.data_source('Login Key', 'data.login_key_name'),
     EnumDyField.data_source('Protect Server Termination', 'data.is_protect_server_termination', default_badge={
         'indigo.500': ['true'], 'coral.600': ['false']

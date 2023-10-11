@@ -103,6 +103,17 @@ class NCloudBaseConnector(BaseConnector):
         setattr(obj, key, value)
 
     @staticmethod
+    def _find_objs_by_key_value(obj_list: List, key, value) -> List:
+
+        obj_list = []
+
+        for obj in obj_list:
+            if obj.get(key) == value:
+                obj_list.append(obj)
+
+        return obj_list
+
+    @staticmethod
     def _create_model_obj(model_cls: Model, resource: Any, **kwargs) -> Model:
 
         model_obj = model_cls()
