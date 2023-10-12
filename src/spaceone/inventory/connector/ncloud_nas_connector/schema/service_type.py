@@ -27,19 +27,18 @@ cst_nas_volume.tags = {
 cst_nas_volume._metadata = CloudServiceTypeMeta.set_meta(
     fields=[
 
+        # TextDyField.data_source('Name', 'data.volume_name'),
         TextDyField.data_source('Status', 'data.nas_volume_instance_status_name'),
+        # TextDyField.data_source('Private IP', 'data.private_ip'),
+        # TextDyField.data_source('vCore', 'data.cpu_count'),
+        # SizeField.data_source('Memory', 'data.memory_size', type="size", options={"source_unit": "BYTES", "display_unit":"GB"}),
         TextDyField.data_source('Instance Type', 'data.nas_volume_instance_status.code_name'),
-        TextDyField.data_source('Total Size', 'data.volume_total_size',  type="size", options={"source_unit": "BYTES", "display_unit":"GB"}),
+        # TextDyField.data_source('Total Size', 'data.volume_total_size', type="size", options={"source_unit" :"BYTES", "display_unit":"GB"}),
+        TextDyField.data_source('Total Size', 'data.volume_total_size'),
         DateTimeDyField.data_source("Created", "data.create_date")
 
     ],
     search=[
-
-        SearchField.set(name='Status', key = 'data.nas_volume_instance_status_name'),
-        SearchField.set(name='Instance Type', key='data.nas_volume_instance_status.code_name'),
-        SearchField.set(name='Total Size', key='data.volume_total_size' , data_type='integer')
-
-
     ],
     widget=[
         CardWidget.set(**get_data_from_yaml(instance_total_count_conf)),
