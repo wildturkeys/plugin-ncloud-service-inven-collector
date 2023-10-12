@@ -1,6 +1,7 @@
 import logging
 import ncloud_server
 from ncloud_server.api.v2_api import V2Api
+from ncloud_server.rest import ApiException
 from spaceone.core.connector import BaseConnector
 from spaceone.inventory.conf.cloud_service_conf import *
 from spaceone.inventory.libs.schema.resource import CloudServiceResponse, CloudServiceResource, ReferenceModel
@@ -14,7 +15,6 @@ DATETIME_KEYS: List[str] = ['uptime', 'create_date']
 
 
 class NCloudBaseConnector(BaseConnector):
-
     cloud_service_group = None
     cloud_service_type = None
     cloud_service_types = None
@@ -52,8 +52,6 @@ class NCloudBaseConnector(BaseConnector):
         self._regions = response.get("region_list")
 
         _LOGGER.info(self._regions)
-
-
 
     @property
     def regions(self) -> List:
@@ -103,11 +101,11 @@ class NCloudBaseConnector(BaseConnector):
         setattr(obj, key, value)
 
     @staticmethod
-    def _find_objs_by_key_value(obj_list: List, key, value) -> List:
+    def _find_objs_by_key_value(target_obj_list: List, key, value) -> List:
 
         obj_list = []
 
-        for obj in obj_list:
+        for obj in target_obj_list:
             if obj.get(key) == value:
                 obj_list.append(obj)
 
@@ -132,3 +130,24 @@ class NCloudBaseConnector(BaseConnector):
                     setattr(model_obj, key, value)
 
         return model_obj
+
+    def _list_ncloud_resources(self, request_api, request_model, response_key: str, response_model, **kwargs) -> List:
+
+        try:
+
+            resources_list = []
+
+            response = request_api(request_model(**kwargs))
+            response_dict = response.to_dict()
+
+            if response_dict.get(response_key):
+
+                for value in response_dict.get(response_key):
+                    obj = self._create_model_obj(response_model, value)
+                    resources_list.append(obj)
+
+            return resources_list
+
+        except ApiException as e:
+            logging.error(e)
+            raise Exception(e)
