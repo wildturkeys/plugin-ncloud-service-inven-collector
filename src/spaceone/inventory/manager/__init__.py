@@ -1,1 +1,2 @@
 from spaceone.inventory.manager.ncloud_server_manager import ServerConnectorManager
+from spaceone.inventory.manager.ncloud_nas_manager import NasConnectorManager
