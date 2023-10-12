@@ -15,6 +15,16 @@ class NasVolume(Model):
     volume_total_size = IntType(serialize_when_none=False)
     volume_size = IntType(serialize_when_none=False)
     volume_use_size = IntType(serialize_when_none=False)
+    volume_use_ratio = FloatType(serialize_when_none=False)
+    snapshot_volume_configuration_ratio = FloatType(serialize_when_none=False)
+    snapshot_volume_config_time = IntType(serialize_when_none=False)
+    snapshot_volume_size = IntType(serialize_when_none=False)
+    snapshot_volume_use_size = IntType(serialize_when_none=False)
+    snapshot_volume_use_ratio = FloatType(serialize_when_none=False)
+    is_snapshot_configuration = BooleanType(serialize_when_none=False)
+    is_event_configuration = BooleanType(serialize_when_none=False)
+    is_return_protection = BooleanType(serialize_when_none=False)
+
 
     region_code = StringType(serialize_when_none=False)
     zone_code = StringType(serialize_when_none=False)
@@ -23,22 +33,11 @@ class NasVolume(Model):
 
     nas_volume_instance_no = StringType(serialize_when_none=False)
     nas_volume_instance_status_name = StringType(serialize_when_none=False)
+    nas_volume_instance_description = StringType(serialize_when_none=False)
+    mount_information
 
     mount_information = StringType(serialize_when_none=False)
 
-
-    # nas_volume_name = StringType(serialize_when_none=False)
-    # nas_volume_instance_type = DictType(StringType, serialize_when_none=False)
-    # private_ip = StringType(serialize_when_none=False)
-    # memory_size = IntType(serialize_when_none=False)
-    # cpu_count = IntType(serialize_when_none=False)
-    # server_image_name = StringType(serialize_when_none=False)
-    # region_code = StringType(serialize_when_none=False)
-    # server_instance_status_name = StringType(serialize_when_none=False)
-    # server_instance_no = StringType(serialize_when_none=False)
-    # zone_code = StringType(serialize_when_none=False)
-    # create_date = DateTimeType()
-    # uptime = DateTimeType()
 
     @property
     def name(self) -> str:
