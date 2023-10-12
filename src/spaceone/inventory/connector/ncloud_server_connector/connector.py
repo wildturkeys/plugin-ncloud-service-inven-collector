@@ -2,8 +2,9 @@ import logging
 import ncloud_server
 from ncloud_server.api.v2_api import V2Api
 from ncloud_server.rest import ApiException
-from typing import Optional
-from spaceone.inventory.connector.ncloud_server_connector.schema.data import Server, NCloudServer, NCloudBlock, NCloudNetworkInterface
+from typing import Optional, Type
+from spaceone.inventory.connector.ncloud_server_connector.schema.data import Server, NCloudServer, NCloudBlock, \
+    NCloudNetworkInterface, NCloudAccessControlGroup, NCloudAccessControlRule, NCloudAccessControlGroupServerInstance
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_connector import NCloudBaseConnector
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_type import CLOUD_SERVICE_TYPES
@@ -40,7 +41,7 @@ class ServerConnector(NCloudBaseConnector):
     _ncloud_cls = ncloud_server
     _ncloud_api_v2 = V2Api
 
-    def get_resources(self) -> List[CloudServiceResponse]:
+    def get_resources(self) -> List[Type[CloudServiceResponse]]:
 
         resources = []
 
@@ -61,13 +62,14 @@ class ServerConnector(NCloudBaseConnector):
 
             if response_dict.get("server_instance_list"):
 
-                _block_storages: List[Optional[NCloudBlock]] = self._list_block_storage_instance()
-                _network_interface: List[Optional[NCloudNetworkInterface]] = self._list_block_storage_instance()
+                _block_storages: List[Optional[NCloudBlock]] = self._list_block_storage_instance(**kwargs)
+                _network_interface: List[Optional[NCloudNetworkInterface]] = self._list_network_interface(**kwargs)
+
+                _instance_access_control_rules = self._sort_access_control_group_rule_group_by_instance_no()
 
                 for server_instance in response_dict.get("server_instance_list"):
 
                     server = Server(self._create_model_obj(NCloudServer, server_instance))
-
                     region = server_instance.get("region")
 
                     if region.get("region_code"):
@@ -84,79 +86,104 @@ class ServerConnector(NCloudBaseConnector):
                         'instance_id': server.server_instance_no
                     }
 
-                    server.os = {
-                        'os_distro': server.platform_type.get('code_name'),
-                    }
+                    server.os = {'os_distro': server.platform_type.get('code_name')}
 
                     server.primary_ip_address = server.private_ip
 
                     if hasattr(server, "server_instance_no"):
                         server.disks = self._find_objs_by_key_value(_block_storages,
                                                                     'server_instance_no', server.server_instance_no)
-
                         server.nics = self._find_objs_by_key_value(_network_interface,
-                                                                    'server_instance_no', server.server_instance_no)
+                                                                   'server_instance_no', server.server_instance_no)
+
+                        server.security_groups = _instance_access_control_rules[server.server_instance_no]
+
                     yield server
 
-
         except ApiException as e:
             logging.error(e)
             raise
 
+    def _list_block_storage_instance(self, **kwargs) -> List[Type[NCloudBlock]]:
 
+        return self._list_ncloud_resources(self.api_client_v2.get_block_storage_instance_list,
+                                           ncloud_server.GetBlockStorageInstanceListRequest,
+                                           "block_storage_instance_list",
+                                           NCloudBlock,
+                                           **kwargs)
 
-    def _list_block_storage_instance(self, **kwargs) -> List:
+    def _list_network_interface(self, **kwargs) -> List[NCloudNetworkInterface]:
 
-        try:
+        return self._list_ncloud_resources(self.api_client_v2.get_network_interface_list,
+                                           ncloud_server.GetNetworkInterfaceListRequest,
+                                           "network_interface_list",
+                                           NCloudNetworkInterface,
+                                           **kwargs)
 
-            block_storage_list = []
+    def _list_access_control_group(self) -> List[NCloudAccessControlGroup]:
 
-            response = self.api_client_v2.get_block_storage_instance_list(
-                ncloud_server.GetBlockStorageInstanceListRequest(**kwargs)
-            )
-            response_dict = response.to_dict()
+        return self._list_ncloud_resources(self.api_client_v2.get_access_control_group_list,
+                                           ncloud_server.GetAccessControlGroupListRequest,
+                                           "access_control_group_list",
+                                           NCloudAccessControlGroup)
 
-            if response_dict.get("block_storage_instance_list"):
+    def _list_access_control_rule(self, access_control_group_configuration_no: str) -> List[NCloudAccessControlRule]:
 
-                for block_storage_instance in response_dict.get("block_storage_instance_list"):
+        return self._list_ncloud_resources(self.api_client_v2.get_access_control_rule_list,
+                                           ncloud_server.GetAccessControlRuleListRequest,
+                                           "access_control_rule_list",
+                                           NCloudAccessControlRule,
+                                           access_control_group_configuration_no=access_control_group_configuration_no
+                                           )
 
-                    block_storage = self._create_model_obj(NCloudBlock, block_storage_instance)
+    def _list_access_control_group_server(self, access_control_group_configuration_no: str) \
+            -> List[NCloudAccessControlGroupServerInstance]:
 
-                    region = block_storage_instance.get("region")
+        return self._list_ncloud_resources(self.api_client_v2.get_access_control_group_server_instance_list,
+                                           ncloud_server.GetAccessControlGroupServerInstanceListRequest,
+                                           "server_instance_list",
+                                           NCloudAccessControlGroupServerInstance,
+                                           access_control_group_configuration_no=access_control_group_configuration_no)
 
-                    if region.get("region_code"):
-                        block_storage.region_code = region.get("region_code")
+    def _sort_access_control_group_rule_group_by_instance_no(self):
+        # to do
+        # 리펙토링 좀 하자
+        access_control_group_rule_server_dict = {}
+        access_control_group_dict = {}
+        access_control_rules_dict = {}
 
-                    block_storage_list.append(block_storage)
+        _access_control_groups = self._list_access_control_group()
 
-            return block_storage_list
+        for access_control_group in _access_control_groups:
+            acg_no = access_control_group.access_control_group_configuration_no
+            access_control_group_dict[acg_no] = access_control_group.access_control_group_name
+            access_control_rules_dict[acg_no] = []
 
-        except ApiException as e:
-            logging.error(e)
-            raise
+        for acg_no in access_control_rules_dict.keys():
+            access_control_rules = self._list_access_control_rule(
+                access_control_group_configuration_no=acg_no)
 
+            for access_control_rule in access_control_rules:
+                access_control_rule.access_control_group_name = access_control_group_dict[acg_no]
+                access_control_rules_dict[acg_no].append(access_control_rule)
 
-    def _list_network_iterface(self, **kwargs) -> List:
+        for acg_no in access_control_rules_dict.keys():
 
-        try:
+            access_control_group_servers = self._list_access_control_group_server(
+                access_control_group_configuration_no=acg_no)
 
-            network_iterface_list = []
+            for access_control_group_server in access_control_group_servers:
+                server_instance_no = access_control_group_server.server_instance_no
+                access_control_group_rule_server_dict[server_instance_no] = []
 
-            response = self.api_client_v2.get_network_interface_list(
-                ncloud_server.GetNetworkInterfaceListRequest(**kwargs)
-            )
-            response_dict = response.to_dict()
+                access_control_group_list = access_control_group_server.access_control_group_list
+                for access_control_group in access_control_group_list:
 
-            if response_dict.get("block_storage_instance_list"):
+                    access_control_group_configuration_no =\
+                        access_control_group.get("access_control_group_configuration_no")
 
-                for network_interface in response_dict.get("network_interface_list"):
+                    if access_control_group_configuration_no:
+                        access_control_group_rule_server_dict[server_instance_no] +=\
+                            access_control_rules_dict[access_control_group_configuration_no]
 
-                    network_interface_obj = self._create_model_obj(NCloudNetworkInterface, network_interface)
-
-                    network_iterface_list.append(network_interface_obj)
-
-            return network_iterface_list
-
-        except ApiException as e:
-            logging.error(e)
-            raise
+        return access_control_group_rule_server_dict

@@ -42,7 +42,7 @@ class NCloudBlock(Model):
     block_storage_size = IntType(serialize_when_none=False)
     device_name = StringType(serialize_when_none=False)
     region_code = StringType(serialize_when_none=False)
-    server_instance_status_name = StringType(serialize_when_none=False)
+    block_storage_instance_status_name = StringType(serialize_when_none=False)
     server_instance_no = StringType(serialize_when_none=False)
     server_name = StringType(serialize_when_none=False)
     zone = DictType(StringType, serialize_when_none=False)
@@ -61,16 +61,25 @@ class NCloudNetworkInterface(Model):
 
 
 class NCloudAccessControlGroup(Model):
-    network_interface_name = StringType(serialize_when_none=False)
-
+    access_control_group_name = StringType(serialize_when_none=False)
+    access_control_group_description = StringType(serialize_when_none=False)
+    access_control_group_configuration_no = StringType(serialize_when_none=False)
+    create_date = DateTimeType(serialize_when_none=False)
+    is_default_group = StringType(serialize_when_none=False)
 
 class NCloudAccessControlGroupServerInstance(Model):
-    network_interface_name = StringType(serialize_when_none=False)
-
+    server_instance_no = StringType(serialize_when_none=False)
+    access_control_group_list = ListType(DictType(StringType), serialize_when_none=False)
 
 class NCloudAccessControlRule(Model):
-    network_interface_name = StringType(serialize_when_none=False)
-
+    access_control_group_name = StringType(serialize_when_none=False)
+    access_control_rule_configuration_no = StringType(serialize_when_none=False)
+    access_control_rule_description = StringType(serialize_when_none=False)
+    destination_port = StringType(serialize_when_none=False)
+    protocol_type = DictType(StringType, serialize_when_none=False)
+    source_access_control_rule_configuration_no = StringType(serialize_when_none=False)
+    source_access_control_rule_name = StringType(serialize_when_none=False)
+    source_ip = StringType(serialize_when_none=False)
 
 class Server(NCloudServer):
     hardware = DictType(StringType, serialize_when_none=False)
@@ -79,7 +88,7 @@ class Server(NCloudServer):
     os = DictType(StringType, serialize_when_none=False)
     primary_ip_address = StringType(serialize_when_none=False)
     disks = ListType(ModelType(NCloudBlock), serialize_when_none=False)
-    security_group = None
+    security_groups = ListType(ModelType(NCloudAccessControlRule), serialize_when_none=False)
 
     @property
     def instance_type(self) -> str:
