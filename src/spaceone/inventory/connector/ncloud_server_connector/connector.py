@@ -67,8 +67,6 @@ class ServerConnector(NCloudBaseConnector):
 
                 _instance_access_control_rules = self._sort_access_control_group_rule_group_by_instance_no()
 
-                print(_instance_access_control_rules)
-
                 for server_instance in response_dict.get("server_instance_list"):
 
                     server = Server(self._create_model_obj(NCloudServer, server_instance))
