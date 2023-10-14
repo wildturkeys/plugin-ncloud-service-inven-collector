@@ -3,6 +3,7 @@ import ncloud_server
 from ncloud_server.api.v2_api import V2Api
 from ncloud_server.rest import ApiException
 from spaceone.inventory.connector.ncloud_nas_connector.schema.data import NasVolume
+from spaceone.inventory.connector.ncloud_server_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_connector import NCloudBaseConnector
 from spaceone.inventory.connector.ncloud_nas_connector.schema.service_type import CLOUD_SERVICE_TYPES
 from spaceone.inventory.libs.schema.resource import CloudServiceResponse, CloudServiceResource
@@ -11,11 +12,13 @@ from typing import Iterator, List
 _LOGGER = logging.getLogger(__name__)
 
 
+
 class NasConnector(NCloudBaseConnector):
 
     cloud_service_group = 'Storage'
     cloud_service_type = 'Nas'
     cloud_service_types = CLOUD_SERVICE_TYPES
+    cloud_service_details = SERVICE_DETAILS
 
     _ncloud_cls = ncloud_server
     _ncloud_api_v2 = V2Api
