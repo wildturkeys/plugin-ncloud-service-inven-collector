@@ -24,23 +24,27 @@ details = ItemDynamicLayout.set_fields('Details', fields= [
     DateTimeDyField.data_source("Created", "data.create_date"),
     TextDyField.data_source('Mount Information','data.mount_information'),
 
+    TextDyField.data_source('Is Event Configuration', 'data.is_event_configuration'),
+    TextDyField.data_source('Is Return Protection', 'data.is_return_protection'),
+    TextDyField.data_source('Is Snapshot Configuration', 'data.is_snapshot_configuration'),
 
-    TextDyField.data_source('Snapshot Volume Configuration Ratio', 'data.snapshot_volume_configuration_ratio'),
-    TextDyField.data_source('Snapshot Volume Config Time','data.snapshot_volume_config_time'),
-
+])
+snapshot = ItemDynamicLayout.set_fields('Snapshot', fields=[
     SizeField.data_source('Snapshot Volume Size', 'data.snapshot_volume_size',
                           options={"source_unit": "BYTES", "display_unit": "GB"}),
     SizeField.data_source('Snapshot Volume Use Size', 'data.snapshot_volume_use_size',
                           options={"source_unit": "BYTES", "display_unit": "GB"}),
-    TextDyField.data_source('Snapshot Volume Use Ratio','data.snapshot_volume_use_ratio'),
-    TextDyField.data_source('Is Snapshot Configuration','data.is_snapshot_configuration'),
-    TextDyField.data_source('Is Event Configuration', 'data.is_event_configuration'),
-    TextDyField.data_source('Is Return Protection', 'data.is_return_protection'),
+    TextDyField.data_source('Snapshot Volume Use Ratio', 'data.snapshot_volume_use_ratio'),
+    TextDyField.data_source('Is Snapshot Configuration', 'data.is_snapshot_configuration'),
 
-
+    TextDyField.data_source('Snapshot Volume Configuration Ratio', 'data.snapshot_volume_configuration_ratio'),
+    TextDyField.data_source('Snapshot Volume Config Time', 'data.snapshot_volume_config_time'),
 
 ])
-SERVICE_DETAILS = CloudServiceMeta.set_layouts([details])
+
+
+
+SERVICE_DETAILS = CloudServiceMeta.set_layouts([details, snapshot])
 
     # volume_name = StringType(serialize_when_none=False)
     # nas_volume_instance_status = DictType(StringType, serialize_when_none=False)

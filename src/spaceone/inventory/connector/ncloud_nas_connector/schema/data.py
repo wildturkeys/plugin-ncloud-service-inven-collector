@@ -2,7 +2,7 @@ import logging
 
 from schematics import Model
 from schematics.types import ModelType, StringType, IntType, ListType, BooleanType, DictType, DateTimeType, FloatType
-
+from spaceone.inventory.connector.ncloud_server_connector.schema.data import Server
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class NasVolume(Model):
     nas_volume_instance_status_name = StringType(serialize_when_none=False)
 
     mount_information = StringType(serialize_when_none=False)
-
+    nas_volume_server_instance_list = ListType(ModelType(Server),serialize_when_none=False )
 
     @property
     def name(self) -> str:
