@@ -20,9 +20,9 @@ details = ItemDynamicLayout.set_fields('Details', fields=[
 
 
 server_instances = TableDynamicLayout.set_fields('Servers', root_path='data.load_balanced_server_instance_list', fields=[
-    TextDyField.data_source('ID', 'server_instance_no'),
-    TextDyField.data_source('Name', 'server_name'),
-    TextDyField.data_source('Status', 'server_instance_status_name'),
+    TextDyField.data_source('ID', 'server_instance.server_instance_no'),
+    TextDyField.data_source('Name', 'server_instance.server_name'),
+    TextDyField.data_source('Status', 'server_instance.server_instance_status_name'),
     TextDyField.data_source('Health Check', 'server_health_check_status_list')
 ])
 

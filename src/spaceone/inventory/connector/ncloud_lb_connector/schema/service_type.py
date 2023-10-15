@@ -22,7 +22,7 @@ cst_lb.service_code = 'ncloudLB'
 cst_lb.is_primary = True
 cst_lb.is_major = True
 cst_lb.tags = {
-    'spaceone:icon': f'{ASSET_URL}/Server.svg',
+    'spaceone:icon': f'{ASSET_URL}/Networking.svg',
 }
 
 cst_lb._metadata = CloudServiceTypeMeta.set_meta(

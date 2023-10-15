@@ -22,7 +22,7 @@ cst_server.service_code = 'ncloudServer'
 cst_server.is_primary = True
 cst_server.is_major = True
 cst_server.tags = {
-    'spaceone:icon': f'{ASSET_URL}/Server.svg',
+    'spaceone:icon': f'{ASSET_URL}/Compute.svg',
 }
 
 """

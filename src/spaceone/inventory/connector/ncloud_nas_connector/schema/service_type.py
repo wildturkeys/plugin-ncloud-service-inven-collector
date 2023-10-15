@@ -20,7 +20,7 @@ cst_nas_volume.service_code = 'ncloudNas'
 cst_nas_volume.is_primary = True
 cst_nas_volume.is_major = True
 cst_nas_volume.tags = {
-    'spaceone:icon': f'{ASSET_URL}/Object_storage.svg',
+    'spaceone:icon': f'{ASSET_URL}/Storage.svg',
 }
 
 cst_nas_volume._metadata = CloudServiceTypeMeta.set_meta(
