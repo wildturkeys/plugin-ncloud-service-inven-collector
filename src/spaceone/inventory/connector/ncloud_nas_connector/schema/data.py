@@ -33,7 +33,6 @@ class NasVolume(Model):
 
     nas_volume_instance_no = StringType(serialize_when_none=False)
     nas_volume_instance_status_name = StringType(serialize_when_none=False)
-    nas_volume_instance_description = StringType(serialize_when_none=False)
 
     mount_information = StringType(serialize_when_none=False)
 
