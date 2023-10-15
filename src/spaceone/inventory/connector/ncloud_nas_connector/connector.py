@@ -2,7 +2,9 @@ import logging
 import ncloud_server
 from ncloud_server.api.v2_api import V2Api
 from ncloud_server.rest import ApiException
+from typing import Optional, Type
 from spaceone.inventory.connector.ncloud_nas_connector.schema.data import NasVolume
+from spaceone.inventory.connector.ncloud_server_connector.schema.data import Server, NCloudServer
 from spaceone.inventory.connector.ncloud_nas_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_connector import NCloudBaseConnector
 from spaceone.inventory.connector.ncloud_nas_connector.schema.service_type import CLOUD_SERVICE_TYPES
@@ -31,7 +33,7 @@ class NasConnector(NCloudBaseConnector):
 
         return resources
 
-    def list_instances(self) -> Iterator:
+    def list_instances(self, **kwargs) -> Iterator:
 
         try:
 
@@ -40,12 +42,17 @@ class NasConnector(NCloudBaseConnector):
 
             if response_dict.get("nas_volume_instance_list"):
 
-                for nas_volume_instance in response_dict.get("nas_volume_instance_list"):
-                    region_code = nas_volume_instance.get("region").get("region_code")
+                # nas_volume_server_instance_list
+                # _servers : List[Optional[Server]] = self._list_server_instances(**kwargs)
 
-                    # 고쳐야 함
+                for nas_volume_instance in response_dict.get("nas_volume_instance_list"):
+
+                    region_code = nas_volume_instance.get("region").get("region_code")
                     nas_volume = NasVolume(self._create_model_obj(NasVolume, nas_volume_instance))
                     nas_volume.region_code = region_code
+
+                    for server_instance in nas_volume_instance.get("nas_volume_server_instance_list"):
+                        server = Server(self._create_model_obj(NCloudServer, server_instance))
 
                     yield nas_volume
 
@@ -53,3 +60,13 @@ class NasConnector(NCloudBaseConnector):
         except ApiException as e:
             logging.error(e)
             raise
+
+    def list_server_instances(self, **kwargs) -> Iterator :
+
+
+
+    # def _list_server_instances(self, **kwargs) -> List[Type[Server]]:
+    #     return self._list_ncloud_resources(self.api_client_v2.,
+    #                                        ncloud_server.GetServerInstanceListRequest(),
+                                           ""
+                                           )

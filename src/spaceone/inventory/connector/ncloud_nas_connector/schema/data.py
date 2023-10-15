@@ -25,6 +25,8 @@ class NasVolume(Model):
     is_event_configuration = BooleanType(serialize_when_none=False)
     is_return_protection = BooleanType(serialize_when_none=False)
 
+    # server instance list
+    nas_volume_server_instance_list = ListType(serialize_when_none=False)
 
     region_code = StringType(serialize_when_none=False)
     zone_code = StringType(serialize_when_none=False)
@@ -47,4 +49,6 @@ class NasVolume(Model):
             "resource_id": self.nas_volume_instance_no,
             "external_link": f"https://console.ncloud.com/nas/volume"
         }
+
+
 

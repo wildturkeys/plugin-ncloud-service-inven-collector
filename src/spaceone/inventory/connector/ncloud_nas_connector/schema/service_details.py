@@ -18,6 +18,15 @@ details = ItemDynamicLayout.set_fields('Details', fields = [
 
 
 ])
+
+server = ItemDynamicLayout.set_fields('Server', fields=[
+
+    TextDyField.data_source('server_name',''),
+    TextDyField.data_source('private_ip',''),
+    TextDyField.data_source('public_ip','')
+
+])
+
 SERVICE_DETAILS = CloudServiceMeta.set_layouts([details])
 
     # volume_name = StringType(serialize_when_none=False)
