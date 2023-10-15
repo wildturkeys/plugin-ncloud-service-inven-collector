@@ -25,7 +25,7 @@ class NasVolume(Model):
     is_event_configuration = BooleanType(serialize_when_none=False)
     is_return_protection = BooleanType(serialize_when_none=False)
 
-
+    zone = DictType(StringType, serialize_when_none=False)
     region_code = StringType(serialize_when_none=False)
     zone_code = StringType(serialize_when_none=False)
 
