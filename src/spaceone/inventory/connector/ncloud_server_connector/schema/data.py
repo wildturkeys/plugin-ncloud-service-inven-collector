@@ -67,9 +67,11 @@ class NCloudAccessControlGroup(Model):
     create_date = DateTimeType(serialize_when_none=False)
     is_default_group = StringType(serialize_when_none=False)
 
+
 class NCloudAccessControlGroupServerInstance(Model):
     server_instance_no = StringType(serialize_when_none=False)
     access_control_group_list = ListType(DictType(StringType), serialize_when_none=False)
+
 
 class NCloudAccessControlRule(Model):
     access_control_group_name = StringType(serialize_when_none=False)
@@ -80,6 +82,7 @@ class NCloudAccessControlRule(Model):
     source_access_control_rule_configuration_no = StringType(serialize_when_none=False)
     source_access_control_rule_name = StringType(serialize_when_none=False)
     source_ip = StringType(serialize_when_none=False)
+
 
 class Server(NCloudServer):
     hardware = DictType(StringType, serialize_when_none=False)

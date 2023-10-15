@@ -1,0 +1,15 @@
+---
+cloud_service_group: Networking
+cloud_service_type: Load Balancer
+name: Count by Type
+query:
+  aggregate:
+    - group:
+        keys:
+          - name: name
+            key: data.server_instance_type.code_name
+        fields:
+          - name: value
+            operator: count
+options:
+  chart_type: DONUT

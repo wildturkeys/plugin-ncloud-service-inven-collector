@@ -1,7 +1,8 @@
 import os
 from spaceone.inventory.libs.common_parser import *
 from spaceone.inventory.libs.schema.dynamic_widget import ChartWidget, CardWidget
-from spaceone.inventory.libs.schema.dynamic_field import TextDyField, SearchField, DateTimeDyField, EnumDyField, SizeField
+from spaceone.inventory.libs.schema.dynamic_field import TextDyField, SearchField, DateTimeDyField, EnumDyField, \
+    SizeField
 from spaceone.inventory.libs.schema.resource import CloudServiceTypeResource, CloudServiceTypeResponse, \
     CloudServiceTypeMeta
 from spaceone.inventory.conf.cloud_service_conf import *
@@ -27,8 +28,8 @@ cst_nas_volume._metadata = CloudServiceTypeMeta.set_meta(
 
         TextDyField.data_source('Status', 'data.nas_volume_instance_status_name'),
         TextDyField.data_source('Instance Type', 'data.nas_volume_instance_status.code_name'),
-        SizeField.data_source('Total Size', 'data.volume_total_size', type="size", 
-                            options={"source_unit" :"BYTES", "display_unit":"GB"}),
+        SizeField.data_source('Total Size', 'data.volume_total_size', type="size",
+                              options={"source_unit": "BYTES", "display_unit": "GB"}),
         DateTimeDyField.data_source("Created", "data.create_date")
 
     ],
@@ -42,6 +43,3 @@ cst_nas_volume._metadata = CloudServiceTypeMeta.set_meta(
 CLOUD_SERVICE_TYPES = [
     CloudServiceTypeResponse({'resource': cst_nas_volume})
 ]
-
-
-

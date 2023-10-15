@@ -116,13 +116,16 @@ class NCloudBaseConnector(BaseConnector):
 
         model_obj = model_cls()
 
+        ignore_keys = kwargs.get('ignore_keys', [])
+
         if isinstance(resource, dict):
             resource_dic = resource
         else:
             resource_dic = resource.to_dict()
 
         for key, value in resource_dic.items():
-            if hasattr(model_obj, key):
+
+            if key not in ignore_keys and hasattr(model_obj, key):
                 if key in DATETIME_KEYS and value:
                     dt_value = DateTimeType().to_native(value)
                     setattr(model_obj, key, dt_value)
