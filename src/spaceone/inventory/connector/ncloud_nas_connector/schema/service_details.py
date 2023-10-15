@@ -5,7 +5,7 @@ from spaceone.inventory.libs.schema.dynamic_layout import ItemDynamicLayout, Sim
     TableDynamicLayout
 
 
-details = ItemDynamicLayout.set_fields('Details', fields[
+details = ItemDynamicLayout.set_fields('Details', fields = [
     # EnumDyField.data_source('Status','data.nas_volume_instance_status'),
 
     TextDyField.data_source('nas_volume_instance_status_name','data.nas_volume_instance_status_name'),
