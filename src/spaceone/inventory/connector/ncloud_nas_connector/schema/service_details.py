@@ -10,7 +10,6 @@ details = ItemDynamicLayout.set_fields('Details', fields= [
 
     TextDyField.data_source('Status','data.nas_volume_instance_status_name'),
     TextDyField.data_source('No' ,'data.nas_volume_instance_no'),
-    TextDyField.data_source('Description')
     SizeField.data_source('Volume Total Size', 'data.volume_total_size',type="size",
                           options={"source_unit": "BYTES", "display_unit": "GB"}),
     SizeField.data_source('Volume Size', 'data.volume_size',type="size",
