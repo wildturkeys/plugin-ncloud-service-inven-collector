@@ -41,10 +41,15 @@ snapshot = ItemDynamicLayout.set_fields('Snapshot', fields=[
     TextDyField.data_source('Snapshot Volume Config Time', 'data.snapshot_volume_config_time'),
 
 ])
+# 서버 이름, 존, ip , status
+acl_server = TableDynamicLayout.set_fields('ACL Server', fields=[
+    TextDyField.data_source('Name','data.nas_volume_server_instance_list.server_name'),
+    TextDyField.data_source('IP','data.nas_volume_server_instance_list.zone.zone_code'),
+    TextDyField.data_source('Zone','data.nas_volume_server_instance_list.private_ip'),
+    TextDyField.data_source('Status', 'data.nas_volume_server_instance_list.server_instance_status_name'),
+])
 
-
-
-SERVICE_DETAILS = CloudServiceMeta.set_layouts([details, snapshot])
+SERVICE_DETAILS = CloudServiceMeta.set_layouts([details, snapshot,acl_server])
 
     # volume_name = StringType(serialize_when_none=False)
     # nas_volume_instance_status = DictType(StringType, serialize_when_none=False)
