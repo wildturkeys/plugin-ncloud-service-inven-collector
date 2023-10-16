@@ -64,7 +64,7 @@ class LBServerInstance(Model):
     protocol_type = DictType(StringType, serialize_when_none=False)
     proxy_protocol_use_yn = StringType(serialize_when_none=False)
     server_port = IntType(serialize_when_none=False)
-    server_status = BooleanType(serialize_when_none=False)
+    server_status = StringType(serialize_when_none=False)
 
 
 class LB(NCloudLB):

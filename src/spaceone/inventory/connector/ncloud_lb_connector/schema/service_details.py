@@ -69,7 +69,11 @@ rules = TableDynamicLayout.set_fields('Rules', root_path='data.load_balancer_rul
     TextDyField.data_source('Certificate', 'certificate_name'),
     TextDyField.data_source('L7 Health Check Path', 'l7_health_check_path'),
     TextDyField.data_source('LB Port', 'load_balancer_port'),
-    TextDyField.data_source('Protocol', 'protocol_type.code_name'),
+    EnumDyField.data_source('Protocol', 'protocol_type.code_name',
+                            default_outline_badge=['http', 'https',
+                                                   'udp', 'tcp',
+                                                   'icmp']
+                            ),
     TextDyField.data_source('Proxy Protocol', 'proxy_protocol_use_yn'),
     TextDyField.data_source('Port', 'server_port'),
 ])

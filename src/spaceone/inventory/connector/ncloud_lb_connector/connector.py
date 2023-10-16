@@ -84,8 +84,7 @@ class LbConnector(NCloudBaseConnector):
                 server_instance_obj["server_port"] = server_health_check_status.get("server_port")
                 server_instance_obj["l7_health_check_path"] = server_health_check_status.get("l7_health_check_path")
                 server_instance_obj["proxy_protocol_use_yn"] = server_health_check_status.get("proxy_protocol_use_yn")
-                server_instance_obj["server_status"] = str(server_health_check_status.get("server_status"))
-
+                server_instance_obj["server_status"] = str(server_health_check_status.get("server_status", "")).lower()
                 server_instance_obj["server_name"] = server_instance.get("server_name")
                 server_instance_obj["server_instance_type"] = server_instance.get("server_instance_type")
                 server_instance_obj["public_ip"] = server_instance.get("public_ip")
