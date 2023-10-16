@@ -6,6 +6,13 @@ from schematics.types import ModelType, StringType, IntType, ListType, BooleanTy
 _LOGGER = logging.getLogger(__name__)
 
 
+class NCloudACG(Model):
+    access_control_group_configuration_no = StringType(serialize_when_none=False)
+    access_control_group_description = StringType(serialize_when_none=False)
+    access_control_group_name = StringType(serialize_when_none=False)
+    create_date = DateTimeType(serialize_when_none=False)
+    is_default = BooleanType(serialize_when_none=False)
+
 class NCloudServer(Model):
     server_name = StringType(serialize_when_none=False)
     server_instance_type = DictType(StringType, serialize_when_none=False)
