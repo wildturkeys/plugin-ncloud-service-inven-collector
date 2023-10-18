@@ -60,7 +60,7 @@ class NasConnector(NCloudBaseConnector):
 
                     nas_volume.nas_volume_server_instance_list = []
                     for server_instance in nas_volume_instance.get("nas_volume_server_instance_list"):
-                        server = server_instance(self._create_model_obj(NCloudServer, server_instance))
+                        server = NCloudServer(self._create_model_obj(NCloudServer, server_instance))
                         nas_volume.nas_volume_server_instance_list.append(server)
 
                     yield nas_volume
