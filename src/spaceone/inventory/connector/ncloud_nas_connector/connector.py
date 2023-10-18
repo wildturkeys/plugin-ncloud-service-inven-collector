@@ -40,7 +40,7 @@ class NasConnector(NCloudBaseConnector):
             response = self.api_client_v2.get_nas_volume_instance_list(ncloud_server.GetNasVolumeInstanceListRequest())
             response_dict = response.to_dict()
 
-            nas_volume = []
+            # nas_volume = []
             if response_dict.get("nas_volume_instance_list"):
 
                 for nas_volume_instance in response_dict.get("nas_volume_instance_list"):
@@ -62,9 +62,9 @@ class NasConnector(NCloudBaseConnector):
 
         except ApiException as e:
             logging.error(e)
-            logging.error(nas_volume)
-            logging.error(nas_volume.nas_volume_server_instance_list)
-            logging.error("!!")
+            # logging.error(nas_volume)
+            # logging.error(nas_volume.nas_volume_server_instance_list)
+            # logging.error("!!")
             raise
 
     def _list_server_instances(self, server_instances, **kwargs ) -> List[Type[NCloudServer]]:
