@@ -53,7 +53,8 @@ class NasConnector(NCloudBaseConnector):
                     # ACL설정 서버가 있을 경우
                     nas_volume.nas_volume_server_instance_list: List[Optional[Server]] = self._list_server_instances(
                         nas_volume_instance.get("nas_volume_server_instance_list"))
-
+                    logging.debug(nas_volume_instance.get("nas_volume_server_instance_list"))
+                    logging.debug(nas_volume.nas_volume_server_instance_list)
                     yield nas_volume
 
 
