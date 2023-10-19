@@ -53,24 +53,21 @@ class NasConnector(NCloudBaseConnector):
                     # ACL설정 서버가 있을 경우
                     # if(hasattr(nas_volume,'nas_volume_server_instance_list')):
 
-                    # nas_volume.nas_volume_server_instance_list = self._list_server_instances(
-                    #     nas_volume_instance.get("nas_volume_server_instance_list"))
+                    nas_volume.nas_volume_server_instance_list = self._list_server_instances(
+                        nas_volume_instance.get("nas_volume_server_instance_list"))
                     # logging.debug(nas_volume_instance.get("nas_volume_server_instance_list"))
                     # logging.debug(nas_volume.nas_volume_server_instance_list)
 
-                    nas_volume.nas_volume_server_instance_list = []
-                    for server_instance in nas_volume_instance.get("nas_volume_server_instance_list"):
-                        server = NCloudServer(self._create_model_obj(NCloudServer, server_instance))
-                        nas_volume.nas_volume_server_instance_list.append(server)
+                    # nas_volume.nas_volume_server_instance_list = []
+                    # for server_instance in nas_volume_instance.get("nas_volume_server_instance_list"):
+                    #     server = NCloudServer(self._create_model_obj(NCloudServer, server_instance))
+                    #     nas_volume.nas_volume_server_instance_list.append(server)
 
                     yield nas_volume
 
 
         except ApiException as e:
             logging.error(e)
-            logging.error(nas_volume)
-            logging.error(nas_volume.nas_volume_server_instance_list)
-            logging.error("!!")
             raise
 
     def _list_server_instances(self, server_instances, **kwargs ) -> List[Type[NCloudServer]]:
