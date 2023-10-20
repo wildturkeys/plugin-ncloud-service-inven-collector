@@ -25,13 +25,25 @@ cst_lb.tags = {
     'spaceone:icon': f'{ASSET_URL}/Networking.svg',
 }
 
+
 cst_lb._metadata = CloudServiceTypeMeta.set_meta(
     fields=[
-        TextDyField.data_source('Status', 'data.load_balancer_instance_status_name'),
-        TextDyField.data_source('Type', 'data.network_usage_type.code_name'),
+
+        EnumDyField.data_source('Type', 'data.network_usage_type.code_name',
+                                default_badge={'indigo.500': ['Public'],
+                                               'coral.600': ['Private']}
+                                ),
         TextDyField.data_source('Domain', 'data.domain_name'),
+        EnumDyField.data_source('Status', 'data.load_balancer_instance_status_name',
+                                default_state={
+                                    'safe': ['used', 'using', 'created'],
+                                    'available': ['initialized', 'creating',
+                                                  'repairing', 'using'],
+                                    'warning': ['disusing', 'changing'],
+                                    'disable': ['terminated']}),
         TextDyField.data_source('VIP', 'data.virtual_ip'),
         TextDyField.data_source('Algorithm', 'data.load_balancer_algorithm_type.code_name'),
+        TextDyField.data_source('Server Count', 'data.load_balanced_server_instance_count'),
         DateTimeDyField.data_source("Created", "data.create_date")
     ],
     search=[
