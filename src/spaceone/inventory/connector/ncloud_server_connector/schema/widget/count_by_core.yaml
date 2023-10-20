@@ -1,0 +1,17 @@
+---
+cloud_service_group: Compute
+cloud_service_type: Server
+name: Count By vCore
+query:
+  aggregate:
+    - group:
+        keys:
+          - name: name
+            key: data.cpu_count
+        fields:
+          - name: value
+            operator: count
+options:
+  chart_type: TREEMAP
+  name_options:
+    key: name
