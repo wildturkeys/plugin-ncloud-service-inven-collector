@@ -2,7 +2,9 @@ import logging
 import ncloud_server
 from ncloud_server.api.v2_api import V2Api
 from ncloud_server.rest import ApiException
-from spaceone.inventory.connector.ncloud_nas_connector.schema.data import NasVolume
+from typing import Optional, Type
+
+from spaceone.inventory.connector.ncloud_nas_connector.schema.data import NcloudNasVolume, NasVolume, NCloudServer
 from spaceone.inventory.connector.ncloud_nas_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_connector import NCloudBaseConnector
 from spaceone.inventory.connector.ncloud_nas_connector.schema.service_type import CLOUD_SERVICE_TYPES
@@ -38,14 +40,28 @@ class NasConnector(NCloudBaseConnector):
             response = self.api_client_v2.get_nas_volume_instance_list(ncloud_server.GetNasVolumeInstanceListRequest())
             response_dict = response.to_dict()
 
+            nas_volume = []
             if response_dict.get("nas_volume_instance_list"):
 
                 for nas_volume_instance in response_dict.get("nas_volume_instance_list"):
                     region_code = nas_volume_instance.get("region").get("region_code")
 
                     # 고쳐야 함
-                    nas_volume = NasVolume(self._create_model_obj(NasVolume, nas_volume_instance))
+                    nas_volume = NasVolume(self._create_model_obj(NcloudNasVolume, nas_volume_instance))
                     nas_volume.region_code = region_code
+
+                    # ACL설정 서버가 있을 경우
+                    # if(hasattr(nas_volume,'nas_volume_server_instance_list')):
+
+                    nas_volume.nas_volume_server_instance_list = self._list_server_instances(
+                        nas_volume_instance.get("nas_volume_server_instance_list"))
+                    # logging.debug(nas_volume_instance.get("nas_volume_server_instance_list"))
+                    # logging.debug(nas_volume.nas_volume_server_instance_list)
+
+                    # nas_volume.nas_volume_server_instance_list = []
+                    # for server_instance in nas_volume_instance.get("nas_volume_server_instance_list"):
+                    #     server = NCloudServer(self._create_model_obj(NCloudServer, server_instance))
+                    #     nas_volume.nas_volume_server_instance_list.append(server)
 
                     yield nas_volume
 
@@ -53,3 +69,19 @@ class NasConnector(NCloudBaseConnector):
         except ApiException as e:
             logging.error(e)
             raise
+
+    def _list_server_instances(self, server_instances, **kwargs ) -> List[Type[NCloudServer]]:
+
+        resources_list = []
+
+        for server_instance in server_instances:
+            server= NCloudServer(self._create_model_obj(NCloudServer, server_instance))
+
+            # region = server_instance.get("region")
+            #
+            # if region.get("region_code"):
+            #     server.region_code = region.get("region_code")
+
+            resources_list.append(server)
+
+        return resources_list
