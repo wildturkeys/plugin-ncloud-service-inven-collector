@@ -48,7 +48,7 @@ disk = TableDynamicLayout.set_fields('Disk', root_path='data.disks', fields=[
         'display_unit': 'GB',
         'source_unit': 'Byte'
     }),
-    EnumDyField.data_source('Status', 'data.block_storage_instance_status_name',
+    EnumDyField.data_source('Status', 'block_storage_instance_status_name',
                             default_state={
                                 'safe': ['attached'],
                                 'available': ['detached'],
