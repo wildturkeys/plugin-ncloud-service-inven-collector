@@ -8,11 +8,10 @@ from spaceone.inventory.libs.schema.dynamic_layout import ItemDynamicLayout, Sim
 details = ItemDynamicLayout.set_fields('Details', fields= [
     # EnumDyField.data_source('Status','data.nas_volume_instance_status'),
 
-    TextDyField.data_source('Status','data.nas_volume_instance_status_name',
+    EnumDyField.data_source('Status','data.nas_volume_instance_status_name',
                                 default_state={
                                 'safe': ['created'],
-                                'disable': ['terminated']}
-                            ),
+                                'disable': ['terminated']}),
     TextDyField.data_source('No' ,'data.nas_volume_instance_no'),
     SizeField.data_source('Volume Total Size', 'data.volume_total_size',type="size",
                           options={"source_unit": "BYTES", "display_unit": "GB"}),
@@ -50,14 +49,13 @@ acl_server = TableDynamicLayout.set_fields('ACL Server',  root_path='data.nas_vo
     TextDyField.data_source('Name','server_name'),
     TextDyField.data_source('IP','private_ip'),
     TextDyField.data_source('Zone', 'zone.zone_code'),
-    TextDyField.data_source('Status', 'server_instance_status_name',
+    EnumDyField.data_source('Status', 'server_instance_status_name',
                             default_state={
                                 'safe': ['running'],
                                 'available': ['init', 'creating', 'booting', 'setting up', 'changingSpec'],
                                 'warning': ['warning', 'rebooting', 'hard rebooting', 'shutting down',
                                             'hard shutting down', 'terminating', 'copying', 'repairing', ],
-                                'disable': ['stopped']}
-                            ),
+                                'disable': ['stopped']}),
 ])
 
 SERVICE_DETAILS = CloudServiceMeta.set_layouts([details, snapshot,acl_server])
