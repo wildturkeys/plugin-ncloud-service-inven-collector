@@ -25,7 +25,9 @@ cst_nas_volume.tags = {
 
 cst_nas_volume._metadata = CloudServiceTypeMeta.set_meta(
     fields=[
-
+        EnumDyField.data_source('Platform', 'data.platform_code', default_badge={
+            'indigo.500': ['classic'], 'coral.600': ['vpc']
+        }),
         TextDyField.data_source('Status', 'data.nas_volume_instance_status_name'),
         TextDyField.data_source('Instance Type', 'data.nas_volume_instance_status.code_name'),
         SizeField.data_source('Total Size', 'data.volume_total_size', type="size",

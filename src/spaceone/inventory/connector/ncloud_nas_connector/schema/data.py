@@ -5,6 +5,7 @@ from schematics.types import ModelType, StringType, IntType, ListType, BooleanTy
 
 _LOGGER = logging.getLogger(__name__)
 
+
 class NCloudServer(Model):
     server_name = StringType(serialize_when_none=False)
     server_instance_type = DictType(StringType, serialize_when_none=False)
@@ -43,7 +44,6 @@ class NCloudServer(Model):
 
 
 class NcloudNasVolume(Model):
-
     volume_name = StringType(serialize_when_none=False)
     nas_volume_instance_status = DictType(StringType, serialize_when_none=False)
 
@@ -73,14 +73,17 @@ class NcloudNasVolume(Model):
     # nas_volume_server_instance_list = ListType(ModelType(NCloudServer),serialize_when_none=False )
 
 
-
-
 class NasVolume(NcloudNasVolume):
     nas_volume_server_instance_list = ListType(ModelType(NCloudServer), serialize_when_none=False)
+    platform_code = StringType(default="classic")
 
     @property
     def name(self) -> str:
         return self.volume_name
+
+    @property
+    def instance_size(self) -> str:
+        return self.volume_total_size
 
     def reference(self):
         return {

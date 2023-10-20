@@ -28,7 +28,9 @@ cst_lb.tags = {
 
 cst_lb._metadata = CloudServiceTypeMeta.set_meta(
     fields=[
-
+        EnumDyField.data_source('Platform', 'data.platform_code', default_badge={
+            'indigo.500': ['classic'], 'coral.600': ['vpc']
+        }),
         EnumDyField.data_source('Type', 'data.network_usage_type.code_name',
                                 default_badge={'indigo.500': ['Public'],
                                                'coral.600': ['Private']}

@@ -7,7 +7,9 @@ from spaceone.inventory.libs.schema.dynamic_layout import ItemDynamicLayout, Sim
 
 details = ItemDynamicLayout.set_fields('Details', fields= [
     # EnumDyField.data_source('Status','data.nas_volume_instance_status'),
-
+    EnumDyField.data_source('Platform', 'data.platform_code', default_badge={
+        'indigo.500': ['classic'], 'coral.600': ['vpc']
+    }),
     TextDyField.data_source('Status','data.nas_volume_instance_status_name'),
     TextDyField.data_source('No' ,'data.nas_volume_instance_no'),
     SizeField.data_source('Volume Total Size', 'data.volume_total_size',type="size",

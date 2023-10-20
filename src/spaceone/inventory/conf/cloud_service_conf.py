@@ -8,7 +8,8 @@ ASSET_URL = "https://chulgyujeon.github.io/images/icon"
 CLOUD_SERVICE_GROUP_MAP = {
     'Server': 'ServerConnectorManager',
     'Nas': 'NasConnectorManager',
-    'LB': 'LbConnectorManager'
+    'LB': 'LbConnectorManager',
+    'Block': 'BlockConnectorManager'
 }
 
 """

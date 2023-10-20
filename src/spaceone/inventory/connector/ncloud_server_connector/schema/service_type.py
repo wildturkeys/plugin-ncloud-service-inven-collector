@@ -10,8 +10,15 @@ from spaceone.inventory.conf.cloud_service_conf import *
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 
-instance_total_count_conf = os.path.join(current_dir, 'widget/instance_total_count.yaml')
+total_instance_count = os.path.join(current_dir, 'widget/total_instance_count.yaml')
+total_vcpu_count = os.path.join(current_dir, 'widget/total_vcpu_count.yaml')
+total_memory_size = os.path.join(current_dir, 'widget/total_memory_size.yaml')
+
+count_by_region_conf = os.path.join(current_dir, 'widget/count_by_region.yaml')
+count_by_project_conf = os.path.join(current_dir, 'widget/count_by_project.yaml')
 count_by_type_conf = os.path.join(current_dir, 'widget/count_by_type.yaml')
+count_by_core_conf = os.path.join(current_dir, 'widget/count_by_core.yaml')
+
 
 cst_server = CloudServiceTypeResource()
 cst_server.name = 'Server'
@@ -43,6 +50,9 @@ repairing
 """
 cst_server._metadata = CloudServiceTypeMeta.set_meta(
     fields=[
+        EnumDyField.data_source('Platform', 'data.platform_code', default_badge={
+            'indigo.500': ['classic'], 'coral.600': ['vpc']
+        }),
         EnumDyField.data_source('Status', 'data.server_instance_status_name',
                                 default_state={
                                     'safe': ['running'],
@@ -69,8 +79,14 @@ cst_server._metadata = CloudServiceTypeMeta.set_meta(
         SearchField.set(name='Image', key='data.server_image_name')
     ],
     widget=[
-        CardWidget.set(**get_data_from_yaml(instance_total_count_conf)),
+        CardWidget.set(**get_data_from_yaml(total_instance_count)),
+        CardWidget.set(**get_data_from_yaml(total_vcpu_count)),
+        CardWidget.set(**get_data_from_yaml(total_memory_size)),
+
+        ChartWidget.set(**get_data_from_yaml(count_by_region_conf)),
+        ChartWidget.set(**get_data_from_yaml(count_by_project_conf)),
         ChartWidget.set(**get_data_from_yaml(count_by_type_conf)),
+        ChartWidget.set(**get_data_from_yaml(count_by_core_conf)),
     ]
 )
 

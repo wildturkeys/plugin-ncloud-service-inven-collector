@@ -85,6 +85,9 @@ class NCloudBaseConnector(BaseConnector):
             if hasattr(obj, "instance_type"):
                 csr_dic["instance_type"] = obj.get("instance_type")
 
+            if hasattr(obj, "instance_size"):
+                csr_dic["instance_size"] = obj.get("instance_size")
+
             if hasattr(obj, "name"):
                 csr_dic["name"] = obj.get("name")
 

@@ -48,10 +48,21 @@ disk = TableDynamicLayout.set_fields('Disk', root_path='data.disks', fields=[
         'display_unit': 'GB',
         'source_unit': 'Byte'
     }),
-    TextDyField.data_source('Status', 'block_storage_instance_status_name'),
-    TextDyField.data_source('Volume ID', 'block_storage_instance_no'),
+    EnumDyField.data_source('Status', 'data.block_storage_instance_status_name',
+                            default_state={
+                                'safe': ['attached'],
+                                'available': ['detached'],
+                                'warning': ['Initialized', 'creating', 'copying', 'terminating', 'repairing',
+                                            'detachFailed'],
+                                'disable': ['terminated']}),
+    TextDyField.data_source('Volume ID', 'block_storage_instance_no',
+                            reference={"resource_type": "inventory.CloudService",
+                                       "reference_key": "reference.resource_id"}),
     TextDyField.data_source('Volume Type', 'block_storage_type.code'),
-    TextDyField.data_source('Dick Type', 'disk_detail_type.code'),
+    EnumDyField.data_source('Disk Type', 'disk_detail_type.code',
+                            default_badge={'indigo.500': ['SSD'],
+                                           'coral.600': ['HDD']}
+                            ),
     TextDyField.data_source('MAX IOPS', 'max_iops_throughput'),
     TextDyField.data_source('Device', 'device_name')
 ])

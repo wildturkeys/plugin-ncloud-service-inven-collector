@@ -71,6 +71,8 @@ class LB(NCloudLB):
     load_balanced_server_instance_list = ListType(ModelType(LBServerInstance), serialize_when_none=False)
     load_balanced_server_instance_count = IntType(serialize_when_none=False)
 
+    platform_code = StringType(default="classic")
+
     @property
     def instance_type(self) -> str:
         if self.network_usage_type:

@@ -100,6 +100,8 @@ class Server(NCloudServer):
     disks = ListType(ModelType(NCloudBlock), serialize_when_none=False)
     security_groups = ListType(ModelType(NCloudAccessControlRule), serialize_when_none=False)
 
+    platform_code = StringType(default="classic")
+
     @property
     def instance_type(self) -> str:
         return self.server_instance_type.get('code_name', None)
