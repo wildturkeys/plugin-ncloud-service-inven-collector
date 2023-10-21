@@ -34,8 +34,8 @@ cst_vpc._metadata = CloudServiceTypeMeta.set_meta(
                                     'safe' : ['RUN'],
                                     'available':['CREATING','INIT'],
                                     'disable':['TERMTING' ]}),
-        TextDyField.data_source('Ipv4 Cidr Block', 'data.ipv4_cidr_block'),
-        TextDyField.data_source('Region','data.region_code')
+        #TextDyField.data_source('Ipv4 Cidr Block', 'data.ipv4_cidr_block'),
+       # TextDyField.data_source('Region','data.region_code')
     ],
     search=[
     ],
