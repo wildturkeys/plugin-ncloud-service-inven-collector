@@ -27,18 +27,15 @@ cst_vpc.tags = {
 
 cst_vpc._metadata = CloudServiceTypeMeta.set_meta(
     fields=[
-        TextDyField.data_source('Name','data.vpc_name'),
-        #TextDyField.data_source('No','data.vpc_no'),
-        #TextDyField.data_source('Create', 'data.create_date'),
-        # TextDyField.data_source('Status','data.vpc_status.code'
-                               # default_state={
-                                #    'safe':['RUN'],
-                                 #   'available':['CREATING','INIT'],
-                                  #  'disable':['TERMTING' ]
-                                #}
-                                # ),
-        #TextDyField.data_source('Ipv4 Cidr Block', 'data.ipv4_cidr_block'),
-        #TextDyField.data_source('Region','data.region_code')
+        TextDyField.data_source('No','data.vpc_no'),
+        DateTimeDyField.data_source('Create', 'data.create_date'),
+        EnumDyField.data_source('Status','data.vpc_status.code',
+                                default_state={
+                                    'safe' : ['RUN'],
+                                    'available':['CREATING','INIT'],
+                                    'disable':['TERMTING' ]}),
+        TextDyField.data_source('Ipv4 Cidr Block', 'data.ipv4_cidr_block'),
+        TextDyField.data_source('Region','data.region_code')
     ],
     search=[
     ],

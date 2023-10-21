@@ -12,7 +12,7 @@ class NcloudVPC(Model):
     region_code = StringType(serialize_when_none=False)
     vpc_name = StringType(serialize_when_none=False)
     vpc_no = StringType(serialize_when_none=False)
-  #  vpc_status = DictType(serialize_when_none=False)
+    vpc_status = DictType(StringType, serialize_when_none=False)
 
 
 class VPC(NcloudVPC):
