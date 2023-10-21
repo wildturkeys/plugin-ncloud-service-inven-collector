@@ -40,7 +40,6 @@ class NasConnector(NCloudBaseConnector):
             response = self.api_client_v2.get_nas_volume_instance_list(ncloud_server.GetNasVolumeInstanceListRequest())
             response_dict = response.to_dict()
 
-            nas_volume = []
             if response_dict.get("nas_volume_instance_list"):
 
                 for nas_volume_instance in response_dict.get("nas_volume_instance_list"):

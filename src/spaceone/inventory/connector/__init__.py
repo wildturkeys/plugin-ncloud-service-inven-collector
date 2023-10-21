@@ -2,3 +2,4 @@ from spaceone.inventory.connector.ncloud_server_connector.connector import Serve
 from spaceone.inventory.connector.ncloud_nas_connector.connector import NasConnector
 from spaceone.inventory.connector.ncloud_lb_connector.connector import LbConnector
 from spaceone.inventory.connector.ncloud_block_connector.connector import BlockConnector
+from spaceone.inventory.connector.ncloud_vpc_connector.connector import VpcConnector
