@@ -7,6 +7,7 @@ FILTER_FORMAT = []
 ASSET_URL = "https://chulgyujeon.github.io/images/icon"
 CLOUD_SERVICE_GROUP_MAP = {
     'Server': 'ServerConnectorManager',
+    'ServerVPC': 'ServerVPCConnectorManager',
     'Nas': 'NasConnectorManager',
     'LB': 'LbConnectorManager',
     'Block': 'BlockConnectorManager',
