@@ -29,7 +29,7 @@ subnet = TableDynamicLayout.set_fields('Subnet', root_path='data.subnet',
                                                                    ),
                                            TextDyField.data_source('No', 'subnet_no'),
                                            EnumDyField.data_source('Usage Type', 'usage_type.code_name',
-                                                                   default_outline_badge=['General','LoadBalancer Only','BareMetal Only', 'Nat Gateway Only']),
+                                                                   default_outline_badge=['General','LoadBalancer Only','BareMetal Only', 'NAT Gateway Only']),
                                            EnumDyField.data_source('Subnet Status','subnet_status.code',
                                                                    default_state={
                                                                     'safe': ['RUN'],
@@ -38,11 +38,24 @@ subnet = TableDynamicLayout.set_fields('Subnet', root_path='data.subnet',
                                            TextDyField.data_source('Zone','zon_code'),
                                            DateTimeDyField.data_source("Created", "create_date"),
 
-
                                        ])
 
+acl = TableDynamicLayout.set_fields('Network ACL', root_path='data.acl',
+                                    fields=[
+                                        TextDyField.data_source('Name','network_acl_name'),
+                                        EnumDyField.data_source('Status','network_acl_status.code',
+                                                                   default_state={
+                                                                    'safe': ['RUN'],
+                                                                    'available':['SET','INIT'],
+                                                                    'disable':['TERMTING' ]}),
+                                        TextDyField.data_source('No', 'network_acl_no'),
+                                        DateTimeDyField.data_source("Created", "create_date"),
+                                        TextDyField.data_source('Description','network_acl_description'),
+
+                                    ])
+
 # 'vpc_status': {'code': 'RUN', 'code_name': 'run'}}
-SERVICE_DETAILS = CloudServiceMeta.set_layouts([details, subnet])
+SERVICE_DETAILS = CloudServiceMeta.set_layouts([details, subnet,acl])
 
 
 
