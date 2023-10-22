@@ -13,6 +13,7 @@ class NCloudACG(Model):
     create_date = DateTimeType(serialize_when_none=False)
     is_default = BooleanType(serialize_when_none=False)
 
+
 class NCloudServer(Model):
     server_name = StringType(serialize_when_none=False)
     server_instance_type = DictType(StringType, serialize_when_none=False)
@@ -114,4 +115,23 @@ class Server(NCloudServer):
         return {
             "resource_id": self.server_instance_no,
             "external_link": f"https://console.ncloud.com/server/server"
+        }
+
+
+## VPC
+
+class NCloudServerVPC(NCloudServer):
+    vpc_no = StringType(serialize_when_none=False)
+    subnet_no = StringType(serialize_when_none=False)
+    zone_code = StringType(serialize_when_none=False)
+    region_code = StringType(serialize_when_none=False)
+
+
+class ServerVPC(NCloudServerVPC, Server):
+    platform_code = StringType(default="vpc")
+
+    def reference(self):
+        return {
+            "resource_id": self.server_instance_no,
+            "external_link": f"https://console.ncloud.com/vpc-compute/server"
         }

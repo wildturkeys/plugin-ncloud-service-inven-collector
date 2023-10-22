@@ -2,9 +2,11 @@ import logging
 import ncloud_server
 from ncloud_server.api.v2_api import V2Api
 from ncloud_server.rest import ApiException
+
 from typing import Optional, Type
 from spaceone.inventory.connector.ncloud_server_connector.schema.data import Server, NCloudServer, NCloudBlock, \
     NCloudNetworkInterface, NCloudAccessControlGroup, NCloudAccessControlRule, NCloudAccessControlGroupServerInstance
+
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_connector import NCloudBaseConnector
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_type import CLOUD_SERVICE_TYPES
@@ -49,15 +51,18 @@ class ServerConnector(NCloudBaseConnector):
 
         for region in self.regions:
             resources.extend(
-                self._convert_cloud_service_response(self.list_server_instances(region_no=region.get('region_no'))))
+                self._convert_cloud_service_response(self.list_server_instances(NCloudServer,
+                                                                                Server,
+                                                                                region_no=region.get('region_no'))))
 
         return resources
 
-    def list_server_instances(self, **kwargs) -> Iterator:
+    def list_server_instances(self, ncloud_server_cls: Type[NCloudServer],
+                              response_server_cls: Type[Server], **kwargs) -> Iterator:
 
         try:
 
-            response = self.api_client_v2.get_server_instance_list(ncloud_server.GetServerInstanceListRequest(**kwargs))
+            response = self.api_client_v2.get_server_instance_list(self._ncloud_cls.GetServerInstanceListRequest(**kwargs))
             response_dict = response.to_dict()
 
             if response_dict.get("server_instance_list"):
@@ -69,19 +74,28 @@ class ServerConnector(NCloudBaseConnector):
 
                 for server_instance in response_dict.get("server_instance_list"):
 
-                    server = Server(self._create_model_obj(NCloudServer, server_instance))
+                    server = response_server_cls(self._create_model_obj(ncloud_server_cls, server_instance))
                     region = server_instance.get("region")
 
-                    if region.get("region_code"):
+                    if region and region.get("region_code"):
                         server.region_code = region.get("region_code")
+                    elif server_instance.get("region_code"):
+                        server.region_code = server_instance.get("region_code")
 
                     server.hardware = {
                         'core': server.cpu_count,
                         'memory': round(server.memory_size / 1024 / 1024 / 1024)
                     }
 
+                    zone_code = None
+
+                    if server.zone and server.zone.get('zone_code'):
+                        zone_code = server.zone.get('zone_code')
+                    elif server.zone_code:
+                        zone_code = server.zone_code
+
                     server.compute = {
-                        'az': server.zone.get('zone_code'),
+                        'az': zone_code,
                         'instance_state': INSTANCE_STATE_MAP.get(server.server_instance_status_name),
                         'instance_id': server.server_instance_no
                     }
@@ -96,18 +110,25 @@ class ServerConnector(NCloudBaseConnector):
                         server.nics = self._find_objs_by_key_value(_network_interface,
                                                                    'server_instance_no', server.server_instance_no)
 
-                        server.security_groups = _instance_access_control_rules[server.server_instance_no]
+                        if _instance_access_control_rules and\
+                                _instance_access_control_rules.get(server.server_instance_no):
+                            server.security_groups = _instance_access_control_rules.get(server.server_instance_no)
 
                     yield server
 
         except ApiException as e:
             logging.error(e)
             raise
+        except Exception as e:
+            import traceback
+            logging.error(traceback.format_exc())
+            logging.error(e)
+            raise
 
     def _list_block_storage_instance(self, **kwargs) -> List[Type[NCloudBlock]]:
 
         return self._list_ncloud_resources(self.api_client_v2.get_block_storage_instance_list,
-                                           ncloud_server.GetBlockStorageInstanceListRequest,
+                                           self._ncloud_cls.GetBlockStorageInstanceListRequest,
                                            "block_storage_instance_list",
                                            NCloudBlock,
                                            **kwargs)
@@ -115,7 +136,7 @@ class ServerConnector(NCloudBaseConnector):
     def _list_network_interface(self, **kwargs) -> List[NCloudNetworkInterface]:
 
         return self._list_ncloud_resources(self.api_client_v2.get_network_interface_list,
-                                           ncloud_server.GetNetworkInterfaceListRequest,
+                                           self._ncloud_cls.GetNetworkInterfaceListRequest,
                                            "network_interface_list",
                                            NCloudNetworkInterface,
                                            **kwargs)
@@ -123,14 +144,14 @@ class ServerConnector(NCloudBaseConnector):
     def _list_access_control_group(self) -> List[NCloudAccessControlGroup]:
 
         return self._list_ncloud_resources(self.api_client_v2.get_access_control_group_list,
-                                           ncloud_server.GetAccessControlGroupListRequest,
+                                           self._ncloud_cls.GetAccessControlGroupListRequest,
                                            "access_control_group_list",
                                            NCloudAccessControlGroup)
 
     def _list_access_control_rule(self, access_control_group_configuration_no: str) -> List[NCloudAccessControlRule]:
 
         return self._list_ncloud_resources(self.api_client_v2.get_access_control_rule_list,
-                                           ncloud_server.GetAccessControlRuleListRequest,
+                                           self._ncloud_cls.GetAccessControlRuleListRequest,
                                            "access_control_rule_list",
                                            NCloudAccessControlRule,
                                            access_control_group_configuration_no=access_control_group_configuration_no
@@ -140,7 +161,7 @@ class ServerConnector(NCloudBaseConnector):
             -> List[NCloudAccessControlGroupServerInstance]:
 
         return self._list_ncloud_resources(self.api_client_v2.get_access_control_group_server_instance_list,
-                                           ncloud_server.GetAccessControlGroupServerInstanceListRequest,
+                                           self._ncloud_cls.GetAccessControlGroupServerInstanceListRequest,
                                            "server_instance_list",
                                            NCloudAccessControlGroupServerInstance,
                                            access_control_group_configuration_no=access_control_group_configuration_no)
@@ -179,11 +200,14 @@ class ServerConnector(NCloudBaseConnector):
                 access_control_group_list = access_control_group_server.access_control_group_list
                 for access_control_group in access_control_group_list:
 
-                    access_control_group_configuration_no =\
+                    access_control_group_configuration_no = \
                         access_control_group.get("access_control_group_configuration_no")
 
                     if access_control_group_configuration_no:
-                        access_control_group_rule_server_dict[server_instance_no] +=\
+                        access_control_group_rule_server_dict[server_instance_no] += \
                             access_control_rules_dict[access_control_group_configuration_no]
 
         return access_control_group_rule_server_dict
+
+
+
