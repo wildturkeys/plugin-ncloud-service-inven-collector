@@ -54,8 +54,26 @@ acl = TableDynamicLayout.set_fields('Network ACL', root_path='data.acl',
 
                                     ])
 
+nat_gateway = TableDynamicLayout.set_fields('NAT Gateway', root_path='data.nat_gateway',
+                                            fields=[
+                                                TextDyField.data_source('Name','nat_gateway_name'),
+                                                EnumDyField.data_source('Status','nat_gateway_instance_status.code',
+                                                                        default_state={
+                                                                            'safe': ['RUN'],
+                                                                            'available': ['INIT'],
+                                                                            'disable': ['TERMTING']}),
+
+                                                DateTimeDyField.data_source('Created','create_date'),
+                                                TextDyField.data_source('Zone','zone_code'),
+                                                TextDyField.data_source('Public IP', 'public_ip'),
+                                                TextDyField.data_source('No', 'nat_gateway_instance_no'),
+                                                TextDyField.data_source('Description','nat_gateway_description')
+
+
+])
+
 # 'vpc_status': {'code': 'RUN', 'code_name': 'run'}}
-SERVICE_DETAILS = CloudServiceMeta.set_layouts([details, subnet,acl])
+SERVICE_DETAILS = CloudServiceMeta.set_layouts([details, subnet,acl, nat_gateway])
 
 
 

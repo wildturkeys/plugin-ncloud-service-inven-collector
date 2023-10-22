@@ -34,12 +34,29 @@ class NcloudACL(Model):
     network_acl_no = StringType(serialize_when_none=False)
     network_acl_status = DictType(StringType, serialize_when_none=False)
     network_acl_description = StringType(serialize_when_none=False)
+    vpc_no = StringType(serialize_when_none=False)
     create_date = DateTimeType()
+
+class NcloudNatGateway(Model):
+    vpc_no = StringType(serialize_when_none=False)
+    nat_gateway_instance_no	= StringType(serialize_when_none=False)
+    nat_gateway_name = StringType(serialize_when_none=False)
+    public_ip= StringType(serialize_when_none=False)
+
+    nat_gateway_instance_status	= DictType(StringType, serialize_when_none=False)
+
+    nat_gateway_instance_status_name = StringType(serialize_when_none=False)
+    nat_gateway_instance_operation = DictType(StringType, serialize_when_none=False)
+
+    create_date	= DateTimeType()
+    nat_gateway_description	= StringType(serialize_when_none=False)
+    zone_code = StringType(serialize_when_none=False)
 
 
 class VPC(NcloudVPC):
     subnet = ListType(ModelType(NcloudSubnet),serialize_when_none=False)
     acl = ListType(ModelType(NcloudACL),serialize_when_none=False)
+    nat_gateway = ListType(ModelType(NcloudNatGateway),serialize_when_none=False)
     @property
     def name(self) -> str:
         return self.vpc_name
