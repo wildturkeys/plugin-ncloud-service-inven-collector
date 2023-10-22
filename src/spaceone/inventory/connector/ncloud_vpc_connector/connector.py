@@ -49,10 +49,10 @@ class VpcConnector(NCloudBaseConnector):
 
                     vpc = VPC(self._create_model_obj(NcloudVPC,vpc_instance ))
                     vpc.subnet = _subnet_instances
-                    # if hasattr(vpc, "vpc_no"):
-                    #     vpc.subnet = self._find_objs_by_key_value( _subnet_instances,
-                    #                                                'vpc_no',
-                    #                                                vpc.vpc_no)
+                    if hasattr(vpc, "vpc_no"):
+                        vpc.subnet = self._find_objs_by_key_value( _subnet_instances,
+                                                                   'vpc_no',
+                                                                   vpc.vpc_no)
 
                     yield vpc
 
