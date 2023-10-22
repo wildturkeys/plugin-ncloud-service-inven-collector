@@ -22,20 +22,21 @@ details = ItemDynamicLayout.set_fields('Details',fields=[
 
 subnet = TableDynamicLayout.set_fields('Subnet', root_path='data.subnet',
                                        fields=[
-                                           TextDyField.data_source('No', 'subnet_no'),
                                            TextDyField.data_source('Name', 'subnet_name'),
-                                           # EnumDyField.data_source('Type', 'subnet_type.code_name',
-                                           #                         default_badge={'indigo.500': ['Public'],
-                                           #                                        'coral.600': ['Private']}
-                                           #                         ),
-                                           # EnumDyField.data_source('Type', 'usage_type.code_name',
-                                           #                         default_outline_badge={'Normal','LoadBalancer', 'BareMetal', 'NatGateway'}),
-                                           # EnumDyField.data_source('Subnet Status','subnet_status.code',
-                                           #                         default_state={
-                                           #                          'safe' : ['RUN'],
-                                           #                          'available':['CREATING','INIT'],
-                                           #                          'disable':['TERMTING' ] }),
-                                           # DateTimeDyField.data_source("Created", "create_date"),
+                                           EnumDyField.data_source('Type', 'subnet_type.code_name',
+                                                                   default_badge={'indigo.500': ['Public'],
+                                                                                  'coral.600': ['Private']}
+                                                                   ),
+                                           TextDyField.data_source('No', 'subnet_no'),
+                                           EnumDyField.data_source('Usage Type', 'usage_type.code_name',
+                                                                   default_outline_badge=['General','LoadBalancer Only','BareMetal Only', 'Nat Gateway Only']),
+                                           EnumDyField.data_source('Subnet Status','subnet_status.code',
+                                                                   default_state={
+                                                                    'safe': ['RUN'],
+                                                                    'available':['CREATING','INIT'],
+                                                                    'disable':['TERMTING' ]}),
+                                           TextDyField.data_source('Zone','zon_code'),
+                                           DateTimeDyField.data_source("Created", "create_date"),
 
 
                                        ])
