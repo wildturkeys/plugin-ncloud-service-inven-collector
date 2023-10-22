@@ -3,7 +3,7 @@ import ncloud_vpc
 from ncloud_vpc.api.v2_api import V2Api
 from ncloud_vpc.rest import ApiException
 from typing import Optional, Type
-from spaceone.inventory.connector.ncloud_vpc_connector.schema.data import VPC, NcloudVPC, NcloudSubnet
+from spaceone.inventory.connector.ncloud_vpc_connector.schema.data import VPC, NcloudVPC, NcloudSubnet, NcloudACL
 from spaceone.inventory.connector.ncloud_vpc_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_connector import NCloudBaseConnector
 from spaceone.inventory.connector.ncloud_vpc_connector.schema.service_type import CLOUD_SERVICE_TYPES
@@ -43,6 +43,8 @@ class VpcConnector(NCloudBaseConnector):
 
             if response_dict.get("vpc_list"):
                 _subnet_instances: List[Optional[NcloudSubnet]] = self._list_subnet_instance(**kwargs)
+                _acl_instances: List[Optional[NcloudACL]] = self._list_acl_instance(**kwargs)
+
                 for vpc_instance in response_dict.get("vpc_list"):
 
                     vpc = VPC(self._create_model_obj(NcloudVPC,vpc_instance ))
@@ -61,3 +63,8 @@ class VpcConnector(NCloudBaseConnector):
     def _list_subnet_instance(self, **kwargs) -> List[Type[NcloudSubnet]]:
         return self._list_ncloud_resources(self.api_client_v2.get_subnet_list, ncloud_vpc.GetSubnetListRequest,
                                           "subnet_list", NcloudSubnet, **kwargs)
+
+
+    def _list_acl_instance(self, **kwargs) -> List[Type[NcloudACL]]:
+        return self._list_ncloud_resources(self.api_client_v2.get_network_acl_list, ncloud_vpc.GetNetworkAclListRequest,
+                                           "network_acl_list", NcloudACL, **kwargs)
