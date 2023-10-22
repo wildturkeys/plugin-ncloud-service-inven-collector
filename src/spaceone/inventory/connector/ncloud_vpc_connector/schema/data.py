@@ -29,8 +29,17 @@ class NcloudSubnet(Model):
     network_acl_no = StringType(serialize_when_none=False)
 
 
+class NcloudACL(Model):
+    network_acl_name = StringType(serialize_when_none=False)
+    network_acl_no = StringType(serialize_when_none=False)
+    network_acl_status = DictType(StringType, serialize_when_none=False)
+    network_acl_description = StringType(serialize_when_none=False)
+    create_date = DateTimeType()
+
+
 class VPC(NcloudVPC):
     subnet = ListType(ModelType(NcloudSubnet),serialize_when_none=False)
+    acl = ListType(ModelType(NcloudACL),serialize_when_none=False)
     @property
     def name(self) -> str:
         return self.vpc_name
