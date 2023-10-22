@@ -41,8 +41,13 @@ subnet = TableDynamicLayout.set_fields('Subnet', root_path='data.subnet',
 
                                        ])
 
+acl = TableDynamicLayout.set_fields('Network ACL', root_path='data.acl',
+                                    fields=[
+                                        TextDyField.data_source('Name','network_acl_name')
+                                    ])
+
 # 'vpc_status': {'code': 'RUN', 'code_name': 'run'}}
-SERVICE_DETAILS = CloudServiceMeta.set_layouts([details, subnet])
+SERVICE_DETAILS = CloudServiceMeta.set_layouts([details, subnet,acl])
 
 
 

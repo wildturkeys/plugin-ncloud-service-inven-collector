@@ -53,7 +53,9 @@ class VpcConnector(NCloudBaseConnector):
                         vpc.subnet = self._find_objs_by_key_value( _subnet_instances,
                                                                    'vpc_no',
                                                                    vpc.vpc_no)
-
+                        vpc.acl = self._find_objs_by_key_value(_acl_instances,
+                                                               'vpc_no',
+                                                               vpc.vpc_no)
                     yield vpc
 
         except ApiException as e:
