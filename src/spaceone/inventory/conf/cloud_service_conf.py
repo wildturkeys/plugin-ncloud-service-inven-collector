@@ -14,6 +14,8 @@ CLOUD_SERVICE_GROUP_MAP = {
     'VPC': 'VpcConnectorManager'
 }
 
+VPC_AVAILABLE_REGION = ["KR", "SGN", "JPN"]
+
 """
 {'region_list': [{'region_code': 'KR',
                   'region_name': 'Korea',

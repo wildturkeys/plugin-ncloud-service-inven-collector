@@ -19,7 +19,6 @@ count_by_project_conf = os.path.join(current_dir, 'widget/count_by_project.yaml'
 count_by_type_conf = os.path.join(current_dir, 'widget/count_by_type.yaml')
 count_by_core_conf = os.path.join(current_dir, 'widget/count_by_core.yaml')
 
-
 cst_server = CloudServiceTypeResource()
 cst_server.name = 'Server'
 cst_server.provider = 'ncloud'
@@ -67,6 +66,8 @@ cst_server._metadata = CloudServiceTypeMeta.set_meta(
                               options={"source_unit": "BYTES", "display_unit": "GB"}),
         TextDyField.data_source('Instance Type', 'data.server_instance_type.code_name'),
         TextDyField.data_source('Image', 'data.server_image_name'),
+        TextDyField.data_source('VPC', 'data.vpc_no', reference={"resource_type": "inventory.CloudService",
+                                                                 "reference_key": "reference.resource_id"}),
         TextDyField.data_source('Zone', 'data.zone.zone_code'),
         DateTimeDyField.data_source("Created", "data.create_date")
     ],

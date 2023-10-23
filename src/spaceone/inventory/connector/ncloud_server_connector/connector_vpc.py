@@ -11,12 +11,10 @@ from spaceone.inventory.connector.ncloud_server_connector.schema.data import NCl
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_type import CLOUD_SERVICE_TYPES
 from spaceone.inventory.libs.schema.resource import CloudServiceResponse
-
+from spaceone.inventory.conf.cloud_service_conf import VPC_AVAILABLE_REGION
 from typing import Iterator, List
 
 _LOGGER = logging.getLogger(__name__)
-
-VPC_AVAILABLE_REGION = ["KR", "SGN", "JPN"]
 
 
 class ServerVPCConnector(ServerConnector):
@@ -30,7 +28,7 @@ class ServerVPCConnector(ServerConnector):
 
     def get_resources(self) -> List[Type[CloudServiceResponse]]:
         resources = []
-        #resources.extend(self.cloud_service_types)
+        # resources.extend(self.cloud_service_types)
 
         for region in self.regions:
             if region.get('region_code') in VPC_AVAILABLE_REGION:

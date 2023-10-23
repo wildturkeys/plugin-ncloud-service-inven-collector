@@ -90,18 +90,20 @@ class NCloudAccessControlRule(Model):
     source_access_control_rule_configuration_no = StringType(serialize_when_none=False)
     source_access_control_rule_name = StringType(serialize_when_none=False)
     source_ip = StringType(serialize_when_none=False)
+    flow = StringType(serialize_when_none=False, default="inbound")
 
 
 class Server(NCloudServer):
     hardware = DictType(StringType, serialize_when_none=False)
     compute = DictType(StringType, serialize_when_none=False)
-    nics = ListType(ModelType(NCloudNetworkInterface), serialize_when_none=False)
+    nics = ListType(ModelType(NCloudNetworkInterface), serialize_when_none=False, default=[])
     os = DictType(StringType, serialize_when_none=False)
     primary_ip_address = StringType(serialize_when_none=False)
-    disks = ListType(ModelType(NCloudBlock), serialize_when_none=False)
-    security_groups = ListType(ModelType(NCloudAccessControlRule), serialize_when_none=False)
+    disks = ListType(ModelType(NCloudBlock), serialize_when_none=False, default=[])
+    security_groups = ListType(ModelType(NCloudAccessControlRule), serialize_when_none=False, default=[])
 
     platform_code = StringType(default="classic")
+    zone_code = StringType(serialize_when_none=False)
 
     @property
     def instance_type(self) -> str:
@@ -123,7 +125,6 @@ class Server(NCloudServer):
 class NCloudServerVPC(NCloudServer):
     vpc_no = StringType(serialize_when_none=False)
     subnet_no = StringType(serialize_when_none=False)
-    zone_code = StringType(serialize_when_none=False)
     region_code = StringType(serialize_when_none=False)
 
 
@@ -133,5 +134,5 @@ class ServerVPC(NCloudServerVPC, Server):
     def reference(self):
         return {
             "resource_id": self.server_instance_no,
-            "external_link": f"https://console.ncloud.com/vpc-compute/server"
+            "external_link": "https://console.ncloud.com/vpc-compute/server"
         }
