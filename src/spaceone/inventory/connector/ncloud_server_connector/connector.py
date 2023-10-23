@@ -125,8 +125,6 @@ class ServerConnector(NCloudBaseConnector):
             logging.error(e)
             raise
         except Exception as e:
-            import traceback
-            logging.error(traceback.format_exc())
             logging.error(e)
             raise
 
