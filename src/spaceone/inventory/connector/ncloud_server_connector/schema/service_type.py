@@ -68,7 +68,7 @@ cst_server._metadata = CloudServiceTypeMeta.set_meta(
         TextDyField.data_source('Image', 'data.server_image_name'),
         TextDyField.data_source('VPC', 'data.vpc_no', reference={"resource_type": "inventory.CloudService",
                                                                  "reference_key": "reference.resource_id"}),
-        TextDyField.data_source('Zone', 'data.zone.zone_code'),
+        TextDyField.data_source('Zone', 'data.zone_code'),
         DateTimeDyField.data_source("Created", "data.create_date")
     ],
     search=[

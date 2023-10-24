@@ -143,6 +143,7 @@ class Server(NCloudServer):
 
     platform_code = StringType(default="classic")
     zone_code = StringType(serialize_when_none=False)
+    region_code = StringType(serialize_when_none=False)
 
     @property
     def instance_type(self) -> str:
@@ -164,7 +165,7 @@ class Server(NCloudServer):
 class NCloudServerVPC(NCloudServer):
     vpc_no = StringType(serialize_when_none=False)
     subnet_no = StringType(serialize_when_none=False)
-    region_code = StringType(serialize_when_none=False)
+    zone_code = StringType(serialize_when_none=False)
 
 
 class ServerVPC(NCloudServerVPC, Server):

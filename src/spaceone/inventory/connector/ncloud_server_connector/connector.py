@@ -33,6 +33,22 @@ class ServerConnector(NCloudBaseConnector):
         super().__init__(*args, **kwargs)
         self._access_control_rules_dict = {}
 
+    def _set_default_server_info(self, server):
+
+        server.hardware = {
+            'core': server.cpu_count,
+            'memory': round(server.memory_size / 1024 / 1024 / 1024)
+        }
+
+        server.compute = {
+            'az': None,
+            'instance_state': INSTANCE_STATE_MAP.get(server.server_instance_status_name),
+            'instance_id': server.server_instance_no
+        }
+
+        server.os = {'os_distro': server.platform_type.get('code_name')}
+        server.primary_ip_address = server.private_ip
+
     def get_resources(self) -> List[Type[CloudServiceResponse]]:
 
         resources = []
@@ -71,27 +87,11 @@ class ServerConnector(NCloudBaseConnector):
                 elif server_instance.get("region_code"):
                     server.region_code = server_instance.get("region_code")
 
-                server.hardware = {
-                    'core': server.cpu_count,
-                    'memory': round(server.memory_size / 1024 / 1024 / 1024)
-                }
+                self._set_default_server_info(server)
 
-                zone_code = None
-
-                if server.zone and server.zone.get('zone_code'):
-                    zone_code = server.zone.get('zone_code')
-                elif server.zone_code:
-                    zone_code = server.zone_code
-
-                server.compute = {
-                    'az': zone_code,
-                    'instance_state': INSTANCE_STATE_MAP.get(server.server_instance_status_name),
-                    'instance_id': server.server_instance_no
-                }
-
-                server.os = {'os_distro': server.platform_type.get('code_name')}
-
-                server.primary_ip_address = server.private_ip
+                if server_instance.get("zone") and server_instance.get("zone").get('zone_code'):
+                    server.zone_code = server_instance.get("zone").get('zone_code')
+                    server.compute['az'] = server_instance.get("zone").get('zone_code')
 
                 if hasattr(server, "server_instance_no"):
                     server.disks = self._find_objs_by_key_value(_block_storages,
@@ -101,7 +101,6 @@ class ServerConnector(NCloudBaseConnector):
 
                     if _instance_access_control_rules and \
                             _instance_access_control_rules.get(server.server_instance_no):
-
                         server.security_groups = []
 
                         server.security_groups.extend(self.__convert_access_control_rules(
@@ -200,7 +199,8 @@ class ServerConnector(NCloudBaseConnector):
 
         return rtn_list
 
-    def __convert_access_control_rules(self, access_control_rules: List[NCloudAccessControlRule]) -> Iterable[AccessControlRule]:
+    def __convert_access_control_rules(self, access_control_rules: List[NCloudAccessControlRule]) -> Iterable[
+        AccessControlRule]:
         """
         access_control_group_name = StringType(serialize_when_none=False)
         access_control_group_no = StringType(serialize_when_none=False)

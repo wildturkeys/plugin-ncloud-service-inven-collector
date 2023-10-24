@@ -37,7 +37,7 @@ class ServerVPCConnector(ServerConnector):
         for region in self.regions:
             if region.get('region_code') in VPC_AVAILABLE_REGION:
                 region_code = region.get('region_code')
-                self._access_control_rules_dict\
+                self._access_control_rules_dict \
                     = dict(self._access_control_rules_dict,
                            **self._sort_access_control_group_rules_group_by_acg_no(region_code=region_code))
 
@@ -63,7 +63,7 @@ class ServerVPCConnector(ServerConnector):
                                            NCloudAccessControlVPC,
                                            **kwargs)
 
-    def _list_access_control_rule(self, access_control_group_no: str,  **kwargs) -> List[NCloudAccessControlRuleVPC]:
+    def _list_access_control_rule(self, access_control_group_no: str, **kwargs) -> List[NCloudAccessControlRuleVPC]:
         return self._list_ncloud_resources(self.api_client_v2.get_access_control_group_rule_list,
                                            self._ncloud_cls.GetAccessControlGroupRuleListRequest,
                                            "access_control_group_rule_list",
@@ -115,25 +115,11 @@ class ServerVPCConnector(ServerConnector):
                 elif server_instance.get("region_code"):
                     server.region_code = server_instance.get("region_code")
 
-                server.hardware = {
-                    'core': server.cpu_count,
-                    'memory': round(server.memory_size / 1024 / 1024 / 1024)
-                }
+                self._set_default_server_info(server)
 
-                zone_code = None
-
-                if server.zone and server.zone.get('zone_code'):
-                    zone_code = server.zone.get('zone_code')
-                elif server.zone_code:
-                    zone_code = server.zone_code
-
-                server.compute = {
-                    'az': zone_code,
-                    'instance_state': INSTANCE_STATE_MAP.get(server.server_instance_status_name),
-                    'instance_id': server.server_instance_no
-                }
-
-                server.os = {'os_distro': server.platform_type.get('code_name')}
+                if server_instance.get('zone_code'):
+                    server.zone_code = server_instance.get('zone_code')
+                    server.compute['az'] = server_instance.get('zone_code')
 
                 if hasattr(server, "server_instance_no"):
                     server.disks = self._find_objs_by_key_value(_block_storages,
@@ -151,12 +137,14 @@ class ServerVPCConnector(ServerConnector):
                                 if self._access_control_rules_dict.get(acg_no):
                                     server.security_groups.extend(
                                         self.__convert_access_control_rules(acg_no,
-                                                                            self._access_control_rules_dict.get(acg_no)))
+                                                                            self._access_control_rules_dict.get(
+                                                                                acg_no)))
 
                 yield server
 
     def __convert_access_control_rules(self, acg_no: str,
-                                       access_control_rules: List[NCloudAccessControlRule]) -> Iterable[AccessControlRule]:
+                                       access_control_rules: List[NCloudAccessControlRule]) -> Iterable[
+        AccessControlRule]:
         """
         access_control_group_name = StringType(serialize_when_none=False)
         access_control_group_no = StringType(serialize_when_none=False)
