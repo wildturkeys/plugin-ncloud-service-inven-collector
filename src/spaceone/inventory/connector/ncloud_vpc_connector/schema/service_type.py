@@ -34,10 +34,9 @@ cst_vpc._metadata = CloudServiceTypeMeta.set_meta(
                                     'safe' : ['RUN'],
                                     'available':['CREATING','INIT'],
                                     'disable':['TERMTING' ]}),
-        #TextDyField.data_source('Ipv4 Cidr Block', 'data.ipv4_cidr_block'),
-       # TextDyField.data_source('Region','data.region_code')
     ],
     search=[
+        SearchField.set(name='Status', key='data.vpc_status.code'),
     ],
     widget=[
         CardWidget.set(**get_data_from_yaml(instance_total_count_conf))

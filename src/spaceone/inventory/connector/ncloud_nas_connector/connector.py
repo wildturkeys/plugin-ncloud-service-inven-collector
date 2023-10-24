@@ -49,18 +49,10 @@ class NasConnector(NCloudBaseConnector):
                     nas_volume = NasVolume(self._create_model_obj(NcloudNasVolume, nas_volume_instance))
                     nas_volume.region_code = region_code
 
-                    # ACL설정 서버가 있을 경우
-                    # if(hasattr(nas_volume,'nas_volume_server_instance_list')):
 
                     nas_volume.nas_volume_server_instance_list = self._list_server_instances(
                         nas_volume_instance.get("nas_volume_server_instance_list"))
-                    # logging.debug(nas_volume_instance.get("nas_volume_server_instance_list"))
-                    # logging.debug(nas_volume.nas_volume_server_instance_list)
 
-                    # nas_volume.nas_volume_server_instance_list = []
-                    # for server_instance in nas_volume_instance.get("nas_volume_server_instance_list"):
-                    #     server = NCloudServer(self._create_model_obj(NCloudServer, server_instance))
-                    #     nas_volume.nas_volume_server_instance_list.append(server)
 
                     yield nas_volume
 
@@ -75,12 +67,6 @@ class NasConnector(NCloudBaseConnector):
 
         for server_instance in server_instances:
             server= NCloudServer(self._create_model_obj(NCloudServer, server_instance))
-
-            # region = server_instance.get("region")
-            #
-            # if region.get("region_code"):
-            #     server.region_code = region.get("region_code")
-
             resources_list.append(server)
 
         return resources_list
