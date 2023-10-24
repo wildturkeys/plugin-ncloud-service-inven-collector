@@ -1,4 +1,5 @@
 import logging
+import traceback
 import ncloud_server
 from ncloud_server.api.v2_api import V2Api
 from ncloud_server.rest import ApiException
@@ -69,7 +70,15 @@ class NCloudBaseConnector(BaseConnector):
         raise NotImplementedError()
 
     def collect_data(self):
-        return self.get_resources()
+
+        try:
+
+            return self.get_resources()
+
+        except Exception as e:
+            _LOGGER.error(e)
+            _LOGGER.error(traceback.format_exc())
+            raise
 
     def _convert_cloud_service_response(self, objs: List):
 
