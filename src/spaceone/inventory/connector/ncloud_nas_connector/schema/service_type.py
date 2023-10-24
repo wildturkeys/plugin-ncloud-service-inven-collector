@@ -28,7 +28,10 @@ cst_nas_volume._metadata = CloudServiceTypeMeta.set_meta(
         EnumDyField.data_source('Platform', 'data.platform_code', default_badge={
             'indigo.500': ['classic'], 'coral.600': ['vpc']
         }),
-        TextDyField.data_source('Status', 'data.nas_volume_instance_status_name'),
+        EnumDyField.data_source('Status','data.nas_volume_instance_status_name' , default_state={
+                                'safe': ['created'],
+                                'disable' : ['terminated']
+                            }),
         TextDyField.data_source('Instance Type', 'data.nas_volume_instance_status.code_name'),
         SizeField.data_source('Total Size', 'data.volume_total_size', type="size",
                               options={"source_unit": "BYTES", "display_unit": "GB"}),
@@ -36,6 +39,10 @@ cst_nas_volume._metadata = CloudServiceTypeMeta.set_meta(
 
     ],
     search=[
+        SearchField.set(name='Status', key='data.nas_volume_instance_status_name'),
+        SearchField.set(name='Instance Type', key='data.nas_volume_instance_status.code_name'),
+
+        SearchField.set(name='Platform', key='data.platform_code'),
     ],
     widget=[
         CardWidget.set(**get_data_from_yaml(instance_total_count_conf)),

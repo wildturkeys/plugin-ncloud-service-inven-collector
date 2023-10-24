@@ -27,17 +27,16 @@ cst_vpc.tags = {
 
 cst_vpc._metadata = CloudServiceTypeMeta.set_meta(
     fields=[
-        TextDyField.data_source('No','data.vpc_no'),
-        DateTimeDyField.data_source('Create', 'data.create_date'),
         EnumDyField.data_source('Status','data.vpc_status.code',
                                 default_state={
                                     'safe' : ['RUN'],
                                     'available':['CREATING','INIT'],
                                     'disable':['TERMTING' ]}),
-        #TextDyField.data_source('Ipv4 Cidr Block', 'data.ipv4_cidr_block'),
-       # TextDyField.data_source('Region','data.region_code')
+        DateTimeDyField.data_source('Create', 'data.create_date'),
+
     ],
     search=[
+        SearchField.set(name='Status', key='data.vpc_status.code'),
     ],
     widget=[
         CardWidget.set(**get_data_from_yaml(instance_total_count_conf))

@@ -35,7 +35,7 @@ subnet = TableDynamicLayout.set_fields('Subnet', root_path='data.subnet',
                                                                     'safe': ['RUN'],
                                                                     'available':['CREATING','INIT'],
                                                                     'disable':['TERMTING' ]}),
-                                           TextDyField.data_source('Zone','zon_code'),
+                                           TextDyField.data_source('Zone','zone_code'),
                                            DateTimeDyField.data_source("Created", "create_date"),
 
                                        ])
