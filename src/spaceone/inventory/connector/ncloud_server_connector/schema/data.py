@@ -93,6 +93,12 @@ class NCloudAccessControlRule(Model):
     flow = StringType(serialize_when_none=False, default="Inbound")
 
 
+class NCloudServerVPC(NCloudServer):
+    vpc_no = StringType(serialize_when_none=False)
+    subnet_no = StringType(serialize_when_none=False)
+    zone_code = StringType(serialize_when_none=False)
+
+
 class NCloudNetworkInterfaceVPC(Model):
     access_control_group_no_list = ListType(StringType, serialize_when_none=False)
     delete_on_termination = BooleanType(serialize_when_none=False)
@@ -109,7 +115,9 @@ class NCloudNetworkInterfaceVPC(Model):
 
 
 class NCloudBlockVPC(NCloudBlock):
-    pass
+    block_storage_disk_type = DictType(StringType, serialize_when_none=False)
+    is_encrypted_volume = BooleanType(serialize_when_none=False)
+    block_storage_disk_detail_type = DictType(StringType, serialize_when_none=False)
 
 
 class NCloudAccessControlVPC(Model):
@@ -138,12 +146,11 @@ class Server(NCloudServer):
     nics = ListType(ModelType(NCloudNetworkInterface), serialize_when_none=False, default=[])
     os = DictType(StringType, serialize_when_none=False)
     primary_ip_address = StringType(serialize_when_none=False)
-    disks = ListType(ModelType(NCloudBlock), serialize_when_none=False, default=[])
+    disks = ListType(ModelType('Disk'), serialize_when_none=False, default=[])
     security_groups = ListType(ModelType(NCloudAccessControlRule), serialize_when_none=False, default=[])
-
-    platform_code = StringType(default="classic")
     zone_code = StringType(serialize_when_none=False)
     region_code = StringType(serialize_when_none=False)
+    platform_code = StringType(default="classic")
 
     @property
     def instance_type(self) -> str:
@@ -158,14 +165,6 @@ class Server(NCloudServer):
             "resource_id": self.server_instance_no,
             "external_link": f"https://console.ncloud.com/server/server"
         }
-
-
-## VPC
-
-class NCloudServerVPC(NCloudServer):
-    vpc_no = StringType(serialize_when_none=False)
-    subnet_no = StringType(serialize_when_none=False)
-    zone_code = StringType(serialize_when_none=False)
 
 
 class ServerVPC(NCloudServerVPC, Server):
@@ -186,3 +185,20 @@ class AccessControlRule(Model):
     flow = StringType(serialize_when_none=False)
     protocol = StringType(serialize_when_none=False)
     ip = StringType(serialize_when_none=False)
+
+
+class NetworkInterface(Model):
+    pass
+
+
+class Disk(Model):
+    block_storage_name = StringType(serialize_when_none=False)
+    block_storage_size = IntType(serialize_when_none=False)
+    block_storage_type = StringType(serialize_when_none=False)
+    block_storage_instance_status_name = StringType(serialize_when_none=False)
+    block_storage_disk_type = StringType(serialize_when_none=False)
+    block_storage_instance_no = StringType(serialize_when_none=False)
+    server_instance_no = StringType(serialize_when_none=False)
+    device_name = StringType(serialize_when_none=False)
+    max_iops_throughput = IntType(serialize_when_none=False)
+    is_encrypted_volume = BooleanType(serialize_when_none=False)

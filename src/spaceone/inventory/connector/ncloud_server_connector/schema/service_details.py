@@ -59,7 +59,7 @@ disk = TableDynamicLayout.set_fields('Disk', root_path='data.disks', fields=[
                             reference={"resource_type": "inventory.CloudService",
                                        "reference_key": "reference.resource_id"}),
     TextDyField.data_source('Volume Type', 'block_storage_type.code'),
-    EnumDyField.data_source('Disk Type', 'disk_detail_type.code',
+    EnumDyField.data_source('Disk Type', 'block_storage_disk_type',
                             default_badge={'indigo.500': ['SSD'],
                                            'coral.600': ['HDD']}
                             ),
