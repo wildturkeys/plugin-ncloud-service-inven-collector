@@ -27,13 +27,13 @@ cst_vpc.tags = {
 
 cst_vpc._metadata = CloudServiceTypeMeta.set_meta(
     fields=[
-        TextDyField.data_source('No','data.vpc_no'),
-        DateTimeDyField.data_source('Create', 'data.create_date'),
         EnumDyField.data_source('Status','data.vpc_status.code',
                                 default_state={
                                     'safe' : ['RUN'],
                                     'available':['CREATING','INIT'],
                                     'disable':['TERMTING' ]}),
+        DateTimeDyField.data_source('Create', 'data.create_date'),
+
     ],
     search=[
         SearchField.set(name='Status', key='data.vpc_status.code'),
