@@ -90,7 +90,46 @@ class NCloudAccessControlRule(Model):
     source_access_control_rule_configuration_no = StringType(serialize_when_none=False)
     source_access_control_rule_name = StringType(serialize_when_none=False)
     source_ip = StringType(serialize_when_none=False)
-    flow = StringType(serialize_when_none=False, default="inbound")
+    flow = StringType(serialize_when_none=False, default="Inbound")
+
+
+class NCloudNetworkInterfaceVPC(Model):
+    access_control_group_no_list = ListType(StringType, serialize_when_none=False)
+    delete_on_termination = BooleanType(serialize_when_none=False)
+    device_name = StringType(serialize_when_none=False)
+    instance_no = StringType(serialize_when_none=False)
+    instance_type = DictType(StringType, serialize_when_none=False)
+    ip = StringType(serialize_when_none=False)
+    is_default = BooleanType(serialize_when_none=False)
+    network_interface_name = StringType(serialize_when_none=False)
+    network_interface_description = StringType(serialize_when_none=False)
+    network_interface_no = StringType(serialize_when_none=False)
+    network_interface_status = DictType(StringType, serialize_when_none=False)
+    subnet_no = StringType(serialize_when_none=False)
+
+
+class NCloudBlockVPC(NCloudBlock):
+    pass
+
+
+class NCloudAccessControlVPC(Model):
+    access_control_group_name = StringType(serialize_when_none=False)
+    access_control_group_description = StringType(serialize_when_none=False)
+    access_control_group_no = StringType(serialize_when_none=False)
+    access_control_group_status = DictType(StringType, serialize_when_none=False)
+    is_default = BooleanType(serialize_when_none=False)
+    vpc_no = StringType(serialize_when_none=False)
+
+
+class NCloudAccessControlRuleVPC(Model):
+    access_control_group_name = StringType(serialize_when_none=False)
+    access_control_rule_no = StringType(serialize_when_none=False)
+    access_control_rule_description = StringType(serialize_when_none=False)
+    access_control_group_rule_type = DictType(StringType, serialize_when_none=False)
+    access_control_group_sequence = StringType(serialize_when_none=False)
+    ip_block = StringType(serialize_when_none=False)
+    port_range = StringType(serialize_when_none=False)
+    protocol_type = DictType(StringType, serialize_when_none=False)
 
 
 class Server(NCloudServer):
@@ -136,3 +175,13 @@ class ServerVPC(NCloudServerVPC, Server):
             "resource_id": self.server_instance_no,
             "external_link": "https://console.ncloud.com/vpc-compute/server"
         }
+
+
+class AccessControlRule(Model):
+    access_control_group_name = StringType(serialize_when_none=False)
+    access_control_group_no = StringType(serialize_when_none=False)
+    access_control_rule_description = StringType(serialize_when_none=False)
+    port = StringType(serialize_when_none=False)
+    flow = StringType(serialize_when_none=False)
+    protocol = StringType(serialize_when_none=False)
+    ip = StringType(serialize_when_none=False)

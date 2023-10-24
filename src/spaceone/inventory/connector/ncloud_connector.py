@@ -24,6 +24,7 @@ class NCloudBaseConnector(BaseConnector):
     _ncloud_cls: Any = None
     _ncloud_api_v2: Any = None
     _ncloud_configuration = None
+    _api_exception_cls = None
 
     _regions = {}
 
@@ -74,6 +75,10 @@ class NCloudBaseConnector(BaseConnector):
         try:
 
             return self.get_resources()
+        except self._api_exception_cls as e:
+            _LOGGER.error(e)
+            _LOGGER.error(traceback.format_exc())
+            raise
 
         except Exception as e:
             _LOGGER.error(e)

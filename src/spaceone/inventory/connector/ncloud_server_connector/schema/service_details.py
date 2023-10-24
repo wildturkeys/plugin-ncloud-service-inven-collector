@@ -76,12 +76,12 @@ nic = TableDynamicLayout.set_fields('NIC', root_path='data.nics', fields=[
 security_groups = TableDynamicLayout.set_fields('Security Groups', root_path='data.security_groups', fields=[
     TextDyField.data_source('Name', 'access_control_group_name'),
     EnumDyField.data_source('Flow', 'flow',
-                            default_badge={'indigo.500': ['inbound'],
-                                           'coral.600': ['outbound']}
+                            default_badge={'indigo.500': ['Inbound'],
+                                           'coral.600': ['Outbound']}
                             ),
-    EnumDyField.data_source('Protocol', 'protocol_type.code', default_outline_badge=['ALL', 'TCP', 'UDP', 'ICMP']),
-    TextDyField.data_source('Source', 'source_ip'),
-    TextDyField.data_source('DST Port', 'destination_port'),
+    EnumDyField.data_source('Protocol', 'protocol', default_outline_badge=['all', 'tcp', 'udp', 'icmp']),
+    TextDyField.data_source('IP', 'ip'),
+    TextDyField.data_source('Port', 'port'),
     TextDyField.data_source('Description', 'access_control_rule_description'),
 ])
 

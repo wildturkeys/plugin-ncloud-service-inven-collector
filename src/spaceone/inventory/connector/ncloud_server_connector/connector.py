@@ -3,35 +3,20 @@ import ncloud_server
 from ncloud_server.api.v2_api import V2Api
 from ncloud_server.rest import ApiException
 
-from typing import Optional, Type
+from typing import Optional, Type, Iterable
 from spaceone.inventory.connector.ncloud_server_connector.schema.data import Server, NCloudServer, NCloudBlock, \
-    NCloudNetworkInterface, NCloudAccessControlGroup, NCloudAccessControlRule, NCloudAccessControlGroupServerInstance
+    NCloudNetworkInterface, NCloudAccessControlGroup, NCloudAccessControlRule, NCloudAccessControlGroupServerInstance, \
+    AccessControlRule
 
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_connector import NCloudBaseConnector
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_type import CLOUD_SERVICE_TYPES
 from spaceone.inventory.libs.schema.resource import CloudServiceResponse
+from spaceone.inventory.conf.cloud_service_conf import INSTANCE_STATE_MAP
 
 from typing import Iterator, List
 
 _LOGGER = logging.getLogger(__name__)
-
-INSTANCE_STATE_MAP = {
-    "init": "RUNNING",
-    "creating": "RUNNING",
-    "booting": "RUNNING",
-    "setting up": "RUNNING",
-    "running": "RUNNING",
-    "rebooting": "RUNNING",
-    "hard rebooting": "RUNNING",
-    "shutting down": "STOPPING",
-    "hard shutting down": "STOPPING",
-    "terminating": "SHUTTING-DOWN",
-    "changingSpec": "PENDING",
-    "copying": "PENDING",
-    "repairing": "PENDING",
-    "stopped": "STOPPED"
-}
 
 
 class ServerConnector(NCloudBaseConnector):
@@ -42,6 +27,7 @@ class ServerConnector(NCloudBaseConnector):
 
     _ncloud_cls = ncloud_server
     _ncloud_api_v2 = V2Api
+    _api_exception_cls = ApiException
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -64,69 +50,64 @@ class ServerConnector(NCloudBaseConnector):
     def list_server_instances(self, ncloud_server_cls: Type[NCloudServer],
                               response_server_cls: Type[Server], **kwargs) -> Iterator:
 
-        try:
+        response = self.api_client_v2.get_server_instance_list(
+            self._ncloud_cls.GetServerInstanceListRequest(**kwargs))
+        response_dict = response.to_dict()
 
-            response = self.api_client_v2.get_server_instance_list(
-                self._ncloud_cls.GetServerInstanceListRequest(**kwargs))
-            response_dict = response.to_dict()
+        if response_dict.get("server_instance_list"):
 
-            if response_dict.get("server_instance_list"):
+            _block_storages: List[Optional[NCloudBlock]] = self._list_block_storage_instance(**kwargs)
+            _network_interfaces: List[Optional[NCloudNetworkInterface]] = self._list_network_interface(**kwargs)
 
-                _block_storages: List[Optional[NCloudBlock]] = self._list_block_storage_instance(**kwargs)
-                _network_interface: List[Optional[NCloudNetworkInterface]] = self._list_network_interface(**kwargs)
+            _instance_access_control_rules = self._sort_access_control_group_rule_group_by_instance_no()
 
-                _instance_access_control_rules = self._sort_access_control_group_rule_group_by_instance_no()
+            for server_instance in response_dict.get("server_instance_list"):
 
-                for server_instance in response_dict.get("server_instance_list"):
+                server = response_server_cls(self._create_model_obj(ncloud_server_cls, server_instance))
+                region = server_instance.get("region")
 
-                    server = response_server_cls(self._create_model_obj(ncloud_server_cls, server_instance))
-                    region = server_instance.get("region")
+                if region and region.get("region_code"):
+                    server.region_code = region.get("region_code")
+                elif server_instance.get("region_code"):
+                    server.region_code = server_instance.get("region_code")
 
-                    if region and region.get("region_code"):
-                        server.region_code = region.get("region_code")
-                    elif server_instance.get("region_code"):
-                        server.region_code = server_instance.get("region_code")
+                server.hardware = {
+                    'core': server.cpu_count,
+                    'memory': round(server.memory_size / 1024 / 1024 / 1024)
+                }
 
-                    server.hardware = {
-                        'core': server.cpu_count,
-                        'memory': round(server.memory_size / 1024 / 1024 / 1024)
-                    }
+                zone_code = None
 
-                    zone_code = None
+                if server.zone and server.zone.get('zone_code'):
+                    zone_code = server.zone.get('zone_code')
+                elif server.zone_code:
+                    zone_code = server.zone_code
 
-                    if server.zone and server.zone.get('zone_code'):
-                        zone_code = server.zone.get('zone_code')
-                    elif server.zone_code:
-                        zone_code = server.zone_code
+                server.compute = {
+                    'az': zone_code,
+                    'instance_state': INSTANCE_STATE_MAP.get(server.server_instance_status_name),
+                    'instance_id': server.server_instance_no
+                }
 
-                    server.compute = {
-                        'az': zone_code,
-                        'instance_state': INSTANCE_STATE_MAP.get(server.server_instance_status_name),
-                        'instance_id': server.server_instance_no
-                    }
+                server.os = {'os_distro': server.platform_type.get('code_name')}
 
-                    server.os = {'os_distro': server.platform_type.get('code_name')}
+                server.primary_ip_address = server.private_ip
 
-                    server.primary_ip_address = server.private_ip
+                if hasattr(server, "server_instance_no"):
+                    server.disks = self._find_objs_by_key_value(_block_storages,
+                                                                'server_instance_no', server.server_instance_no)
+                    server.nics = self._find_objs_by_key_value(_network_interfaces,
+                                                               'server_instance_no', server.server_instance_no)
 
-                    if hasattr(server, "server_instance_no"):
-                        server.disks = self._find_objs_by_key_value(_block_storages,
-                                                                    'server_instance_no', server.server_instance_no)
-                        server.nics = self._find_objs_by_key_value(_network_interface,
-                                                                   'server_instance_no', server.server_instance_no)
+                    if _instance_access_control_rules and \
+                            _instance_access_control_rules.get(server.server_instance_no):
 
-                        if _instance_access_control_rules and \
-                                _instance_access_control_rules.get(server.server_instance_no):
-                            server.security_groups = _instance_access_control_rules.get(server.server_instance_no)
+                        server.security_groups = []
 
-                    yield server
+                        server.security_groups.extend(self.__convert_access_control_rules(
+                            _instance_access_control_rules.get(server.server_instance_no)))
 
-        except ApiException as e:
-            logging.error(e)
-            raise
-        except Exception as e:
-            logging.error(e)
-            raise
+                yield server
 
     def _list_block_storage_instance(self, **kwargs) -> List[Type[NCloudBlock]]:
 
@@ -199,7 +180,6 @@ class ServerConnector(NCloudBaseConnector):
             for access_control_group_server in access_control_group_servers:
 
                 if access_control_group_server.get("server_instance_no"):
-
                     server_instance_no = access_control_group_server.get("server_instance_no")
                     access_control_group_rule_server_dict[server_instance_no] = \
                         self._get_access_control_group_rules_by_server_no(access_control_group_server, acg_no)
@@ -216,7 +196,34 @@ class ServerConnector(NCloudBaseConnector):
 
             if access_control_group.get("access_control_group_configuration_no") and \
                     acg_no in self._access_control_rules_dict.keys():
-
                 rtn_list.extend(self._access_control_rules_dict[acg_no])
 
         return rtn_list
+
+    def __convert_access_control_rules(self, access_control_rules: List[NCloudAccessControlRule]) -> Iterable[AccessControlRule]:
+        """
+        access_control_group_name = StringType(serialize_when_none=False)
+        access_control_group_no = StringType(serialize_when_none=False)
+        access_control_rule_description = StringType(serialize_when_none=False)
+        port = StringType(serialize_when_none=False)
+        flow = StringType(serialize_when_none=False)
+        protocol = StringType(serialize_when_none=False)
+        ip = StringType(serialize_when_none=False)
+        """
+
+        for access_control_rule in access_control_rules:
+
+            dic = {
+                "access_control_group_name": access_control_rule.access_control_group_name,
+                "access_control_group_no": access_control_rule.access_control_rule_configuration_no,
+                "access_control_rule_description": access_control_rule.access_control_rule_description,
+                "port": access_control_rule.destination_port,
+                "ip": access_control_rule.source_ip
+            }
+
+            if access_control_rule.protocol_type.get("code_name"):
+                dic["protocol"] = access_control_rule.protocol_type.get("code_name")
+
+            dic["flow"] = "Inbound"
+
+            yield AccessControlRule(dic)

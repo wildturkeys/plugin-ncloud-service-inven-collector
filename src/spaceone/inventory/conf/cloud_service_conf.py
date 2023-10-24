@@ -5,6 +5,7 @@ SUPPORTED_RESOURCE_TYPE = ['inventory.CloudService', 'inventory.CloudServiceType
 DEFAULT_REGION = 'KR-KOREA-1'
 FILTER_FORMAT = []
 ASSET_URL = "https://chulgyujeon.github.io/images/icon"
+
 CLOUD_SERVICE_GROUP_MAP = {
     'Server': 'ServerConnectorManager',
     'ServerVPC': 'ServerVPCConnectorManager',
@@ -13,6 +14,24 @@ CLOUD_SERVICE_GROUP_MAP = {
     'Block': 'BlockConnectorManager',
     'VPC': 'VpcConnectorManager'
 }
+
+INSTANCE_STATE_MAP = {
+    "init": "RUNNING",
+    "creating": "RUNNING",
+    "booting": "RUNNING",
+    "setting up": "RUNNING",
+    "running": "RUNNING",
+    "rebooting": "RUNNING",
+    "hard rebooting": "RUNNING",
+    "shutting down": "STOPPING",
+    "hard shutting down": "STOPPING",
+    "terminating": "SHUTTING-DOWN",
+    "changingSpec": "PENDING",
+    "copying": "PENDING",
+    "repairing": "PENDING",
+    "stopped": "STOPPED"
+}
+
 
 VPC_AVAILABLE_REGION = ["KR", "SGN", "JPN"]
 
