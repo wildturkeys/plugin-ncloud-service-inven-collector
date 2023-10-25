@@ -30,40 +30,14 @@ class BaseResponse(Model):
     resource_type = StringType(required=True)
     match_rules = DictType(ListType(StringType), serialize_when_none=False)
     resource = PolyModelType(Model, default={})
-    
-    
+
+
 class ReferenceModel(Model):
     class Option:
         serialize_when_none = False
 
     resource_id = StringType(required=False, serialize_when_none=False)
     external_link = StringType(required=False, serialize_when_none=False)
-
-
-class CloudWatchDimension(Model):
-    Name = StringType(serialize_when_none=False)
-    Value = StringType(serialize_when_none=False)
-
-
-class CloudWatchMetricInfo(Model):
-    Namespace = StringType(serialize_when_none=False)
-    Dimensions = ListType(ModelType(CloudWatchDimension), serialize_when_none=False)
-
-
-class CloudWatchModel(Model):
-    region_name = StringType(default='us-east-1')
-    metrics_info = ListType(ModelType(CloudWatchMetricInfo), default=[])
-
-
-class CloudTrailLookupResource(Model):
-    AttributeKey = StringType(default='ResourceName')
-    AttributeValue = StringType(default='')
-
-
-class CloudTrailModel(Model):
-    region_name = StringType(serialize_when_none=False)
-    resource_type = StringType(serialize_when_none=False)
-    LookupAttributes = ListType(ModelType(CloudTrailLookupResource), default=[])
 
 
 class CloudServiceTypeMeta(BaseMetaData):
@@ -118,7 +92,6 @@ class CloudServiceResource(Model):
     reference = ModelType(ReferenceModel)
     region_code = StringType(serialize_when_none=False)
     _metadata = PolyModelType(CloudServiceMeta, serialize_when_none=False, serialized_name='metadata')
-
 
 
 class RegionResource(Model):

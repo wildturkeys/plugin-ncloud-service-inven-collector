@@ -22,7 +22,7 @@ metadata:
 
               '
         type: markdown
-name: Naver Cloud Platform
+name: NCloud
 provider: ncloud
 tags:
   color: '#2485F4'

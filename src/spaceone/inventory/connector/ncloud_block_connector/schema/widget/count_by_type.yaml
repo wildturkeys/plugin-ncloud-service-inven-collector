@@ -1,0 +1,15 @@
+---
+cloud_service_group: Compute
+cloud_service_type: Volume
+name: Count by Type
+query:
+  aggregate:
+    - group:
+        keys:
+          - name: name
+            key: data.block_storage_type.code
+        fields:
+          - name: value
+            operator: count
+options:
+  chart_type: DONUT
