@@ -71,7 +71,7 @@ nic = TableDynamicLayout.set_fields('NIC', root_path='data.nics', fields=[
     TextDyField.data_source('Name', 'network_interface_name'),
     TextDyField.data_source('IP Addresses', 'ip'),
     TextDyField.data_source('Status', 'network_interface_status_name'),
-    TextDyField.data_source('Device', 'device'),
+    TextDyField.data_source('Device', 'device_name'),
     TextDyField.data_source('Default', 'is_default'),
     TextDyField.data_source('Description', 'network_interface_description'),
 ])

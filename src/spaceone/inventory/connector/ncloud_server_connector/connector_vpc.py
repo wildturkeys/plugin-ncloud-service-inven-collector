@@ -10,7 +10,7 @@ from spaceone.inventory.connector.ncloud_server_connector.connector import Serve
 from spaceone.inventory.connector.ncloud_server_connector.schema.data import NCloudServerVPC, \
     NCloudAccessControlRuleVPC, ServerVPC, NCloudAccessControlVPC, NCloudNetworkInterfaceVPC
 from spaceone.inventory.connector.ncloud_server_connector.schema.data import Server, NCloudServer, NCloudBlockVPC, \
-    NCloudNetworkInterface, NCloudAccessControlRule, AccessControlRule, Disk, NetworkInterface
+    NCloudNetworkInterface, NCloudAccessControlRule, AccessControlRule, Disk, NetworkInterface, NCloudServerImageProduct
 
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_type import CLOUD_SERVICE_TYPES
@@ -32,16 +32,34 @@ class ServerVPCConnector(ServerConnector):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         self._access_control_rules_dict = {}
+        self._server_images_dict = {}
 
         for region in self.regions:
-            if region.get('region_code') in VPC_AVAILABLE_REGION:
-                region_code = region.get('region_code')
-                self._access_control_rules_dict \
-                    = dict(self._access_control_rules_dict,
-                           **self._sort_access_control_group_rules_group_by_acg_no(region_code=region_code))
 
-        self._server_images_dict = {}
+            region_code = region.get('region_code')
+            self._access_control_rules_dict \
+                = dict(self._access_control_rules_dict,
+                       **self._sort_access_control_group_rules_group_by_acg_no(region_code=region_code))
+
+            for image_product in self._list_image_product(region_code=region_code):
+                self._server_images_dict[image_product.product_code] = image_product.product_name
+
+    def _set_region(self, access_key, secret_key):
+
+        configuration = self._ncloud_cls.Configuration()
+        configuration.access_key = access_key
+        configuration.secret_key = secret_key
+
+        client = self._ncloud_cls.ApiClient(configuration)
+
+        api = self._ncloud_api_v2(client)
+        get_region_list_request = self._ncloud_cls.GetRegionListRequest
+        response = api.get_region_list(get_region_list_request).to_dict()
+        self._regions = response.get("region_list")
+
+        _LOGGER.info(self._regions)
 
     def get_resources(self) -> List[Type[CloudServiceResponse]]:
         resources = []
@@ -71,12 +89,11 @@ class ServerVPCConnector(ServerConnector):
             for server_instance in response_dict.get("server_instance_list"):
 
                 server = response_server_cls(self._create_model_obj(ncloud_server_cls, server_instance))
-                region = server_instance.get("region")
+                server.region_code = server_instance.get("region_code")
 
-                if region and region.get("region_code"):
-                    server.region_code = region.get("region_code")
-                elif server_instance.get("region_code"):
-                    server.region_code = server_instance.get("region_code")
+                if server_instance.get("server_image_product_code"):
+                    server.server_image_name =\
+                        self._server_images_dict.get(server_instance.get("server_image_product_code"))
 
                 self._set_default_server_info(server)
 
@@ -91,6 +108,12 @@ class ServerVPCConnector(ServerConnector):
                     server.nics = self._find_objs_by_key_value(_network_interfaces,
                                                                'server_instance_no', server.server_instance_no)
 
+                    for nic in server.nics:
+                        if nic.get("is_default"):
+                            server.private_ip = nic.get("ip")
+                            server.primary_ip_address = server.private_ip
+                            continue
+
                     server.security_groups = []
 
                     for nic in server.nics:
@@ -104,6 +127,14 @@ class ServerVPCConnector(ServerConnector):
                                                                                acg_no)))
 
                 yield server
+
+    def _list_image_product(self, **kwargs) -> List[Type[NCloudServerImageProduct]]:
+
+        return self._list_ncloud_resources(self.api_client_v2.get_server_image_product_list,
+                                           self._ncloud_cls.GetServerImageProductListRequest,
+                                           "product_list",
+                                           NCloudServerImageProduct,
+                                           **kwargs)
 
     def _list_block_storage_instance(self, **kwargs) -> List[Type[NCloudBlockVPC]]:
 
@@ -241,7 +272,8 @@ class ServerVPCConnector(ServerConnector):
                 "network_interface_status_name": network_interface.network_interface_status.get("code"),
                 "is_default": network_interface.is_default,
                 "network_interface_description": network_interface.network_interface_description,
-                "server_instance_no": network_interface.instance_no
+                "server_instance_no": network_interface.instance_no,
+                "device_name": network_interface.device_name
             }
 
             rtn_list.append(NetworkInterface(dic))

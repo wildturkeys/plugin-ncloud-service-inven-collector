@@ -101,6 +101,12 @@ class NCloudAccessControlGroup(Model):
     is_default_group = StringType(serialize_when_none=False)
 
 
+class NCloudServerImageProduct(Model):
+    product_code = StringType(serialize_when_none=False)
+    product_name = StringType(serialize_when_none=False)
+    os_information = StringType(serialize_when_none=False)
+
+
 class NCloudAccessControlGroupServerInstance(Model):
     server_instance_no = StringType(serialize_when_none=False)
     access_control_group_list = ListType(DictType(StringType), serialize_when_none=False)
