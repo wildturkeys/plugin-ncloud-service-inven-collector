@@ -6,7 +6,7 @@ from ncloud_server.rest import ApiException
 from typing import Optional, Type, Iterable
 from spaceone.inventory.connector.ncloud_server_connector.schema.data import Server, NCloudServer, NCloudBlock, \
     NCloudNetworkInterface, NCloudAccessControlGroup, NCloudAccessControlRule, NCloudAccessControlGroupServerInstance, \
-    AccessControlRule, Disk
+    AccessControlRule, Disk, NetworkInterface
 
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_connector import NCloudBaseConnector
@@ -73,7 +73,8 @@ class ServerConnector(NCloudBaseConnector):
         if response_dict.get("server_instance_list"):
 
             _block_storages: List[Optional[Disk]] = self._convert_disk(self._list_block_storage_instance(**kwargs))
-            _network_interfaces: List[Optional[NCloudNetworkInterface]] = self._list_network_interface(**kwargs)
+            _network_interfaces: List[Optional[NetworkInterface]] = \
+                self._convert_network_interfaces(self._list_network_interface(**kwargs))
 
             _instance_access_control_rules = self._sort_access_control_group_rule_group_by_instance_no()
 
@@ -103,7 +104,7 @@ class ServerConnector(NCloudBaseConnector):
                             _instance_access_control_rules.get(server.server_instance_no):
                         server.security_groups = []
 
-                        server.security_groups.extend(self.__convert_access_control_rules(
+                        server.security_groups.extend(self._convert_access_control_rules(
                             _instance_access_control_rules.get(server.server_instance_no)))
 
                 yield server
@@ -199,7 +200,7 @@ class ServerConnector(NCloudBaseConnector):
 
         return rtn_list
 
-    def __convert_access_control_rules(self, access_control_rules: List[NCloudAccessControlRule])\
+    def _convert_access_control_rules(self, access_control_rules: List[NCloudAccessControlRule]) \
             -> List[AccessControlRule]:
         """
         access_control_group_name = StringType(serialize_when_none=False)
@@ -264,5 +265,33 @@ class ServerConnector(NCloudBaseConnector):
                 dic["block_storage_type"] = block_disk.block_storage_type.get("code")
 
             rtn_list.append(Disk(dic))
+
+        return rtn_list
+
+    def _convert_network_interfaces(self, network_interfaces: List[NCloudNetworkInterface]) \
+            -> List[NetworkInterface]:
+        """
+        network_interface_name = StringType(serialize_when_none=False)
+        ip = StringType(serialize_when_none=False)
+        network_interface_status_name = StringType(serialize_when_none=False)
+        device_name = StringType(serialize_when_none=False)
+        is_default = BooleanType(serialize_when_none=False)
+        network_interface_description = StringType(serialize_when_none=False)
+        server_instance_no = StringType(serialize_when_none=False)
+        """
+        rtn_list = []
+
+        for network_interface in network_interfaces:
+
+            dic = {
+                "network_interface_name": network_interface.network_interface_name,
+                "ip": network_interface.network_interface_ip,
+                "network_interface_status_name": network_interface.status_code,
+                "is_default": False,
+                "network_interface_description": network_interface.network_interface_description,
+                "server_instance_no": network_interface.server_instance_no
+            }
+
+            rtn_list.append(NetworkInterface(dic))
 
         return rtn_list

@@ -10,7 +10,7 @@ from spaceone.inventory.connector.ncloud_server_connector.connector import Serve
 from spaceone.inventory.connector.ncloud_server_connector.schema.data import NCloudServerVPC, \
     NCloudAccessControlRuleVPC, ServerVPC, NCloudAccessControlVPC, NCloudNetworkInterfaceVPC
 from spaceone.inventory.connector.ncloud_server_connector.schema.data import Server, NCloudServer, NCloudBlockVPC, \
-    NCloudNetworkInterface, NCloudAccessControlRule, AccessControlRule, Disk
+    NCloudNetworkInterface, NCloudAccessControlRule, AccessControlRule, Disk, NetworkInterface
 
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_type import CLOUD_SERVICE_TYPES
@@ -54,6 +54,56 @@ class ServerVPCConnector(ServerConnector):
                                                                                     region_code=region.get(
                                                                                         'region_code'))))
         return resources
+
+    def list_server_instances(self, ncloud_server_cls: Type[NCloudServer],
+                              response_server_cls: Type[Server], **kwargs) -> Iterator:
+
+        response = self.api_client_v2.get_server_instance_list(
+            self._ncloud_cls.GetServerInstanceListRequest(**kwargs))
+        response_dict = response.to_dict()
+
+        if response_dict.get("server_instance_list"):
+
+            _block_storages: List[Optional[Disk]] = self._convert_disk(self._list_block_storage_instance(**kwargs))
+            _network_interfaces: List[Optional[NetworkInterface]] = \
+                self._convert_network_interfaces(self._list_network_interface(**kwargs))
+
+            for server_instance in response_dict.get("server_instance_list"):
+
+                server = response_server_cls(self._create_model_obj(ncloud_server_cls, server_instance))
+                region = server_instance.get("region")
+
+                if region and region.get("region_code"):
+                    server.region_code = region.get("region_code")
+                elif server_instance.get("region_code"):
+                    server.region_code = server_instance.get("region_code")
+
+                self._set_default_server_info(server)
+
+                if server_instance.get('zone_code'):
+                    server.zone_code = server_instance.get('zone_code')
+                    server.compute['az'] = server_instance.get('zone_code')
+
+                if hasattr(server, "server_instance_no"):
+                    server.disks = self._find_objs_by_key_value(_block_storages,
+                                                                'server_instance_no', server.server_instance_no)
+
+                    server.nics = self._find_objs_by_key_value(_network_interfaces,
+                                                               'server_instance_no', server.server_instance_no)
+
+                    server.security_groups = []
+
+                    for nic in server.nics:
+                        if nic and nic.get("access_control_group_no_list"):
+                            access_control_group_no_list = nic.get("access_control_group_no_list")
+                            for acg_no in access_control_group_no_list:
+                                if self._access_control_rules_dict.get(acg_no):
+                                    server.security_groups.extend(
+                                        self._convert_access_control_rules(acg_no,
+                                                                           self._access_control_rules_dict.get(
+                                                                               acg_no)))
+
+                yield server
 
     def _list_block_storage_instance(self, **kwargs) -> List[Type[NCloudBlockVPC]]:
 
@@ -101,57 +151,8 @@ class ServerVPCConnector(ServerConnector):
 
         return rtn_dict
 
-    def list_server_instances(self, ncloud_server_cls: Type[NCloudServer],
-                              response_server_cls: Type[Server], **kwargs) -> Iterator:
-
-        response = self.api_client_v2.get_server_instance_list(
-            self._ncloud_cls.GetServerInstanceListRequest(**kwargs))
-        response_dict = response.to_dict()
-
-        if response_dict.get("server_instance_list"):
-
-            _block_storages: List[Optional[Disk]] = self._convert_disk(self._list_block_storage_instance(**kwargs))
-            _network_interfaces: List[Optional[NCloudNetworkInterfaceVPC]] = self._list_network_interface(**kwargs)
-
-            for server_instance in response_dict.get("server_instance_list"):
-
-                server = response_server_cls(self._create_model_obj(ncloud_server_cls, server_instance))
-                region = server_instance.get("region")
-
-                if region and region.get("region_code"):
-                    server.region_code = region.get("region_code")
-                elif server_instance.get("region_code"):
-                    server.region_code = server_instance.get("region_code")
-
-                self._set_default_server_info(server)
-
-                if server_instance.get('zone_code'):
-                    server.zone_code = server_instance.get('zone_code')
-                    server.compute['az'] = server_instance.get('zone_code')
-
-                if hasattr(server, "server_instance_no"):
-                    server.disks = self._find_objs_by_key_value(_block_storages,
-                                                                'server_instance_no', server.server_instance_no)
-
-                    server.nics = self._find_objs_by_key_value(_network_interfaces,
-                                                               'instance_no', server.server_instance_no)
-
-                    server.security_groups = []
-
-                    for nic in server.nics:
-                        if nic and nic.get("access_control_group_no_list"):
-                            access_control_group_no_list = nic.get("access_control_group_no_list")
-                            for acg_no in access_control_group_no_list:
-                                if self._access_control_rules_dict.get(acg_no):
-                                    server.security_groups.extend(
-                                        self.__convert_access_control_rules(acg_no,
-                                                                            self._access_control_rules_dict.get(
-                                                                                acg_no)))
-
-                yield server
-
-    def __convert_access_control_rules(self, acg_no: str,
-                                       access_control_rules: List[NCloudAccessControlRule]) -> List[AccessControlRule]:
+    def _convert_access_control_rules(self, acg_no: str,
+                                      access_control_rules: List[NCloudAccessControlRule]) -> List[AccessControlRule]:
         """
         access_control_group_name = StringType(serialize_when_none=False)
         access_control_group_no = StringType(serialize_when_none=False)
@@ -217,5 +218,32 @@ class ServerVPCConnector(ServerConnector):
                 dic["block_storage_type"] = block_disk.block_storage_type.get("code")
 
             rtn_list.append(Disk(dic))
+
+        return rtn_list
+
+    def _convert_network_interfaces(self, network_interfaces: List[NCloudNetworkInterfaceVPC]) \
+            -> List[NetworkInterface]:
+        """
+        network_interface_name = StringType(serialize_when_none=False)
+        ip = StringType(serialize_when_none=False)
+        network_interface_status_name = StringType(serialize_when_none=False)
+        device_name = StringType(serialize_when_none=False)
+        is_default = BooleanType(serialize_when_none=False)
+        network_interface_description = StringType(serialize_when_none=False)
+        server_instance_no = StringType(serialize_when_none=False)
+        """
+        rtn_list = []
+
+        for network_interface in network_interfaces:
+            dic = {
+                "network_interface_name": network_interface.network_interface_name,
+                "ip": network_interface.ip,
+                "network_interface_status_name": network_interface.network_interface_status.get("code"),
+                "is_default": network_interface.is_default,
+                "network_interface_description": network_interface.network_interface_description,
+                "server_instance_no": network_interface.instance_no
+            }
+
+            rtn_list.append(NetworkInterface(dic))
 
         return rtn_list

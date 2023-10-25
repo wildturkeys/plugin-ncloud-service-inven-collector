@@ -68,6 +68,31 @@ class NCloudNetworkInterface(Model):
     status_code = StringType(serialize_when_none=False)
 
 
+class NCloudNetworkInterfaceVPC(Model):
+    access_control_group_no_list = ListType(StringType, serialize_when_none=False)
+    delete_on_termination = BooleanType(serialize_when_none=False)
+    device_name = StringType(serialize_when_none=False)
+    instance_no = StringType(serialize_when_none=False)
+    instance_type = DictType(StringType, serialize_when_none=False)
+    ip = StringType(serialize_when_none=False)
+    is_default = BooleanType(serialize_when_none=False)
+    network_interface_name = StringType(serialize_when_none=False)
+    network_interface_description = StringType(serialize_when_none=False)
+    network_interface_no = StringType(serialize_when_none=False)
+    network_interface_status = DictType(StringType, serialize_when_none=False)
+    subnet_no = StringType(serialize_when_none=False)
+
+
+class NetworkInterface(Model):
+    network_interface_name = StringType(serialize_when_none=False)
+    ip = StringType(serialize_when_none=False)
+    network_interface_status_name = StringType(serialize_when_none=False)
+    device_name = StringType(serialize_when_none=False)
+    is_default = BooleanType(serialize_when_none=False)
+    network_interface_description = StringType(serialize_when_none=False)
+    server_instance_no = StringType(serialize_when_none=False)
+
+
 class NCloudAccessControlGroup(Model):
     access_control_group_name = StringType(serialize_when_none=False)
     access_control_group_description = StringType(serialize_when_none=False)
@@ -99,21 +124,6 @@ class NCloudServerVPC(NCloudServer):
     zone_code = StringType(serialize_when_none=False)
 
 
-class NCloudNetworkInterfaceVPC(Model):
-    access_control_group_no_list = ListType(StringType, serialize_when_none=False)
-    delete_on_termination = BooleanType(serialize_when_none=False)
-    device_name = StringType(serialize_when_none=False)
-    instance_no = StringType(serialize_when_none=False)
-    instance_type = DictType(StringType, serialize_when_none=False)
-    ip = StringType(serialize_when_none=False)
-    is_default = BooleanType(serialize_when_none=False)
-    network_interface_name = StringType(serialize_when_none=False)
-    network_interface_description = StringType(serialize_when_none=False)
-    network_interface_no = StringType(serialize_when_none=False)
-    network_interface_status = DictType(StringType, serialize_when_none=False)
-    subnet_no = StringType(serialize_when_none=False)
-
-
 class NCloudBlockVPC(NCloudBlock):
     block_storage_disk_type = DictType(StringType, serialize_when_none=False)
     is_encrypted_volume = BooleanType(serialize_when_none=False)
@@ -143,7 +153,7 @@ class NCloudAccessControlRuleVPC(Model):
 class Server(NCloudServer):
     hardware = DictType(StringType, serialize_when_none=False)
     compute = DictType(StringType, serialize_when_none=False)
-    nics = ListType(ModelType(NCloudNetworkInterface), serialize_when_none=False, default=[])
+    nics = ListType(ModelType(NetworkInterface), serialize_when_none=False, default=[])
     os = DictType(StringType, serialize_when_none=False)
     primary_ip_address = StringType(serialize_when_none=False)
     disks = ListType(ModelType('Disk'), serialize_when_none=False, default=[])
@@ -185,10 +195,6 @@ class AccessControlRule(Model):
     flow = StringType(serialize_when_none=False)
     protocol = StringType(serialize_when_none=False)
     ip = StringType(serialize_when_none=False)
-
-
-class NetworkInterface(Model):
-    pass
 
 
 class Disk(Model):
