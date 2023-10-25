@@ -1,20 +1,19 @@
 import logging
+from typing import Iterator, List
+from typing import Optional, Type
+
 import ncloud_server
 from ncloud_server.api.v2_api import V2Api
 from ncloud_server.rest import ApiException
 
-from typing import Optional, Type, Iterable
+from spaceone.inventory.conf.cloud_service_conf import INSTANCE_STATE_MAP
+from spaceone.inventory.connector.ncloud_connector import NCloudBaseConnector
 from spaceone.inventory.connector.ncloud_server_connector.schema.data import Server, NCloudServer, NCloudBlock, \
     NCloudNetworkInterface, NCloudAccessControlGroup, NCloudAccessControlRule, NCloudAccessControlGroupServerInstance, \
     AccessControlRule, Disk, NetworkInterface
-
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_details import SERVICE_DETAILS
-from spaceone.inventory.connector.ncloud_connector import NCloudBaseConnector
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_type import CLOUD_SERVICE_TYPES
 from spaceone.inventory.libs.schema.resource import CloudServiceResponse
-from spaceone.inventory.conf.cloud_service_conf import INSTANCE_STATE_MAP
-
-from typing import Iterator, List
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -282,7 +281,6 @@ class ServerConnector(NCloudBaseConnector):
         rtn_list = []
 
         for network_interface in network_interfaces:
-
             dic = {
                 "network_interface_name": network_interface.network_interface_name,
                 "ip": network_interface.network_interface_ip,

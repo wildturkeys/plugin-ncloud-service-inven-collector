@@ -1,4 +1,5 @@
 import logging
+
 from spaceone.api.inventory.plugin import collector_pb2, collector_pb2_grpc
 from spaceone.core.pygrpc import BaseAPI
 
@@ -6,7 +7,6 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class Collector(BaseAPI, collector_pb2_grpc.CollectorServicer):
-
     pb2 = collector_pb2
     pb2_grpc = collector_pb2_grpc
 

@@ -1,17 +1,15 @@
 import os
-from spaceone.inventory.libs.common_parser import *
-from spaceone.inventory.libs.schema.dynamic_widget import ChartWidget, CardWidget
-from spaceone.inventory.libs.schema.dynamic_field import TextDyField, SearchField, DateTimeDyField, EnumDyField, \
-    SizeField
-from spaceone.inventory.libs.schema.resource import CloudServiceTypeResource, CloudServiceTypeResponse, \
-    CloudServiceTypeMeta
 
 from spaceone.inventory.conf.cloud_service_conf import *
+from spaceone.inventory.libs.common_parser import *
+from spaceone.inventory.libs.schema.dynamic_field import SearchField, DateTimeDyField, EnumDyField
+from spaceone.inventory.libs.schema.dynamic_widget import CardWidget
+from spaceone.inventory.libs.schema.resource import CloudServiceTypeResource, CloudServiceTypeResponse, \
+    CloudServiceTypeMeta
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 
 instance_total_count_conf = os.path.join(current_dir, 'widget/instance_total_count.yaml')
-
 
 cst_vpc = CloudServiceTypeResource()
 cst_vpc.name = 'VPC'
@@ -27,11 +25,11 @@ cst_vpc.tags = {
 
 cst_vpc._metadata = CloudServiceTypeMeta.set_meta(
     fields=[
-        EnumDyField.data_source('Status','data.vpc_status.code',
+        EnumDyField.data_source('Status', 'data.vpc_status.code',
                                 default_state={
-                                    'safe' : ['RUN'],
-                                    'available':['CREATING','INIT'],
-                                    'disable':['TERMTING' ]}),
+                                    'safe': ['RUN'],
+                                    'available': ['CREATING', 'INIT'],
+                                    'disable': ['TERMTING']}),
         DateTimeDyField.data_source('Create', 'data.create_date'),
 
     ],

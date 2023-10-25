@@ -1,15 +1,16 @@
 import logging
+from typing import Iterator, List
+from typing import Type
+
 import ncloud_loadbalancer
 from ncloud_loadbalancer.api.v2_api import V2Api
 from ncloud_loadbalancer.rest import ApiException
-from typing import Optional, Type
+
+from spaceone.inventory.connector.ncloud_connector import NCloudBaseConnector
 from spaceone.inventory.connector.ncloud_lb_connector.schema.data import NCloudLB, LB, LBServerInstance
 from spaceone.inventory.connector.ncloud_lb_connector.schema.service_details import SERVICE_DETAILS
-from spaceone.inventory.connector.ncloud_connector import NCloudBaseConnector
 from spaceone.inventory.connector.ncloud_lb_connector.schema.service_type import CLOUD_SERVICE_TYPES
 from spaceone.inventory.libs.schema.resource import CloudServiceResponse
-
-from typing import Iterator, List
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -54,7 +55,8 @@ class LbConnector(NCloudBaseConnector):
                     if load_balancer_instance.get("load_balanced_server_instance_list"):
                         load_balancer.load_balanced_server_instance_list = self._list_load_balancer_instance(
                             load_balancer_instance.get("load_balanced_server_instance_list"))
-                        load_balancer.load_balanced_server_instance_count = len(load_balancer.load_balanced_server_instance_list)
+                        load_balancer.load_balanced_server_instance_count = len(
+                            load_balancer.load_balanced_server_instance_list)
 
                     if kwargs.get("region_no"):
                         for region in self.regions:

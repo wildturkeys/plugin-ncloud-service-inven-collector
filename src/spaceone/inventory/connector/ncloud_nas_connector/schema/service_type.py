@@ -1,11 +1,12 @@
 import os
+
+from spaceone.inventory.conf.cloud_service_conf import *
 from spaceone.inventory.libs.common_parser import *
-from spaceone.inventory.libs.schema.dynamic_widget import ChartWidget, CardWidget
 from spaceone.inventory.libs.schema.dynamic_field import TextDyField, SearchField, DateTimeDyField, EnumDyField, \
     SizeField
+from spaceone.inventory.libs.schema.dynamic_widget import CardWidget
 from spaceone.inventory.libs.schema.resource import CloudServiceTypeResource, CloudServiceTypeResponse, \
     CloudServiceTypeMeta
-from spaceone.inventory.conf.cloud_service_conf import *
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 
@@ -28,10 +29,10 @@ cst_nas_volume._metadata = CloudServiceTypeMeta.set_meta(
         EnumDyField.data_source('Platform', 'data.platform_code', default_badge={
             'indigo.500': ['classic'], 'coral.600': ['vpc']
         }),
-        EnumDyField.data_source('Status','data.nas_volume_instance_status_name' , default_state={
-                                'safe': ['created'],
-                                'disable' : ['terminated']
-                            }),
+        EnumDyField.data_source('Status', 'data.nas_volume_instance_status_name', default_state={
+            'safe': ['created'],
+            'disable': ['terminated']
+        }),
         TextDyField.data_source('Instance Type', 'data.nas_volume_instance_status.code_name'),
         SizeField.data_source('Total Size', 'data.volume_total_size', type="size",
                               options={"source_unit": "BYTES", "display_unit": "GB"}),

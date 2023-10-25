@@ -1,12 +1,11 @@
 import os
-from spaceone.inventory.libs.common_parser import *
-from spaceone.inventory.libs.schema.dynamic_widget import ChartWidget, CardWidget
-from spaceone.inventory.libs.schema.dynamic_field import TextDyField, SearchField, DateTimeDyField, EnumDyField, \
-    SizeField
-from spaceone.inventory.libs.schema.resource import CloudServiceTypeResource, CloudServiceTypeResponse, \
-    CloudServiceTypeMeta
 
 from spaceone.inventory.conf.cloud_service_conf import *
+from spaceone.inventory.libs.common_parser import *
+from spaceone.inventory.libs.schema.dynamic_field import TextDyField, SearchField, DateTimeDyField, EnumDyField
+from spaceone.inventory.libs.schema.dynamic_widget import ChartWidget, CardWidget
+from spaceone.inventory.libs.schema.resource import CloudServiceTypeResource, CloudServiceTypeResponse, \
+    CloudServiceTypeMeta
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 
@@ -24,7 +23,6 @@ cst_lb.is_major = True
 cst_lb.tags = {
     'spaceone:icon': f'{ASSET_URL}/Networking.svg',
 }
-
 
 cst_lb._metadata = CloudServiceTypeMeta.set_meta(
     fields=[

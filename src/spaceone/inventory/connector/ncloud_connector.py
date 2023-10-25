@@ -1,14 +1,15 @@
 import logging
 import traceback
+from typing import Any, List
+
 import ncloud_server
 from ncloud_server.api.v2_api import V2Api
 from ncloud_server.rest import ApiException
-from spaceone.core.connector import BaseConnector
-from spaceone.inventory.conf.cloud_service_conf import *
-from spaceone.inventory.libs.schema.resource import CloudServiceResponse, CloudServiceResource, ReferenceModel
-from typing import Any, List
 from schematics import Model
 from schematics.types import DateTimeType
+from spaceone.core.connector import BaseConnector
+
+from spaceone.inventory.libs.schema.resource import CloudServiceResponse, CloudServiceResource, ReferenceModel
 
 _LOGGER = logging.getLogger(__name__)
 

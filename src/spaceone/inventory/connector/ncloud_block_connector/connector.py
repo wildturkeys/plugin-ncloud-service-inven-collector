@@ -1,15 +1,16 @@
 import logging
+from typing import Iterator, List
+from typing import Type
+
 import ncloud_server
 from ncloud_server.api.v2_api import V2Api
 from ncloud_server.rest import ApiException
-from typing import Optional, Type
+
 from spaceone.inventory.connector.ncloud_block_connector.schema.data import Block, NCloudBlock
 from spaceone.inventory.connector.ncloud_block_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_block_connector.schema.service_type import CLOUD_SERVICE_TYPES
 from spaceone.inventory.connector.ncloud_connector import NCloudBaseConnector
 from spaceone.inventory.libs.schema.resource import CloudServiceResponse
-
-from typing import Iterator, List
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -31,7 +32,8 @@ class BlockConnector(NCloudBaseConnector):
 
         for region in self.regions:
             resources.extend(
-                self._convert_cloud_service_response(self.list_block_storage_instance(region_no=region.get('region_no'))))
+                self._convert_cloud_service_response(
+                    self.list_block_storage_instance(region_no=region.get('region_no'))))
 
         return resources
 
@@ -39,7 +41,8 @@ class BlockConnector(NCloudBaseConnector):
 
         try:
 
-            response = self.api_client_v2.get_block_storage_instance_list(ncloud_server.GetBlockStorageInstanceListRequest(**kwargs))
+            response = self.api_client_v2.get_block_storage_instance_list(
+                ncloud_server.GetBlockStorageInstanceListRequest(**kwargs))
             response_dict = response.to_dict()
 
             if response_dict.get("block_storage_instance_list"):

@@ -1,7 +1,7 @@
 import logging
 
 from schematics import Model
-from schematics.types import ModelType, StringType, IntType, ListType, BooleanType, DictType, DateTimeType
+from schematics.types import StringType, IntType, DictType, DateTimeType
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -22,8 +22,8 @@ class NCloudBlock(Model):
     max_iops_throughput = IntType(serialize_when_none=False)
     region = DictType(StringType, serialize_when_none=False)
 
-class Block(NCloudBlock):
 
+class Block(NCloudBlock):
     region_code = StringType(serialize_when_none=False)
     platform_code = StringType(default="classic")
 

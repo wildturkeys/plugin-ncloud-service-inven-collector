@@ -1,5 +1,6 @@
 from schematics import Model
-from schematics.types import ModelType, StringType, PolyModelType, DictType, ListType
+from schematics.types import StringType, PolyModelType, ListType
+
 from .dynamic_field import BaseDynamicField, TextDyField
 
 

@@ -1,22 +1,19 @@
 import logging
+from typing import Iterator, List
+from typing import Optional, Type
 
 import ncloud_vserver
 from ncloud_vserver.api.v2_api import V2Api
-from ncloud_vserver.rest import ApiException
 
-from typing import Optional, Type, Iterable
-
+from spaceone.inventory.conf.cloud_service_conf import VPC_AVAILABLE_REGION
 from spaceone.inventory.connector.ncloud_server_connector.connector import ServerConnector
 from spaceone.inventory.connector.ncloud_server_connector.schema.data import NCloudServerVPC, \
     NCloudAccessControlRuleVPC, ServerVPC, NCloudAccessControlVPC, NCloudNetworkInterfaceVPC
 from spaceone.inventory.connector.ncloud_server_connector.schema.data import Server, NCloudServer, NCloudBlockVPC, \
-    NCloudNetworkInterface, NCloudAccessControlRule, AccessControlRule, Disk, NetworkInterface, NCloudServerImageProduct
-
+    NCloudAccessControlRule, AccessControlRule, Disk, NetworkInterface, NCloudServerImageProduct
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_type import CLOUD_SERVICE_TYPES
 from spaceone.inventory.libs.schema.resource import CloudServiceResponse
-from spaceone.inventory.conf.cloud_service_conf import VPC_AVAILABLE_REGION, INSTANCE_STATE_MAP
-from typing import Iterator, List
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -92,7 +89,7 @@ class ServerVPCConnector(ServerConnector):
                 server.region_code = server_instance.get("region_code")
 
                 if server_instance.get("server_image_product_code"):
-                    server.server_image_name =\
+                    server.server_image_name = \
                         self._server_images_dict.get(server_instance.get("server_image_product_code"))
 
                 self._set_default_server_info(server)

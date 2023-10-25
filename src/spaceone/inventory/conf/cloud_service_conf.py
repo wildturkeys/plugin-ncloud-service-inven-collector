@@ -32,7 +32,6 @@ INSTANCE_STATE_MAP = {
     "stopped": "STOPPED"
 }
 
-
 VPC_AVAILABLE_REGION = ["KR", "SGN", "JPN"]
 
 """
@@ -70,7 +69,8 @@ REGION_INFO = {
             'tags': {'latitude': '36.204823', 'longitude': '138.252930', 'continent': 'east asia', 'region_no': '8'}
             },
     'USWN': {'name': 'US-West',
-             'tags': {'latitude': '34.052235', 'longitude': '-118.243683', 'continent': 'north america', 'region_no': '9'}
+             'tags': {'latitude': '34.052235', 'longitude': '-118.243683', 'continent': 'north america',
+                      'region_no': '9'}
              },
     'DEN': {'name': 'Germany',
             'tags': {'latitude': '50.110924', 'longitude': '8.682127', 'continent': 'europe', 'region_no': '10'}
