@@ -1,5 +1,5 @@
 import logging
-from typing import Iterator, List
+from typing import Iterable, List
 from typing import Type
 
 import ncloud_server
@@ -37,7 +37,7 @@ class BlockConnector(NCloudBaseConnector):
 
         return resources
 
-    def list_block_storage_instance(self, **kwargs) -> Iterator:
+    def list_block_storage_instance(self, **kwargs) -> Iterable[Block]:
 
         try:
 

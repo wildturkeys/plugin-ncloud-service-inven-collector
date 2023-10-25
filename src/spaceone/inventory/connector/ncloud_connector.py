@@ -1,6 +1,6 @@
 import logging
 import traceback
-from typing import Any, List
+from typing import Any, List, Iterable, Type, Callable
 
 import ncloud_server
 from ncloud_server.api.v2_api import V2Api
@@ -30,6 +30,7 @@ class NCloudBaseConnector(BaseConnector):
     _regions = {}
 
     def __init__(self, *args, **kwargs):
+        super().__init__()
 
         self._ncloud_configuration = self._ncloud_cls.Configuration()
 
@@ -71,7 +72,7 @@ class NCloudBaseConnector(BaseConnector):
     def get_resources(self, **kwargs) -> List[CloudServiceResponse]:
         raise NotImplementedError()
 
-    def collect_data(self):
+    def collect_data(self) -> List[CloudServiceResponse]:
 
         try:
 
@@ -86,7 +87,7 @@ class NCloudBaseConnector(BaseConnector):
             _LOGGER.error(traceback.format_exc())
             raise
 
-    def _convert_cloud_service_response(self, objs: List):
+    def _convert_cloud_service_response(self, objs: List) -> Iterable[CloudServiceResponse]:
 
         for obj in objs:
 
@@ -130,7 +131,7 @@ class NCloudBaseConnector(BaseConnector):
         return obj_list
 
     @staticmethod
-    def _create_model_obj(model_cls: Model, resource: Any, **kwargs) -> Model:
+    def _create_model_obj(model_cls: Callable[[], Type[Model]], resource: Any, **kwargs) -> Type[Model]:
 
         model_obj = model_cls()
 

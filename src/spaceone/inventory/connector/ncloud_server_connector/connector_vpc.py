@@ -1,5 +1,5 @@
 import logging
-from typing import Iterator, List
+from typing import Iterator, List, Dict
 from typing import Optional, Type
 
 import ncloud_vserver
@@ -119,9 +119,8 @@ class ServerVPCConnector(ServerConnector):
                             for acg_no in access_control_group_no_list:
                                 if self._access_control_rules_dict.get(acg_no):
                                     server.security_groups.extend(
-                                        self._convert_access_control_rules(acg_no,
-                                                                           self._access_control_rules_dict.get(
-                                                                               acg_no)))
+                                        self.__convert_access_control_rules(acg_no,
+                                                                            self._access_control_rules_dict))
 
                 yield server
 
@@ -164,7 +163,7 @@ class ServerVPCConnector(ServerConnector):
                                            NCloudNetworkInterfaceVPC,
                                            **kwargs)
 
-    def _sort_access_control_group_rules_group_by_acg_no(self, **kwargs):
+    def _sort_access_control_group_rules_group_by_acg_no(self, **kwargs) -> Dict:
 
         rtn_dict = {}
 
@@ -179,8 +178,8 @@ class ServerVPCConnector(ServerConnector):
 
         return rtn_dict
 
-    def _convert_access_control_rules(self, acg_no: str,
-                                      access_control_rules: List[NCloudAccessControlRule]) -> List[AccessControlRule]:
+    def __convert_access_control_rules(self, acg_no: str,
+                                       access_control_rules: Dict) -> List[AccessControlRule]:
         """
         access_control_group_name = StringType(serialize_when_none=False)
         access_control_group_no = StringType(serialize_when_none=False)
@@ -190,9 +189,13 @@ class ServerVPCConnector(ServerConnector):
         protocol = StringType(serialize_when_none=False)
         ip = StringType(serialize_when_none=False)
         """
+
+        if not access_control_rules.get(acg_no):
+            return []
+
         rtn_list = []
 
-        for access_control_rule in access_control_rules:
+        for access_control_rule in access_control_rules.get(acg_no):
 
             dic = {
                 "access_control_group_name": access_control_rule.access_control_group_name,

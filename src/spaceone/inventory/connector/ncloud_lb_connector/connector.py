@@ -1,5 +1,5 @@
 import logging
-from typing import Iterator, List
+from typing import Iterable, List
 from typing import Type
 
 import ncloud_loadbalancer
@@ -37,7 +37,7 @@ class LbConnector(NCloudBaseConnector):
 
         return resources
 
-    def list_load_balancer_instances(self, **kwargs) -> Iterator:
+    def list_load_balancer_instances(self, **kwargs) -> Iterable[LB]:
 
         try:
 
