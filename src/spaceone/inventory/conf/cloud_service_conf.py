@@ -12,6 +12,7 @@ CLOUD_SERVICE_GROUP_MAP = {
     'Nas': 'NasConnectorManager',
     'LB': 'LbConnectorManager',
     'Block': 'BlockConnectorManager',
+    'BlockVPC': 'BlockVPCConnectorManager',
     'VPC': 'VpcConnectorManager'
 }
 

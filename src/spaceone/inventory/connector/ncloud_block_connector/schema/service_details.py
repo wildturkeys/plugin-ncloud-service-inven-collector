@@ -20,8 +20,8 @@ details = ItemDynamicLayout.set_fields('Details', fields=[
                                             'detachFailed'],
                                 'disable': ['terminated']}),
     TextDyField.data_source('Volume ID', 'data.block_storage_instance_no'),
-    TextDyField.data_source('Volume Type', 'data.block_storage_type.code'),
-    EnumDyField.data_source('Disk Type', 'data.disk_detail_type.code',
+    TextDyField.data_source('Volume Type', 'data.block_storage_type'),
+    EnumDyField.data_source('Disk Type', 'data.block_storage_disk_type',
                             default_badge={'indigo.500': ['SSD'],
                                            'coral.600': ['HDD']}
                             ),
@@ -31,6 +31,6 @@ details = ItemDynamicLayout.set_fields('Details', fields=[
         "resource_type": "inventory.CloudService",
         "reference_key": "reference.resource_id"}),
     TextDyField.data_source('Server Name', 'data.server_name'),
-    TextDyField.data_source('Zone', 'data.zone.zone_code'), ])
+    TextDyField.data_source('Zone', 'data.zone_code'), ])
 
 SERVICE_DETAILS = CloudServiceMeta.set_layouts([details])
