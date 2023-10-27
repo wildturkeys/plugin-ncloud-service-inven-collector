@@ -264,7 +264,8 @@ class ServerVPCConnector(ServerConnector):
                 "is_default": network_interface.is_default,
                 "network_interface_description": network_interface.network_interface_description,
                 "server_instance_no": network_interface.instance_no,
-                "device_name": network_interface.device_name
+                "device_name": network_interface.device_name,
+                "access_control_group_no_list": network_interface.access_control_group_no_list
             }
 
             rtn_list.append(NetworkInterface(dic))

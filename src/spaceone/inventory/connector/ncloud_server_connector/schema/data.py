@@ -91,6 +91,7 @@ class NetworkInterface(Model):
     is_default = BooleanType(serialize_when_none=False)
     network_interface_description = StringType(serialize_when_none=False)
     server_instance_no = StringType(serialize_when_none=False)
+    access_control_group_no_list = ListType(StringType, serialize_when_none=False)
 
 
 class NCloudAccessControlGroup(Model):
