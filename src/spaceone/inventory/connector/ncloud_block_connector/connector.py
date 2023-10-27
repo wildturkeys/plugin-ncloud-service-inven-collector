@@ -82,8 +82,8 @@ class BlockConnector(NCloudBaseConnector):
             if block_storage.block_storage_type and block_storage.block_storage_type.get("code"):
                 dic["block_storage_type"] = block_storage.block_storage_type.get("code")
 
-            if block_storage.zone and block_storage.zone.get('code_name'):
-                dic["zone_code"] = block_storage.zone.get('code_name')
+            if block_storage.zone and block_storage.zone.get('zone_code'):
+                dic["zone_code"] = block_storage.zone.get('zone_code')
 
             if block_storage.region and block_storage.region.get('code_name'):
                 dic["region_coder"] = block_storage.region.get('code_name')
