@@ -52,7 +52,6 @@ class ServerVPCConnector(ServerConnector):
             for image_product in self._list_image_product(region_code=region_code):
                 self._server_images_dict[image_product.product_code] = image_product.product_name
 
-        for region in self.regions:
             resources.extend(
                 self._convert_cloud_service_response(self.list_server_instances(NCloudServerVPC,
                                                                                 ServerVPC,

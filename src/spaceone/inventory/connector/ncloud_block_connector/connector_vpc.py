@@ -8,6 +8,7 @@ from ncloud_vserver.rest import ApiException
 
 from spaceone.inventory.connector.ncloud_connector import NCloudBaseConnector
 from spaceone.inventory.connector.ncloud_block_connector.schema.data import BlockVPC, NCloudBlockVPC
+from spaceone.inventory.connector.ncloud_server_connector.schema.data import NCloudServerVPC
 from spaceone.inventory.connector.ncloud_block_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_block_connector.schema.service_type import CLOUD_SERVICE_TYPES
 from spaceone.inventory.libs.schema.resource import CloudServiceResponse
@@ -30,6 +31,7 @@ class BlockVPCConnector(NCloudBaseConnector):
         super().__init__(*args, **kwargs)
 
         self.api_type = API_TYPE_VPC
+        self.server_instance_dict = {}
 
     def get_resources(self) -> List[Type[CloudServiceResponse]]:
 
@@ -38,9 +40,15 @@ class BlockVPCConnector(NCloudBaseConnector):
         resources.extend(self.cloud_service_types)
 
         for region in self.regions:
+
+            region_code = region.get('region_code')
+
+            for server_instance in self._list_server_instance(region_code=region_code):
+                self.server_instance_dict[server_instance.server_instance_no] = server_instance.server_name
+            print(self.server_instance_dict)
             resources.extend(
                 self._convert_cloud_service_response(
-                    self.list_block_storage_instance(region_code=region.get('region_code'))))
+                    self.list_block_storage_instance(region_code=region_code)))
 
         return resources
 
@@ -54,6 +62,14 @@ class BlockVPCConnector(NCloudBaseConnector):
                                            self._ncloud_cls.GetBlockStorageInstanceListRequest,
                                            "block_storage_instance_list",
                                            NCloudBlockVPC,
+                                           **kwargs)
+
+    def _list_server_instance(self, **kwargs) -> List[Type[NCloudBlockVPC]]:
+
+        return self._list_ncloud_resources(self.api_client_v2.get_server_instance_list,
+                                           self._ncloud_cls.GetServerInstanceListRequest,
+                                           "server_instance_list",
+                                           NCloudServerVPC,
                                            **kwargs)
 
     def _convert_block_storage(self, block_storages: List[NCloudBlockVPC]) -> List[BlockVPC]:
@@ -84,11 +100,15 @@ class BlockVPCConnector(NCloudBaseConnector):
                 "zone_code": block_storage.zone_code
             }
 
-            if block_storage.block_storage_disk_detail_type and block_storage.block_storage_disk_detail_type.get("code_name"):
+            if block_storage.block_storage_disk_detail_type and\
+                    block_storage.block_storage_disk_detail_type.get("code_name"):
                 dic["block_storage_disk_type"] = block_storage.block_storage_disk_detail_type.get("code_name")
 
             if block_storage.block_storage_type and block_storage.block_storage_type.get("code"):
                 dic["block_storage_type"] = block_storage.block_storage_type.get("code")
+
+            if block_storage.server_instance_no:
+                dic["server_name"] = self.server_instance_dict.get(block_storage.server_instance_no)
 
             rtn_list.append(BlockVPC(dic))
 
