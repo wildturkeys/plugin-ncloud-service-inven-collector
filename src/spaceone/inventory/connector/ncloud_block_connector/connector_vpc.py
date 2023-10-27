@@ -84,8 +84,8 @@ class BlockVPCConnector(NCloudBaseConnector):
                 "zone_code": block_storage.zone_code
             }
 
-            if block_storage.disk_detail_type and block_storage.disk_detail_type.get("code_name"):
-                dic["block_storage_disk_type"] = block_storage.disk_detail_type.get("code_name")
+            if block_storage.block_storage_disk_detail_type and block_storage.block_storage_disk_detail_type.get("code_name"):
+                dic["block_storage_disk_type"] = block_storage.block_storage_disk_detail_type.get("code_name")
 
             if block_storage.block_storage_type and block_storage.block_storage_type.get("code"):
                 dic["block_storage_type"] = block_storage.block_storage_type.get("code")
