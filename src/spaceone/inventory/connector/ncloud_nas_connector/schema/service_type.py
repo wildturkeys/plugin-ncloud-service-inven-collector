@@ -4,13 +4,20 @@ from spaceone.inventory.conf.cloud_service_conf import *
 from spaceone.inventory.libs.common_parser import *
 from spaceone.inventory.libs.schema.dynamic_field import TextDyField, SearchField, DateTimeDyField, EnumDyField, \
     SizeField
-from spaceone.inventory.libs.schema.dynamic_widget import CardWidget
+from spaceone.inventory.libs.schema.dynamic_widget import CardWidget, ChartWidget
 from spaceone.inventory.libs.schema.resource import CloudServiceTypeResource, CloudServiceTypeResponse, \
     CloudServiceTypeMeta
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 
-instance_total_count_conf = os.path.join(current_dir, 'widget/instance_total_count.yaml')
+total_instance_count_conf = os.path.join(current_dir, 'widget/total_instance_count.yaml')
+total_memory_count_conf = os.path.join(current_dir, 'widget/total_memory_size.yaml')
+total_snapshot_size_conf = os.path.join(current_dir, 'widget/total_snapshot_size.yaml')
+
+
+count_by_memory_size_conf = os.path.join(current_dir, 'widget/count_by_memory_size.yaml')
+count_by_project_conf = os.path.join(current_dir,'widget/count_by_project.yaml')
+count_by_region_conf = os.path.join(current_dir,'widget/count_by_region.yaml')
 
 cst_nas_volume = CloudServiceTypeResource()
 cst_nas_volume.name = 'Nas'
@@ -46,7 +53,14 @@ cst_nas_volume._metadata = CloudServiceTypeMeta.set_meta(
         SearchField.set(name='Platform', key='data.platform_code'),
     ],
     widget=[
-        CardWidget.set(**get_data_from_yaml(instance_total_count_conf)),
+        CardWidget.set(**get_data_from_yaml(total_instance_count_conf)),
+        CardWidget.set(**get_data_from_yaml(total_memory_count_conf)),
+        CardWidget.set(**get_data_from_yaml(total_snapshot_size_conf)),
+
+        ChartWidget.set(**get_data_from_yaml(count_by_region_conf)),
+        ChartWidget.set(**get_data_from_yaml(count_by_project_conf)),
+        ChartWidget.set(**get_data_from_yaml(count_by_memory_size_conf))
+
     ]
 )
 

@@ -3,13 +3,18 @@ import os
 from spaceone.inventory.conf.cloud_service_conf import *
 from spaceone.inventory.libs.common_parser import *
 from spaceone.inventory.libs.schema.dynamic_field import SearchField, DateTimeDyField, EnumDyField
-from spaceone.inventory.libs.schema.dynamic_widget import CardWidget
+from spaceone.inventory.libs.schema.dynamic_widget import CardWidget, ChartWidget
 from spaceone.inventory.libs.schema.resource import CloudServiceTypeResource, CloudServiceTypeResponse, \
     CloudServiceTypeMeta
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 
-instance_total_count_conf = os.path.join(current_dir, 'widget/instance_total_count.yaml')
+total_instance_count_conf = os.path.join(current_dir, 'widget/total_instance_count.yaml')
+total_subnet_count_conf = os.path.join(current_dir,'widget/total_subnet_count.yaml')
+
+count_by_project_conf = os.path.join(current_dir, 'widget/count_by_project.yaml')
+count_by_region_conf = os.path.join(current_dir, 'widget/count_by_region.yaml')
+
 
 cst_vpc = CloudServiceTypeResource()
 cst_vpc.name = 'VPC'
@@ -37,7 +42,12 @@ cst_vpc._metadata = CloudServiceTypeMeta.set_meta(
         SearchField.set(name='Status', key='data.vpc_status.code'),
     ],
     widget=[
-        CardWidget.set(**get_data_from_yaml(instance_total_count_conf))
+        CardWidget.set(**get_data_from_yaml(total_instance_count_conf)),
+        # CardWidget.set(**get_data_from_yaml(total_subnet_count_conf)),
+
+        ChartWidget.set(**get_data_from_yaml(count_by_region_conf)),
+        ChartWidget.set(**get_data_from_yaml(count_by_project_conf))
+
     ]
 
 )

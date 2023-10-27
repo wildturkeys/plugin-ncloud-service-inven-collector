@@ -1,0 +1,16 @@
+---
+cloud_service_group: Networking
+cloud_service_type: VPC
+name: Total Subnet Count
+query:
+  aggregate:
+    - group:
+        fields:
+          - name: value
+            key: data.subnet.subnet_no
+            operator: count
+options:
+  value_options:
+    key: value
+    options:
+      default: 0

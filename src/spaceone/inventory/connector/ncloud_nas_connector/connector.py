@@ -48,6 +48,9 @@ class NasConnector(NCloudBaseConnector):
                     # 고쳐야 함
                     nas_volume = NasVolume(self._create_model_obj(NcloudNasVolume, nas_volume_instance))
                     nas_volume.region_code = region_code
+                    nas_volume.volume_size_gb = round(nas_volume.volume_size / 1024 / 1024 / 1024)
+                    nas_volume.snapshot_volume_size_gb = round(nas_volume.snapshot_volume_size / 1024 / 1024 / 1024)
+
 
                     nas_volume.nas_volume_server_instance_list = self._list_server_instances(
                         nas_volume_instance.get("nas_volume_server_instance_list"))

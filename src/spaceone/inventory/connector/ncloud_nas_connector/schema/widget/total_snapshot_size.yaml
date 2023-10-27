@@ -1,0 +1,18 @@
+---
+cloud_service_group: Storage
+cloud_service_type: Nas
+name: Total Snapshot Size
+query:
+  aggregate:
+    - group:
+        fields:
+          - name: value
+            key: data.snapshot_volume_size_gb
+            operator: sum
+options:
+  value_options:
+    key: value
+    type: size
+    options:
+      default: 0
+      source_unit: GB
