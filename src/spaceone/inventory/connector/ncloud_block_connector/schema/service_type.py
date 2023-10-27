@@ -52,8 +52,8 @@ cst_block._metadata = CloudServiceTypeMeta.set_meta(
                                                 'detachFailed'],
                                     'disable': ['terminated']}),
         TextDyField.data_source('Volume ID', 'data.block_storage_instance_no'),
-        TextDyField.data_source('Volume Type', 'data.block_storage_type.code'),
-        EnumDyField.data_source('Disk Type', 'data.disk_detail_type.code',
+        TextDyField.data_source('Volume Type', 'data.block_storage_type'),
+        EnumDyField.data_source('Disk Type', 'data.block_storage_disk_type',
                                 default_badge={'indigo.500': ['SSD'],
                                                'coral.600': ['HDD']}
                                 ),
@@ -63,18 +63,18 @@ cst_block._metadata = CloudServiceTypeMeta.set_meta(
             "resource_type": "inventory.CloudService",
             "reference_key": "reference.resource_id"}),
         TextDyField.data_source('Server Name', 'data.server_name'),
-        TextDyField.data_source('Zone', 'data.zone.zone_code'),
+        TextDyField.data_source('Zone', 'data.zone_code'),
     ],
     search=[
         SearchField.set(name='Status', key='data.block_storage_instance_status_name'),
         SearchField.set(name='Volume ID', key='data.block_storage_instance_no'),
-        SearchField.set(name='Volume Type', key='data.block_storage_type.code'),
-        SearchField.set(name='Disk Type', key='data.disk_detail_type.code'),
+        SearchField.set(name='Volume Type', key='data.block_storage_type'),
+        SearchField.set(name='Disk Type', key='data.block_storage_disk_type'),
         SearchField.set(name='MAX IOPS', key='data.max_iops_throughput'),
         SearchField.set(name='Device', key='data.device_name'),
         SearchField.set(name='Server ID', key='data.server_instance_no'),
         SearchField.set(name='Server Name', key='data.server_name'),
-        SearchField.set(name='Zone Name', key='data.zone.zone_code')
+        SearchField.set(name='Zone Name', key='data.zone_code')
     ],
     widget=[
         CardWidget.set(**get_data_from_yaml(instance_total_count_conf)),
