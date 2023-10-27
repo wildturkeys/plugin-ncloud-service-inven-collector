@@ -4,16 +4,17 @@ from typing import Optional, Type
 
 import ncloud_vserver
 from ncloud_vserver.api.v2_api import V2Api
+from ncloud_vserver.rest import ApiException
 
-from spaceone.inventory.conf.cloud_service_conf import VPC_AVAILABLE_REGION
 from spaceone.inventory.connector.ncloud_server_connector.connector import ServerConnector
 from spaceone.inventory.connector.ncloud_server_connector.schema.data import NCloudServerVPC, \
     NCloudAccessControlRuleVPC, ServerVPC, NCloudAccessControlVPC, NCloudNetworkInterfaceVPC
 from spaceone.inventory.connector.ncloud_server_connector.schema.data import Server, NCloudServer, NCloudBlockVPC, \
-    NCloudAccessControlRule, AccessControlRule, Disk, NetworkInterface, NCloudServerImageProduct
+     AccessControlRule, Disk, NetworkInterface, NCloudServerImageProduct
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_type import CLOUD_SERVICE_TYPES
 from spaceone.inventory.libs.schema.resource import CloudServiceResponse
+from spaceone.inventory.conf.cloud_service_conf import API_TYPE_VPC
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -26,16 +27,24 @@ class ServerVPCConnector(ServerConnector):
 
     _ncloud_cls = ncloud_vserver
     _ncloud_api_v2 = V2Api
+    _api_exception_cls = ApiException
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.api_type = API_TYPE_VPC
+
         self._access_control_rules_dict = {}
         self._server_images_dict = {}
+
+    def get_resources(self) -> List[Type[CloudServiceResponse]]:
+
+        resources = []
 
         for region in self.regions:
 
             region_code = region.get('region_code')
+
             self._access_control_rules_dict \
                 = dict(self._access_control_rules_dict,
                        **self._sort_access_control_group_rules_group_by_acg_no(region_code=region_code))
@@ -43,31 +52,13 @@ class ServerVPCConnector(ServerConnector):
             for image_product in self._list_image_product(region_code=region_code):
                 self._server_images_dict[image_product.product_code] = image_product.product_name
 
-    def _set_region(self, access_key, secret_key):
-
-        configuration = self._ncloud_cls.Configuration()
-        configuration.access_key = access_key
-        configuration.secret_key = secret_key
-
-        client = self._ncloud_cls.ApiClient(configuration)
-
-        api = self._ncloud_api_v2(client)
-        get_region_list_request = self._ncloud_cls.GetRegionListRequest
-        response = api.get_region_list(get_region_list_request).to_dict()
-        self._regions = response.get("region_list")
-
-        _LOGGER.info(self._regions)
-
-    def get_resources(self) -> List[Type[CloudServiceResponse]]:
-        resources = []
-
         for region in self.regions:
-            if region.get('region_code') in VPC_AVAILABLE_REGION:
-                resources.extend(
-                    self._convert_cloud_service_response(self.list_server_instances(NCloudServerVPC,
-                                                                                    ServerVPC,
-                                                                                    region_code=region.get(
-                                                                                        'region_code'))))
+            resources.extend(
+                self._convert_cloud_service_response(self.list_server_instances(NCloudServerVPC,
+                                                                                ServerVPC,
+                                                                                region_code=region.get(
+                                                                                    'region_code'))))
+
         return resources
 
     def list_server_instances(self, ncloud_server_cls: Type[NCloudServer],

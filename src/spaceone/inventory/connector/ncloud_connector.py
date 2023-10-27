@@ -3,8 +3,13 @@ import traceback
 from typing import Any, List, Iterable, Type, Callable
 
 import ncloud_server
-from ncloud_server.api.v2_api import V2Api
-from ncloud_server.rest import ApiException
+import ncloud_vserver
+
+from ncloud_server.api.v2_api import V2Api as ClassicV2Api
+from ncloud_vserver.api.v2_api import V2Api as VpcV2Api
+
+from spaceone.inventory.conf.cloud_service_conf import API_TYPE, API_TYPE_CLASSIC, API_TYPE_VPC
+
 from schematics import Model
 from schematics.types import DateTimeType
 from spaceone.core.connector import BaseConnector
@@ -25,37 +30,37 @@ class NCloudBaseConnector(BaseConnector):
     _ncloud_cls: Any = None
     _ncloud_api_v2: Any = None
     _ncloud_configuration = None
+    _ncloud_region_configuration = None
     _api_exception_cls = None
+
+    __api_type = API_TYPE_CLASSIC
 
     _regions = {}
 
     def __init__(self, *args, **kwargs):
-        super().__init__()
-
-        self._ncloud_configuration = self._ncloud_cls.Configuration()
-
-        if self._ncloud_cls and kwargs.get("secret_data") and self._ncloud_configuration:
-            secret_data = kwargs.get("secret_data")
-
-            self._ncloud_configuration.access_key = secret_data.get("access_key")
-            self._ncloud_configuration.secret_key = secret_data.get("secret_key")
-
-            self._set_region(secret_data.get("access_key"), secret_data.get("secret_key"))
+        super().__init__(*args, **kwargs)
 
     def _set_region(self, access_key, secret_key):
 
-        configuration = ncloud_server.Configuration()
-        configuration.access_key = access_key
-        configuration.secret_key = secret_key
+        if self.__api_type == API_TYPE_CLASSIC:
+            self._set_classic_region(access_key, secret_key)
 
-        client = ncloud_server.ApiClient(configuration)
-
-        api = V2Api(client)
-        get_region_list_request = ncloud_server.GetRegionListRequest
-        response = api.get_region_list(get_region_list_request).to_dict()
-        self._regions = response.get("region_list")
+        elif self.__api_type == API_TYPE_VPC:
+            self._set_vpc_region(access_key, secret_key)
+        else:
+            raise
 
         _LOGGER.info(self._regions)
+
+    @property
+    def api_type(self):
+        return self.api_type
+
+    @api_type.setter
+    def api_type(self, api_type: str):
+        if api_type not in API_TYPE:
+            raise ValueError("Invalid api type")
+        self.__api_type = api_type
 
     @property
     def regions(self) -> List:
@@ -69,23 +74,51 @@ class NCloudBaseConnector(BaseConnector):
     def api_client_v2(self):
         return self._ncloud_api_v2(self.api_client)
 
+    def _set_configuration(self, access_key: str, secret_key: str):
+
+        self._ncloud_configuration = self._ncloud_cls.Configuration()
+        self._ncloud_configuration.access_key = access_key
+        self._ncloud_configuration.secret_key = secret_key
+
+        self._set_region(access_key, secret_key)
+
+    def _set_classic_region(self, access_key: str, secret_key: str):
+
+        _ncloud_region_configuration = ncloud_server.Configuration()
+        _ncloud_region_configuration.access_key = access_key
+        _ncloud_region_configuration.secret_key = secret_key
+
+        client = ncloud_server.ApiClient(_ncloud_region_configuration)
+
+        api = ClassicV2Api(client)
+        get_region_list_request = ncloud_server.GetRegionListRequest
+        response = api.get_region_list(get_region_list_request).to_dict()
+        self._regions = response.get("region_list")
+
+    def _set_vpc_region(self, access_key: str, secret_key: str):
+
+        _ncloud_region_configuration = ncloud_vserver.Configuration()
+        _ncloud_region_configuration.access_key = access_key
+        _ncloud_region_configuration.secret_key = secret_key
+
+        client = ncloud_vserver.ApiClient(_ncloud_region_configuration)
+
+        api = VpcV2Api(client)
+        get_region_list_request = ncloud_vserver.GetRegionListRequest
+        response = api.get_region_list(get_region_list_request).to_dict()
+        self._regions = response.get("region_list")
+
     def get_resources(self, **kwargs) -> List[CloudServiceResponse]:
         raise NotImplementedError()
 
     def collect_data(self) -> List[CloudServiceResponse]:
 
-        try:
+        access_key = self.secret_data.get("access_key")
+        secret_key = self.secret_data.get("secret_key")
 
-            return self.get_resources()
-        except self._api_exception_cls as e:
-            _LOGGER.error(e)
-            _LOGGER.error(traceback.format_exc())
-            raise
+        self._set_configuration(access_key, secret_key)
 
-        except Exception as e:
-            _LOGGER.error(e)
-            _LOGGER.error(traceback.format_exc())
-            raise
+        return self.get_resources()
 
     def _convert_cloud_service_response(self, objs: List) -> Iterable[CloudServiceResponse]:
 
@@ -170,6 +203,11 @@ class NCloudBaseConnector(BaseConnector):
 
             return resources_list
 
-        except ApiException as e:
-            logging.error(e)
-            raise Exception(e)
+        except self._api_exception_cls as e:
+            _LOGGER.error(e)
+            raise
+
+        except Exception as e:
+            _LOGGER.error(e)
+            _LOGGER.error(traceback.format_exc())
+            raise

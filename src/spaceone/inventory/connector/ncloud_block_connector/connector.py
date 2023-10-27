@@ -23,6 +23,7 @@ class BlockConnector(NCloudBaseConnector):
 
     _ncloud_cls = ncloud_server
     _ncloud_api_v2 = V2Api
+    _api_exception_cls = ApiException
 
     def get_resources(self) -> List[Type[CloudServiceResponse]]:
 

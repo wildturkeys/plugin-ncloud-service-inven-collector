@@ -14,6 +14,7 @@ from spaceone.inventory.connector.ncloud_server_connector.schema.data import Ser
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_type import CLOUD_SERVICE_TYPES
 from spaceone.inventory.libs.schema.resource import CloudServiceResponse
+from spaceone.inventory.conf.cloud_service_conf import API_TYPE_CLASSIC
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -30,6 +31,8 @@ class ServerConnector(NCloudBaseConnector):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.api_type = API_TYPE_CLASSIC
         self._access_control_rules_dict = {}
 
     def _set_default_server_info(self, server: Server):

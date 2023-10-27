@@ -32,6 +32,10 @@ INSTANCE_STATE_MAP = {
     "stopped": "STOPPED"
 }
 
+API_TYPE_CLASSIC = "classic"
+API_TYPE_VPC = "vpc"
+API_TYPE = [API_TYPE_VPC, API_TYPE_CLASSIC]
+
 VPC_AVAILABLE_REGION = ["KR", "SGN", "JPN"]
 
 """
