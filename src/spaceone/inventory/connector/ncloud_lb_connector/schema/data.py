@@ -48,7 +48,6 @@ class NCloudLB(Model):
 
 
 class NCloudLBVPC(Model):
-
     load_balancer_name = StringType(serialize_when_none=False)
     load_balancer_description = StringType(serialize_when_none=False)
     load_balancer_domain = StringType(serialize_when_none=False)
@@ -95,8 +94,23 @@ class LBServerInstance(Model):
     server_status = StringType(serialize_when_none=False)
 
 
-class LB(Model):
+class LBListener(Model):
 
+    load_balancer_instance_name = StringType(serialize_when_none=False)
+    load_balancer_instance_no = StringType(serialize_when_none=False)
+    load_balancer_instance_port = IntType(serialize_when_none=False)
+    load_balancer_instance_status_name = StringType(serialize_when_none=False)
+    protocol_type = StringType(serialize_when_none=False)
+
+    health_check_path = StringType(serialize_when_none=False)
+
+    server_instance_name = StringType(serialize_when_none=False)
+    server_instance_no = StringType(serialize_when_none=False)
+    server_instance_port = StringType(serialize_when_none=False)
+    server_instance_status_name = StringType(serialize_when_none=False)
+
+
+class LB(Model):
     load_balancer_name = StringType(serialize_when_none=False)
     load_balancer_description = StringType(serialize_when_none=False)
     load_balancer_domain = StringType(serialize_when_none=False)
@@ -110,7 +124,7 @@ class LB(Model):
     region_code = StringType(serialize_when_none=False)
     throughput_type = StringType(serialize_when_none=False)
 
-    load_balanced_server_instance_list = ListType(ModelType(LBServerInstance), serialize_when_none=False)
+    load_balancer_listener_list = ListType(ModelType(LBListener), serialize_when_none=False, default=[])
     load_balanced_server_instance_count = IntType(serialize_when_none=False)
 
     platform_code = StringType(default="classic")
@@ -133,11 +147,9 @@ class LB(Model):
         }
 
 
-class LB_VPC(LB):
-
+class LBVPC(LB):
     platform_code = StringType(default="vpc")
     vpc_no = ListType(StringType, serialize_when_none=False)
-
 
     def reference(self):
         return {

@@ -8,7 +8,7 @@ from ncloud_vloadbalancer.api.v2_api import V2Api
 
 
 from spaceone.inventory.connector.ncloud_connector import NCloudBaseConnector
-from spaceone.inventory.connector.ncloud_lb_connector.schema.data import NCloudLBVPC, LB_VPC, LBServerInstance
+from spaceone.inventory.connector.ncloud_lb_connector.schema.data import NCloudLBVPC, LBVPC, LBServerInstance
 from spaceone.inventory.connector.ncloud_lb_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_lb_connector.schema.service_type import CLOUD_SERVICE_TYPES
 from spaceone.inventory.libs.schema.resource import CloudServiceResponse
@@ -43,7 +43,7 @@ class LbVPCConnector(NCloudBaseConnector):
 
         return resources
 
-    def list_load_balancer_instances(self, **kwargs) -> Iterable[LB_VPC]:
+    def list_load_balancer_instances(self, **kwargs) -> Iterable[LBVPC]:
 
         yield from self.__convert_list_load_balancer_instances(self._list_load_balancer_instances(**kwargs))
 
@@ -56,13 +56,13 @@ class LbVPCConnector(NCloudBaseConnector):
                                            **kwargs)
 
     def __convert_list_load_balancer_instances(self, load_balancer_instances: List[NCloudLBVPC], **kwargs) \
-            -> List[LB_VPC]:
+            -> List[LBVPC]:
 
         rtn_list = []
 
         for load_balancer_instance in load_balancer_instances:
 
-            lb_vpc_obj = LB_VPC()
+            lb_vpc_obj = LBVPC()
             lb_vpc_obj.load_balancer_name = load_balancer_instance.load_balancer_name
             lb_vpc_obj.load_balancer_description = load_balancer_instance.load_balancer_description
             lb_vpc_obj.load_balancer_instance_no = load_balancer_instance.load_balancer_instance_no
