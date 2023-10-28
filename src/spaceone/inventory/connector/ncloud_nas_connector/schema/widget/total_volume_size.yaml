@@ -1,7 +1,7 @@
 ---
 cloud_service_group: Storage
 cloud_service_type: Nas
-name: Total Memory Size
+name: Total Volume Size
 query:
   aggregate:
     - group:

@@ -11,11 +11,11 @@ from spaceone.inventory.libs.schema.resource import CloudServiceTypeResource, Cl
 current_dir = os.path.abspath(os.path.dirname(__file__))
 
 total_instance_count_conf = os.path.join(current_dir, 'widget/total_instance_count.yaml')
-total_memory_count_conf = os.path.join(current_dir, 'widget/total_memory_size.yaml')
+total_volume_count_conf = os.path.join(current_dir, 'widget/total_volume_size.yaml')
 total_snapshot_size_conf = os.path.join(current_dir, 'widget/total_snapshot_size.yaml')
 
 
-count_by_memory_size_conf = os.path.join(current_dir, 'widget/count_by_memory_size.yaml')
+count_by_volume_size_conf = os.path.join(current_dir, 'widget/count_by_volume_size.yaml')
 count_by_project_conf = os.path.join(current_dir,'widget/count_by_project.yaml')
 count_by_region_conf = os.path.join(current_dir,'widget/count_by_region.yaml')
 
@@ -41,7 +41,7 @@ cst_nas_volume._metadata = CloudServiceTypeMeta.set_meta(
             'disable': ['terminated']
         }),
         TextDyField.data_source('Instance Type', 'data.nas_volume_instance_status.code_name'),
-        SizeField.data_source('Total Size', 'data.volume_total_size', type="size",
+        SizeField.data_source('Volume Size', 'data.volume_size', type="size",
                               options={"source_unit": "BYTES", "display_unit": "GB"}),
         DateTimeDyField.data_source("Created", "data.create_date")
 
@@ -54,12 +54,12 @@ cst_nas_volume._metadata = CloudServiceTypeMeta.set_meta(
     ],
     widget=[
         CardWidget.set(**get_data_from_yaml(total_instance_count_conf)),
-        CardWidget.set(**get_data_from_yaml(total_memory_count_conf)),
+        CardWidget.set(**get_data_from_yaml(total_volume_count_conf)),
         CardWidget.set(**get_data_from_yaml(total_snapshot_size_conf)),
 
         ChartWidget.set(**get_data_from_yaml(count_by_region_conf)),
         ChartWidget.set(**get_data_from_yaml(count_by_project_conf)),
-        ChartWidget.set(**get_data_from_yaml(count_by_memory_size_conf))
+        ChartWidget.set(**get_data_from_yaml(count_by_volume_size_conf))
 
     ]
 )
