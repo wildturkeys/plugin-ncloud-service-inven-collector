@@ -40,36 +40,17 @@ class LbConnector(NCloudBaseConnector):
 
     def list_load_balancer_instances(self, **kwargs) -> Iterable[LB]:
 
-        try:
+        yield from self.__convert_list_load_balancer_instances(self._list_load_balancer_instances(**kwargs))
 
-            response = self.api_client_v2.get_load_balancer_instance_list(
-                ncloud_loadbalancer.GetLoadBalancerInstanceListRequest(**kwargs))
+    def _list_load_balancer_instances(self, **kwargs) -> List[Type[NCloudLB]]:
 
-            response_dict = response.to_dict()
+        return self._list_ncloud_resources(self.api_client_v2.get_load_balancer_instance_list,
+                                           self._ncloud_cls.GetLoadBalancerInstanceListRequest,
+                                           "load_balancer_instance_list",
+                                           NCloudLB,
+                                           **kwargs)
 
-            if response_dict.get("load_balancer_instance_list"):
-
-                for load_balancer_instance in response_dict.get("load_balancer_instance_list"):
-
-                    load_balancer = LB(self._create_model_obj(NCloudLB, load_balancer_instance))
-
-                    if load_balancer_instance.get("load_balanced_server_instance_list"):
-                        load_balancer.load_balanced_server_instance_list = self._list_load_balancer_instance(
-                            load_balancer_instance.get("load_balanced_server_instance_list"))
-                        load_balancer.load_balanced_server_instance_count = len(
-                            load_balancer.load_balanced_server_instance_list)
-
-                    if kwargs.get("region_no"):
-                        for region in self.regions:
-                            if region.get("region_no") == kwargs.get("region_no"):
-                                load_balancer.region_code = region.get("region_code")
-
-                    yield load_balancer
-
-        except ApiException as e:
-            logging.error(e)
-            raise
-
+    """
     def _list_load_balancer_instance(self, load_balancer_instance_list) -> List[LBServerInstance]:
 
         rtn_list = []
@@ -98,5 +79,33 @@ class LbConnector(NCloudBaseConnector):
                 server_instance_obj["internet_line_type"] = server_instance.get("internet_line_type")
 
                 rtn_list.append(LBServerInstance(server_instance_obj))
+
+        return rtn_list
+        """
+
+    def __convert_list_load_balancer_instances(self, load_balancer_instances: List[NCloudLB], **kwargs) \
+            -> List[LB]:
+
+        rtn_list = []
+
+        for load_balancer_instance in load_balancer_instances:
+
+            lb_obj = LB()
+            lb_obj.load_balancer_name = load_balancer_instance.load_balancer_name
+            lb_obj.load_balancer_description = load_balancer_instance.load_balancer_description
+            lb_obj.load_balancer_instance_no = load_balancer_instance.load_balancer_instance_no
+
+            if load_balancer_instance.get('virtual_ip'):
+                lb_obj.load_balancer_ip_list = str(load_balancer_instance.virtual_ip).split(",")
+
+            lb_obj.load_balancer_domain = load_balancer_instance.domain_name
+            lb_obj.load_balancer_instance_status_name = load_balancer_instance.load_balancer_instance_status_name
+            lb_obj.load_balancer_network_type = load_balancer_instance.network_usage_type.get("code_name")
+            lb_obj.create_date = load_balancer_instance.create_date
+
+            if load_balancer_instance.get("region"):
+                lb_obj.region_code = load_balancer_instance.get("region").get("region_code")
+
+            rtn_list.append(lb_obj)
 
         return rtn_list

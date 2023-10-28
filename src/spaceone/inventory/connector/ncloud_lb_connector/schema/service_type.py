@@ -2,7 +2,7 @@ import os
 
 from spaceone.inventory.conf.cloud_service_conf import *
 from spaceone.inventory.libs.common_parser import *
-from spaceone.inventory.libs.schema.dynamic_field import TextDyField, SearchField, DateTimeDyField, EnumDyField
+from spaceone.inventory.libs.schema.dynamic_field import TextDyField, SearchField, DateTimeDyField, EnumDyField, ListDyField
 from spaceone.inventory.libs.schema.dynamic_widget import ChartWidget, CardWidget
 from spaceone.inventory.libs.schema.resource import CloudServiceTypeResource, CloudServiceTypeResponse, \
     CloudServiceTypeMeta
@@ -29,29 +29,26 @@ cst_lb._metadata = CloudServiceTypeMeta.set_meta(
         EnumDyField.data_source('Platform', 'data.platform_code', default_badge={
             'indigo.500': ['classic'], 'coral.600': ['vpc']
         }),
-        EnumDyField.data_source('Type', 'data.network_usage_type.code_name',
+        EnumDyField.data_source('Type', 'data.load_balancer_network_type',
                                 default_badge={'indigo.500': ['Public'],
                                                'coral.600': ['Private']}
                                 ),
-        TextDyField.data_source('Domain', 'data.domain_name'),
+        TextDyField.data_source('Domain', 'data.load_balancer_domain'),
         EnumDyField.data_source('Status', 'data.load_balancer_instance_status_name',
                                 default_state={
-                                    'safe': ['used', 'using', 'created'],
+                                    'safe': ['used', 'using', 'created', "running"],
                                     'available': ['initialized', 'creating',
                                                   'repairing', 'using'],
-                                    'warning': ['disusing', 'changing'],
+                                    'warning': ['disusing', 'changing', 'terminating'],
                                     'disable': ['terminated']}),
-        TextDyField.data_source('VIP', 'data.virtual_ip'),
-        TextDyField.data_source('Algorithm', 'data.load_balancer_algorithm_type.code_name'),
-        TextDyField.data_source('Server Count', 'data.load_balanced_server_instance_count'),
+        ListDyField.data_source('IPs', 'data.load_balancer_ip_list'),
         DateTimeDyField.data_source("Created", "data.create_date")
     ],
     search=[
         SearchField.set(name='Status', key='data.load_balancer_instance_status_name'),
-        SearchField.set(name='Type', key='data.network_usage_type.code_name'),
+        SearchField.set(name='Type', key='data.network_usage_type'),
         SearchField.set(name='Domain', key='data.domain_name'),
-        SearchField.set(name='VIP', key='data.virtual_ip'),
-        SearchField.set(name='Algorithm', key='data.load_balancer_algorithm_type.code_name')
+        SearchField.set(name='IPs', key='data.load_balancer_ip_list'),
     ],
     widget=[
         CardWidget.set(**get_data_from_yaml(instance_total_count_conf)),

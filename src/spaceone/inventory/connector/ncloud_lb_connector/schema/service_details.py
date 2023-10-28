@@ -1,4 +1,4 @@
-from spaceone.inventory.libs.schema.dynamic_field import TextDyField, DateTimeDyField, EnumDyField
+from spaceone.inventory.libs.schema.dynamic_field import TextDyField, DateTimeDyField, EnumDyField, ListDyField
 from spaceone.inventory.libs.schema.dynamic_layout import ItemDynamicLayout, TableDynamicLayout
 from spaceone.inventory.libs.schema.resource import CloudServiceMeta
 
@@ -7,23 +7,19 @@ details = ItemDynamicLayout.set_fields('Details', fields=[
     EnumDyField.data_source('Platform', 'data.platform_code', default_badge={
         'indigo.500': ['classic'], 'coral.600': ['vpc']
     }),
-    TextDyField.data_source('Name', 'data.load_balancer_name'),
-    EnumDyField.data_source('Type', 'data.network_usage_type.code_name',
+    EnumDyField.data_source('Type', 'data.load_balancer_network_type',
                             default_badge={'indigo.500': ['Public'],
                                            'coral.600': ['Private']}
                             ),
-    TextDyField.data_source('Domain', 'data.domain_name'),
+    TextDyField.data_source('Domain', 'data.load_balancer_domain'),
     EnumDyField.data_source('Status', 'data.load_balancer_instance_status_name',
                             default_state={
-                                'safe': ['used', 'using', 'created'],
+                                'safe': ['used', 'using', 'created', "running"],
                                 'available': ['initialized', 'creating',
                                               'repairing', 'using'],
-                                'warning': ['disusing', 'changing'],
+                                'warning': ['disusing', 'changing', 'terminating'],
                                 'disable': ['terminated']}),
-    TextDyField.data_source('VIP', 'data.virtual_ip'),
-    TextDyField.data_source('Algorithm', 'data.load_balancer_algorithm_type.code_name'),
-    TextDyField.data_source('Certificate', 'data.certificate_name'),
-    TextDyField.data_source('Http Keep Alive', 'data.is_http_keep_alive'),
+    ListDyField.data_source('IPs', 'data.load_balancer_ip_list'),
     DateTimeDyField.data_source("Created", "data.create_date")
 ])
 
