@@ -39,7 +39,7 @@ port_forwarding = ItemDynamicLayout.set_fields('Port Forwarding', fields=[
     TextDyField.data_source('Internal Port', 'data.port_forwarding_internal_port'),
 ])
 
-disk = TableDynamicLayout.set_fields('Disk', root_path='data.disks', fields=[
+block_storages = TableDynamicLayout.set_fields('Disk', root_path='data.block_storages', fields=[
     TextDyField.data_source('Name', 'block_storage_name'),
     SizeField.data_source('Size(GB)', 'block_storage_size', options={
         'display_unit': 'GB',
@@ -52,19 +52,25 @@ disk = TableDynamicLayout.set_fields('Disk', root_path='data.disks', fields=[
                                 'warning': ['Initialized', 'creating', 'copying', 'terminating', 'repairing',
                                             'detachFailed'],
                                 'disable': ['terminated']}),
-    TextDyField.data_source('Volume ID', 'block_storage_instance_no',
-                            reference={"resource_type": "inventory.CloudService",
-                                       "reference_key": "reference.resource_id"}),
-    TextDyField.data_source('Volume Type', 'block_storage_type.code'),
+    TextDyField.data_source('Volume ID', 'block_storage_instance_no'),
+    TextDyField.data_source('Volume Type', 'block_storage_type'),
     EnumDyField.data_source('Disk Type', 'block_storage_disk_type',
                             default_badge={'indigo.500': ['SSD'],
                                            'coral.600': ['HDD']}
                             ),
     TextDyField.data_source('MAX IOPS', 'max_iops_throughput'),
-    TextDyField.data_source('Device', 'device_name')
+    TextDyField.data_source('Device', 'device_name'),
+    TextDyField.data_source('Server ID', 'server_instance_no', reference={
+        "resource_type": "inventory.CloudService",
+        "reference_key": "reference.resource_id"}),
+    EnumDyField.data_source('Encrypted', 'is_encrypted_volume',
+                            default_badge={'indigo.500': ["true"],
+                                           'coral.600': ["false"]}),
+    DateTimeDyField.data_source("Created", "create_date")
+
 ])
 
-nic = TableDynamicLayout.set_fields('NIC', root_path='data.nics', fields=[
+nics = TableDynamicLayout.set_fields('NIC', root_path='data.nics', fields=[
     TextDyField.data_source('Name', 'network_interface_name'),
     TextDyField.data_source('IP Addresses', 'ip'),
     TextDyField.data_source('Status', 'network_interface_status_name'),
@@ -85,4 +91,4 @@ security_groups = TableDynamicLayout.set_fields('Security Groups', root_path='da
     TextDyField.data_source('Description', 'access_control_rule_description'),
 ])
 
-SERVICE_DETAILS = CloudServiceMeta.set_layouts([details, port_forwarding, nic, disk, security_groups])
+SERVICE_DETAILS = CloudServiceMeta.set_layouts([details, port_forwarding, nics, block_storages, security_groups])

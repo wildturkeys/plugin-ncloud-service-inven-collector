@@ -7,10 +7,15 @@ from ncloud_vserver.api.v2_api import V2Api
 from ncloud_vserver.rest import ApiException
 
 from spaceone.inventory.connector.ncloud_server_connector.connector import ServerConnector
+
 from spaceone.inventory.connector.ncloud_server_connector.schema.data import NCloudServerVPC, \
     NCloudAccessControlRuleVPC, ServerVPC, NCloudAccessControlVPC, NCloudNetworkInterfaceVPC
-from spaceone.inventory.connector.ncloud_server_connector.schema.data import Server, NCloudServer, NCloudBlockVPC, \
-     AccessControlRule, Disk, NetworkInterface, NCloudServerImageProduct
+
+from spaceone.inventory.connector.ncloud_server_connector.schema.data import Server, NCloudServer, \
+    AccessControlRule, NetworkInterface, NCloudServerImageProduct
+
+from spaceone.inventory.connector.ncloud_block_connector.schema.data import NCloudBlockVPC, BlockVPC
+
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_server_connector.schema.service_type import CLOUD_SERVICE_TYPES
 from spaceone.inventory.libs.schema.resource import CloudServiceResponse
@@ -69,7 +74,8 @@ class ServerVPCConnector(ServerConnector):
 
         if response_dict.get("server_instance_list"):
 
-            _block_storages: List[Optional[Disk]] = self._convert_disk(self._list_block_storage_instance(**kwargs))
+            _block_storages: List[Optional[BlockVPC]] = self._convert_block_storages(
+                self._list_block_storage_instance(**kwargs))
             _network_interfaces: List[Optional[NetworkInterface]] = \
                 self._convert_network_interfaces(self._list_network_interface(**kwargs))
 
@@ -89,8 +95,9 @@ class ServerVPCConnector(ServerConnector):
                     server.compute['az'] = server_instance.get('zone_code')
 
                 if hasattr(server, "server_instance_no"):
-                    server.disks = self._find_objs_by_key_value(_block_storages,
-                                                                'server_instance_no', server.server_instance_no)
+                    server.block_storages = self._find_objs_by_key_value(_block_storages,
+                                                                         'server_instance_no',
+                                                                         server.server_instance_no)
 
                     server.nics = self._find_objs_by_key_value(_network_interfaces,
                                                                'server_instance_no', server.server_instance_no)
@@ -205,7 +212,7 @@ class ServerVPCConnector(ServerConnector):
 
         return rtn_list
 
-    def _convert_disk(self, block_disks: List[NCloudBlockVPC]) -> List[Disk]:
+    def _convert_block_storages(self, block_storages: List[NCloudBlockVPC]) -> List[BlockVPC]:
         """
         block_storage_name = StringType(serialize_when_none=False)
         block_storage_size = IntType(serialize_when_none=False)
@@ -219,26 +226,28 @@ class ServerVPCConnector(ServerConnector):
         """
         rtn_list = []
 
-        for block_disk in block_disks:
+        for block_storage in block_storages:
 
             dic = {
-                "block_storage_name": block_disk.block_storage_name,
-                "block_storage_size": block_disk.block_storage_size,
-                "block_storage_instance_status_name": block_disk.block_storage_instance_status_name,
-                "block_storage_instance_no": block_disk.block_storage_instance_no,
-                "server_instance_no": block_disk.server_instance_no,
-                "device_name": block_disk.device_name,
-                "max_iops_throughput": block_disk.max_iops_throughput,
-                "is_encrypted_volume": block_disk.is_encrypted_volume
+                "block_storage_name": block_storage.block_storage_name,
+                "block_storage_size": block_storage.block_storage_size,
+                "block_storage_instance_status_name": block_storage.block_storage_instance_status_name,
+                "block_storage_instance_no": block_storage.block_storage_instance_no,
+                "server_instance_no": block_storage.server_instance_no,
+                "device_name": block_storage.device_name,
+                "max_iops_throughput": block_storage.max_iops_throughput,
+                "is_encrypted_volume": str(block_storage.is_encrypted_volume).lower(),
+                "create_date": block_storage.create_date
             }
 
-            if block_disk.block_storage_disk_detail_type and block_disk.block_storage_disk_detail_type.get("code_name"):
-                dic["block_storage_disk_type"] = block_disk.block_storage_disk_detail_type.get("code_name")
+            if block_storage.block_storage_disk_detail_type and block_storage.block_storage_disk_detail_type.get(
+                    "code_name"):
+                dic["block_storage_disk_type"] = block_storage.block_storage_disk_detail_type.get("code_name")
 
-            if block_disk.block_storage_type and block_disk.block_storage_type.get("code"):
-                dic["block_storage_type"] = block_disk.block_storage_type.get("code")
+            if block_storage.block_storage_type and block_storage.block_storage_type.get("code"):
+                dic["block_storage_type"] = block_storage.block_storage_type.get("code")
 
-            rtn_list.append(Disk(dic))
+            rtn_list.append(BlockVPC(dic))
 
         return rtn_list
 

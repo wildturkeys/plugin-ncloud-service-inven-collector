@@ -45,7 +45,7 @@ class BlockVPCConnector(NCloudBaseConnector):
 
             for server_instance in self._list_server_instance(region_code=region_code):
                 self.server_instance_dict[server_instance.server_instance_no] = server_instance.server_name
-            print(self.server_instance_dict)
+
             resources.extend(
                 self._convert_cloud_service_response(
                     self.list_block_storage_instance(region_code=region_code)))
@@ -97,7 +97,9 @@ class BlockVPCConnector(NCloudBaseConnector):
                 "device_name": block_storage.device_name,
                 "max_iops_throughput": block_storage.max_iops_throughput,
                 "region_code": block_storage.region_code,
-                "zone_code": block_storage.zone_code
+                "zone_code": block_storage.zone_code,
+                "create_date": block_storage.create_date,
+                "is_encrypted_volume": str(block_storage.is_encrypted_volume).lower()
             }
 
             if block_storage.block_storage_disk_detail_type and\

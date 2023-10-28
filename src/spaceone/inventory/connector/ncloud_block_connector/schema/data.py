@@ -59,6 +59,7 @@ class Block(NCloudBlock):
 
 class BlockVPC(Block, NCloudBlockVPC):
     platform_code = StringType(default="vpc")
+    is_encrypted_volume = StringType(serialize_when_none=False)
 
     def reference(self):
         return {

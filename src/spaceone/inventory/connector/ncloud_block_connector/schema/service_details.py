@@ -1,4 +1,4 @@
-from spaceone.inventory.libs.schema.dynamic_field import TextDyField, EnumDyField, SizeField
+from spaceone.inventory.libs.schema.dynamic_field import TextDyField, EnumDyField, SizeField, DateTimeDyField
 from spaceone.inventory.libs.schema.dynamic_layout import ItemDynamicLayout
 from spaceone.inventory.libs.schema.resource import CloudServiceMeta
 
@@ -31,6 +31,11 @@ details = ItemDynamicLayout.set_fields('Details', fields=[
         "resource_type": "inventory.CloudService",
         "reference_key": "reference.resource_id"}),
     TextDyField.data_source('Server Name', 'data.server_name'),
-    TextDyField.data_source('Zone', 'data.zone_code'), ])
+    EnumDyField.data_source('Encrypted', 'data.is_encrypted_volume',
+                            default_badge={'indigo.500': ["true"],
+                                           'coral.600': ["false"]}),
+    TextDyField.data_source('Zone', 'data.zone_code'),
+    DateTimeDyField.data_source("Created", "data.create_date")
+])
 
 SERVICE_DETAILS = CloudServiceMeta.set_layouts([details])

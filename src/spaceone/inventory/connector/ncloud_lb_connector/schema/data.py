@@ -87,3 +87,23 @@ class LB(NCloudLB):
             "resource_id": self.load_balancer_instance_no,
             "external_link": f"https://console.ncloud.com/load-balancer/loadBalancer"
         }
+
+
+class LBVPC(LB):
+    load_balanced_server_instance_list = ListType(ModelType(LBServerInstance), serialize_when_none=False)
+    load_balanced_server_instance_count = IntType(serialize_when_none=False)
+
+    platform_code = StringType(default="vpc")
+
+    @property
+    def instance_type(self) -> str:
+        if self.network_usage_type:
+            return self.network_usage_type.get('code_name', None)
+        return None
+
+
+    def reference(self):
+        return {
+            "resource_id": self.load_balancer_instance_no,
+            "external_link": f"https://console.ncloud.com/vpc-load-balancer/loadBalancer"
+        }

@@ -2,7 +2,7 @@ import os
 
 from spaceone.inventory.conf.cloud_service_conf import *
 from spaceone.inventory.libs.common_parser import *
-from spaceone.inventory.libs.schema.dynamic_field import TextDyField, SearchField, EnumDyField, \
+from spaceone.inventory.libs.schema.dynamic_field import TextDyField, SearchField, EnumDyField, DateTimeDyField,\
     SizeField
 from spaceone.inventory.libs.schema.dynamic_widget import ChartWidget, CardWidget
 from spaceone.inventory.libs.schema.resource import CloudServiceTypeResource, CloudServiceTypeResponse, \
@@ -63,7 +63,11 @@ cst_block._metadata = CloudServiceTypeMeta.set_meta(
             "resource_type": "inventory.CloudService",
             "reference_key": "reference.resource_id"}),
         TextDyField.data_source('Server Name', 'data.server_name'),
+        EnumDyField.data_source('Encrypted', 'data.is_encrypted_volume',
+                                default_badge={'indigo.500': ["true"],
+                                               'coral.600': ["false"]}),
         TextDyField.data_source('Zone', 'data.zone_code'),
+        DateTimeDyField.data_source("Created", "data.create_date")
     ],
     search=[
         SearchField.set(name='Status', key='data.block_storage_instance_status_name'),

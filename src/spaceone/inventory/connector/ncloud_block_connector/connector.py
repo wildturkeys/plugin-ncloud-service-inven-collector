@@ -74,6 +74,7 @@ class BlockConnector(NCloudBaseConnector):
                 "server_instance_no": block_storage.server_instance_no,
                 "device_name": block_storage.device_name,
                 "max_iops_throughput": block_storage.max_iops_throughput,
+                "create_date": block_storage.create_date
             }
 
             if block_storage.disk_detail_type and block_storage.disk_detail_type.get("code_name"):
