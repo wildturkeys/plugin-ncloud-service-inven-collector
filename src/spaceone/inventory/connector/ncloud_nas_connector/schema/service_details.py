@@ -23,7 +23,7 @@ details = ItemDynamicLayout.set_fields('Details', fields=[
     TextDyField.data_source('Volume Use Ratio', 'data.volume_use_ratio'),
 
     TextDyField.data_source('Region', 'data.region_code'),
-    TextDyField.data_source('Zone', 'data.zone.zone_code'),
+    TextDyField.data_source('Zone', 'data.zone_code'),
 
     DateTimeDyField.data_source("Created", "data.create_date"),
     TextDyField.data_source('Mount Information', 'data.mount_information'),
@@ -56,8 +56,9 @@ acl_server = TableDynamicLayout.set_fields('ACL Server', root_path='data.nas_vol
                                             'hard shutting down', 'terminating', 'copying', 'repairing', ],
                                 'disable': ['stopped']}
                             ),
-    TextDyField.data_source('IP', 'zone.zone_code'),
-    TextDyField.data_source('Zone', 'private_ip'),
+    TextDyField.data_source('IP', 'private_ip'),
+    TextDyField.data_source('Zone', 'zone.zone_code'),
 ])
 
 SERVICE_DETAILS = CloudServiceMeta.set_layouts([details, snapshot, acl_server])
+# SERVICE_DETAILS = CloudServiceMeta.set_layouts([details, snapshot, acl_server])

@@ -3,6 +3,7 @@ from spaceone.inventory.connector.ncloud_block_connector.connector_vpc import Bl
 from spaceone.inventory.connector.ncloud_lb_connector.connector import LbConnector
 from spaceone.inventory.connector.ncloud_lb_connector.connector_vpc import LbVPCConnector
 from spaceone.inventory.connector.ncloud_nas_connector.connector import NasConnector
+from spaceone.inventory.connector.ncloud_nas_connector.connector_vpc import NasVPCConnector
 from spaceone.inventory.connector.ncloud_server_connector.connector import ServerConnector
 from spaceone.inventory.connector.ncloud_server_connector.connector_vpc import ServerVPCConnector
 from spaceone.inventory.connector.ncloud_vpc_connector.connector import VpcConnector
