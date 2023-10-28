@@ -80,6 +80,7 @@ class NCloudNasVolumeVPC(NcloudNasVolume):
     nas_volume_instance_no = StringType(serialize_when_none=False)
     volume_name = StringType(serialize_when_none=False)
     zone_code = StringType(serialize_when_none=False)
+    nas_volume_server_instance_no_list = DictType(StringType, serialize_when_none=False)
 
 class NasVolume(NcloudNasVolume):
     nas_volume_server_instance_list = ListType(ModelType(NCloudServer), serialize_when_none=False)
