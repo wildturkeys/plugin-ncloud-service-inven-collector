@@ -98,7 +98,7 @@ class LBListener(Model):
 
     load_balancer_instance_name = StringType(serialize_when_none=False)
     load_balancer_instance_no = StringType(serialize_when_none=False)
-    load_balancer_instance_port = IntType(serialize_when_none=False)
+    load_balancer_instance_port = StringType(serialize_when_none=False)
     load_balancer_instance_status_name = StringType(serialize_when_none=False)
     protocol_type = StringType(serialize_when_none=False)
 
