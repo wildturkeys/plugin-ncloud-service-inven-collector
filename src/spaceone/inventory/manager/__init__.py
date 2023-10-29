@@ -7,3 +7,5 @@ from spaceone.inventory.manager.ncloud_nas_manager import NasVPCConnectorManager
 from spaceone.inventory.manager.ncloud_server_manager import ServerConnectorManager
 from spaceone.inventory.manager.ncloud_server_manager import ServerVPCConnectorManager
 from spaceone.inventory.manager.ncloud_vpc_manager import VpcConnectorManager
+from spaceone.inventory.manager.ncloud_clouddb_manager import CloudDBConnectorManager
+

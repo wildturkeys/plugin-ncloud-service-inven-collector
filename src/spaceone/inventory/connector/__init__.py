@@ -7,3 +7,5 @@ from spaceone.inventory.connector.ncloud_nas_connector.connector_vpc import NasV
 from spaceone.inventory.connector.ncloud_server_connector.connector import ServerConnector
 from spaceone.inventory.connector.ncloud_server_connector.connector_vpc import ServerVPCConnector
 from spaceone.inventory.connector.ncloud_vpc_connector.connector import VpcConnector
+from spaceone.inventory.connector.ncloud_clouddb_connector.connector import CloudDBConnector
+

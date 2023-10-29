@@ -15,7 +15,9 @@ CLOUD_SERVICE_GROUP_MAP = {
     'LB_VPC': 'LbVPCConnectorManager',
     'Block': 'BlockConnectorManager',
     'BlockVPC': 'BlockVPCConnectorManager',
-    'VPC': 'VpcConnectorManager'
+    'VPC': 'VpcConnectorManager',
+    'CloudDB':'CloudDBConnectorManager'
+
 }
 
 INSTANCE_STATE_MAP = {
