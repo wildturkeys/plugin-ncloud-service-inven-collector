@@ -167,7 +167,6 @@ class LbConnector(NCloudBaseConnector):
             server_health_check_status_list = load_balanced_server_instance.get("server_health_check_status_list", [])
 
             for server_health_check_status in server_health_check_status_list:
-
                 lb_listener_obj = LBListener()
 
                 lb_listener_obj.load_balancer_instance_name = load_balancer_instance_name
@@ -183,7 +182,6 @@ class LbConnector(NCloudBaseConnector):
                 lb_listener_obj.server_instance_no = server_instance.get("server_instance_no")
                 lb_listener_obj.server_instance_port = str(server_health_check_status.get("server_port"))
                 lb_listener_obj.server_instance_status_name = server_instance.get("server_instance_status_name")
-
 
                 rtn_list.append(lb_listener_obj)
 

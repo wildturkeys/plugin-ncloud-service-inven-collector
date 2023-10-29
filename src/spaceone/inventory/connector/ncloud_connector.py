@@ -211,3 +211,48 @@ class NCloudBaseConnector(BaseConnector):
             _LOGGER.error(e)
             _LOGGER.error(traceback.format_exc())
             raise
+
+    def _list_ncloud_raw_resources(self, request_api, request_model, response_key: str, **kwargs) -> List:
+
+        try:
+
+            response = request_api(request_model(**kwargs))
+
+            return getattr(response, response_key)
+
+        except self._api_exception_cls as e:
+            _LOGGER.error(e)
+            raise
+
+        except Exception as e:
+            _LOGGER.error(e)
+            _LOGGER.error(traceback.format_exc())
+            raise
+
+    def _list_ncloud_raw_resources_ex(self, ncloud_cls, v2_api_cls, exception_cls, request_api: str, request_model,
+                                      response_key: str,
+                                      **kwargs) -> List:
+
+        try:
+
+            configuration = ncloud_cls.Configuration()
+            configuration.access_key = self.secret_data.get('access_key')
+            configuration.secret_key = self.secret_data.get('secret_key')
+
+            client = ncloud_cls.ApiClient(configuration)
+
+            api = v2_api_cls(client)
+            request_api = getattr(api, request_api)
+            api_response = request_api(request_model(**kwargs))
+
+            return getattr(api_response, response_key)
+
+
+        except exception_cls as e:
+            _LOGGER.error(e)
+            raise
+
+        except Exception as e:
+            _LOGGER.error(e)
+            _LOGGER.error(traceback.format_exc())
+            raise

@@ -25,8 +25,6 @@ details = ItemDynamicLayout.set_fields('Details', fields=[
 
 listeners = TableDynamicLayout.set_fields('Listener', root_path='data.load_balancer_listener_list',
                                           fields=[
-                                              TextDyField.data_source('L7 Health Check Path',
-                                                                      'health_check_path'),
                                               EnumDyField.data_source('Protocol', 'protocol_type',
                                                                       default_outline_badge=['http', 'https',
                                                                                              'udp', 'tcp',
@@ -35,9 +33,10 @@ listeners = TableDynamicLayout.set_fields('Listener', root_path='data.load_balan
                                               TextDyField.data_source('Server Port', 'server_instance_port'),
                                               EnumDyField.data_source('LB Status',
                                                                       'load_balancer_instance_status_name',
-                                                                      default_badge={'indigo.500': ['true'],
-                                                                                     'coral.600': ['false']}
+                                                                      default_badge={'indigo.500': ['true', 'up'],
+                                                                                     'coral.600': ['false', 'down']}
                                                                       ),
+                                              TextDyField.data_source('L7 Health Check Path', 'health_check_path'),
                                               TextDyField.data_source('Server ID', 'server_instance_no', reference={
                                                   "resource_type": "inventory.CloudService",
                                                   "reference_key": "reference.resource_id"}),
