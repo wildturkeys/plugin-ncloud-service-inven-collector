@@ -56,6 +56,8 @@ acl_server = TableDynamicLayout.set_fields('ACL Server', root_path='data.nas_vol
                                             'hard shutting down', 'terminating', 'copying', 'repairing', ],
                                 'disable': ['stopped']}
                             ),
+    TextDyField.data_source('No','server_instance_no', reference={"resource_type": "inventory.CloudService",
+                                                                  "reference_key": "reference.resource_id"}),
     TextDyField.data_source('IP', 'private_ip'),
     TextDyField.data_source('Zone', 'zone.zone_code'),
 ])

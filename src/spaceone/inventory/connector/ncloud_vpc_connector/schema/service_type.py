@@ -30,6 +30,9 @@ cst_vpc.tags = {
 
 cst_vpc._metadata = CloudServiceTypeMeta.set_meta(
     fields=[
+        EnumDyField.data_source('Platform', 'data.platform_code', default_badge={
+            'indigo.500': ['classic'], 'coral.600': ['vpc']
+        }),
         EnumDyField.data_source('Status', 'data.vpc_status.code',
                                 default_state={
                                     'safe': ['RUN'],

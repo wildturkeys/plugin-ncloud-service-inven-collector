@@ -7,6 +7,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class NcloudVPC(Model):
+    platform_code = StringType(default="vpc")
     create_date = DateTimeType()
     ipv4_cidr_block = StringType(serialize_when_none=False)
     region_code = StringType(serialize_when_none=False)

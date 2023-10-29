@@ -12,6 +12,8 @@ from spaceone.inventory.connector.ncloud_vpc_connector.schema.data import VPC, N
 from spaceone.inventory.connector.ncloud_vpc_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_vpc_connector.schema.service_type import CLOUD_SERVICE_TYPES
 from spaceone.inventory.libs.schema.resource import CloudServiceResponse
+from spaceone.inventory.conf.cloud_service_conf import API_TYPE_VPC
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -25,21 +27,32 @@ class VpcConnector(NCloudBaseConnector):
     _ncloud_cls = ncloud_vpc
     _ncloud_api_v2 = V2Api
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.api_type = API_TYPE_VPC
+
     def get_resources(self) -> List[Type[CloudServiceResponse]]:
 
         resources = []
 
         resources.extend(self.cloud_service_types)
-        resources.extend(self._convert_cloud_service_response(self.list_vpc_instances()))
+        for region in self.regions:
+            resources.extend(self._convert_cloud_service_response(self.list_vpc_instances(
+                NcloudVPC, VPC, region_code=region.get('region_code')
+            )))
+
+        # resources.extend(self._convert_cloud_service_response(self.list_vpc_instances()))
 
         return resources
 
-    def list_vpc_instances(self, **kwargs) -> Iterator:
+    def list_vpc_instances(self, ncloud_nas_vpc_cls:Type[NcloudVPC],
+                           response_vpc_cls: Type[VPC], **kwargs) -> Iterator:
 
         try:
 
             response = self.api_client_v2.get_vpc_list(
-                ncloud_vpc.GetVpcListRequest())
+                self._ncloud_cls.GetVpcListRequest(**kwargs))
 
             response_dict = response.to_dict()
 
@@ -50,7 +63,7 @@ class VpcConnector(NCloudBaseConnector):
 
                 for vpc_instance in response_dict.get("vpc_list"):
 
-                    vpc = VPC(self._create_model_obj(NcloudVPC, vpc_instance))
+                    vpc = response_vpc_cls(self._create_model_obj(ncloud_nas_vpc_cls, vpc_instance))
                     # vpc.acl = _acl_instances
 
                     if hasattr(vpc, "vpc_no"):
@@ -70,13 +83,15 @@ class VpcConnector(NCloudBaseConnector):
 
     def _list_nat_gateway_instance(self, **kwargs) -> List[Type[NcloudNatGateway]]:
         return self._list_ncloud_resources(self.api_client_v2.get_nat_gateway_instance_list,
-                                           ncloud_vpc.GetNatGatewayInstanceListRequest,
+                                           self._ncloud_cls.GetNatGatewayInstanceListRequest,
                                            "nat_gateway_instance_list", NcloudNatGateway, **kwargs)
 
     def _list_subnet_instance(self, **kwargs) -> List[Type[NcloudSubnet]]:
-        return self._list_ncloud_resources(self.api_client_v2.get_subnet_list, ncloud_vpc.GetSubnetListRequest,
+        return self._list_ncloud_resources(self.api_client_v2.get_subnet_list,
+                                           self._ncloud_cls.GetSubnetListRequest,
                                            "subnet_list", NcloudSubnet, **kwargs)
 
     def _list_acl_instance(self, **kwargs) -> List[Type[NcloudACL]]:
-        return self._list_ncloud_resources(self.api_client_v2.get_network_acl_list, ncloud_vpc.GetNetworkAclListRequest,
+        return self._list_ncloud_resources(self.api_client_v2.get_network_acl_list,
+                                           self._ncloud_cls.GetNetworkAclListRequest,
                                            "network_acl_list", NcloudACL, **kwargs)
