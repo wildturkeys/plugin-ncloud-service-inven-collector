@@ -1,7 +1,7 @@
 import logging
 
 from schematics import Model
-from schematics.types import StringType, IntType, DictType, DateTimeType, BooleanType
+from schematics.types import StringType, IntType, DictType, DateTimeType, BooleanType, ListType, ModelType
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -17,6 +17,22 @@ _LOGGER = logging.getLogger(__name__)
 # region_no	str		[optional]
 # region_code	str		[optional]
 # region_name	str		[optional]
+
+
+
+class NCloudServer(Model):
+    cloud_db_server_instance_no = StringType(serialize_when_none=False)
+    cloud_db_server_instance_status_name = StringType(serialize_when_none=False)
+    cloud_db_server_name = StringType(serialize_when_none=False)
+    cloud_db_server_role = DictType(StringType, serialize_when_none=False) # code, code_name
+    create_date = DateTimeType()
+    data_storage_size = IntType(serialize_when_none=False)
+    private_dns_name = StringType(serialize_when_none=False)
+    uptime = DateTimeType()
+    used_data_storage_size = IntType(serialize_when_none=False)
+
+    # 'cloud_db_server_instance_list'
+
 
 class NcloudCloudDB(Model):
     cloud_db_instance_no = StringType(serialize_when_none=False)
@@ -51,6 +67,7 @@ class NcloudCloudDB(Model):
 
 class CloudDB(NcloudCloudDB):
     platform_code = StringType(default="classic")
+    cloud_db_server_instance_list = ListType(ModelType(NCloudServer), serialize_when_none=False)
 
     @property
     def name(self) -> str:

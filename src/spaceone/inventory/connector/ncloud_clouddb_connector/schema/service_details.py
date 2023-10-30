@@ -27,5 +27,25 @@ details = ItemDynamicLayout.set_fields('Details', fields=[
 
 
     ])
+db_server = TableDynamicLayout.set_fields('DB Server', root_path='cloud_db_server_instance_list', fields=[
+    TextDyField.data_source('Name', 'cloud_db_server_name'),
+    EnumDyField.data_source('Status', 'cloud_db_server_instance_status_name',
+                            default_state={
+                                'safe': ['running'],
+                                'available': ['init', 'creating', 'booting', 'setting up', 'changingSpec'],
+                                'warning': ['warning', 'rebooting', 'hard rebooting', 'shutting down',
+                                            'hard shutting down', 'terminating', 'copying', 'repairing', ],
+                                'disable': ['stopped']}
+                            ),
+    EnumDyField.data_source('Server Role','cloud_db_server_role.code_name',
+                            default_badge={'indigo.500': ['Master'],
+                                           'coral.600': ['Standby Master']}),
+    DateTimeDyField.data_source('Created','create_date'),
+    TextDyField.data_source('No', 'cloud_db_server_instance_no'),
+    TextDyField.data_source('Storage Size','data_storage_size'),
+    TextDyField.data_source('Used Storage Size', 'used_data_storage_size'),
+    DateTimeDyField.data_source('Uptime','uptime'),
 
-SERVICE_DETAILS = CloudServiceMeta.set_layouts([details])
+])
+
+SERVICE_DETAILS = CloudServiceMeta.set_layouts([details, db_server])

@@ -7,7 +7,7 @@ from ncloud_clouddb.api.v2_api import V2Api
 from ncloud_clouddb.rest import ApiException
 
 from spaceone.inventory.connector.ncloud_connector import NCloudBaseConnector
-from spaceone.inventory.connector.ncloud_clouddb_connector.schema.data import NcloudCloudDB, CloudDB
+from spaceone.inventory.connector.ncloud_clouddb_connector.schema.data import NcloudCloudDB, CloudDB, NCloudServer
 from spaceone.inventory.connector.ncloud_clouddb_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_clouddb_connector.schema.service_type import CLOUD_SERVICE_TYPES
 from spaceone.inventory.libs.schema.resource import CloudServiceResponse
@@ -43,7 +43,8 @@ class CloudDBConnector(NCloudBaseConnector):
             resources.extend(
                 self._convert_cloud_service_response(self.list_cloud_db_instances(NcloudCloudDB,
                                                                                   CloudDB,
-                                                                                  db_kind_code='MYSQL')))
+                                                                                  db_kind_code='MYSQL',
+                                                                                  )))
 
         return resources
 
@@ -61,5 +62,18 @@ class CloudDBConnector(NCloudBaseConnector):
                 region_code = cloud_db_instance.get("region").get("region_code")
                 cloud_db = response_cloud_db_cls(self._create_model_obj(ncloud_cloud_db_cls, cloud_db_instance))
                 cloud_db.region_code = region_code
+
+                cloud_db.cloud_db_server_instance_list = self._list_server_instances(
+                    cloud_db_instance.get("cloud_db_server_instance_list")
+                )
                 yield cloud_db
 
+    def _list_server_instances(self, server_instances, **kwargs) -> List[Type[NCloudServer]]:
+
+        resources_list = []
+
+        for server_instance in server_instances:
+            server = NCloudServer(self._create_model_obj(NCloudServer, server_instance))
+            resources_list.append(server)
+
+        return resources_list
