@@ -20,7 +20,7 @@ cst_cloud_db.service_code = 'ncloudCloudDB'
 cst_cloud_db.is_primary = True
 cst_cloud_db.is_major = True
 cst_cloud_db.tags = {
-    'spaceone:icon': f'{ASSET_URL}/Storage.svg',
+    'spaceone:icon': f'{ASSET_URL}/Database.svg',
 }
 
 
