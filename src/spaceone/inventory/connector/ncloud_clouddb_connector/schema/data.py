@@ -29,19 +29,19 @@ class NcloudCloudDB(Model):
     license_code =StringType(serialize_when_none=False)
     cloud_db_port = IntType(serialize_when_none=False)
     is_ha = BooleanType(serialize_when_none=False)
-    backup_time=StringType(serialize_when_none=False) #확인 필요
+    backup_time= StringType(serialize_when_none=False) #확인 필요
     backup_file_retention_period = IntType(serialize_when_none=False)
     cloud_db_instance_status_name =StringType(serialize_when_none=False)
-    collation =StringType(serialize_when_none=False)
+    collation = StringType(serialize_when_none=False)
     reboot_schedule_time =StringType(serialize_when_none=False)
     create_date = DateTimeType()
     cloud_db_image_product_code	=StringType(serialize_when_none=False)
     cloud_db_product_code	=StringType(serialize_when_none=False)
     is_cloud_db_config_need_reboot=BooleanType(serialize_when_none=False)
     is_cloud_db_need_reboot	=BooleanType(serialize_when_none=False)
-    # zone	Zone	Zone	[optional]
-
-    # region	Region	리전	[optional]
+    zone = DictType(StringType, serialize_when_none=False)
+    region = DictType(StringType, serialize_when_none=False)
+    region_code = StringType(serialize_when_none=False)
 
     # cloud_db_config_list	list[CloudDBConfig]		[optional]
     # cloud_db_config_group_list	list[CloudDBConfigGroup]		[optional]
@@ -50,6 +50,7 @@ class NcloudCloudDB(Model):
 
 
 class CloudDB(NcloudCloudDB):
+    platform_code = StringType(default="classic")
 
     @property
     def name(self) -> str:

@@ -26,7 +26,20 @@ cst_cloud_db.tags = {
 
 cst_cloud_db._metadata = CloudServiceTypeMeta.set_meta(
     fields=[
-        TextDyField.data_source('No', 'data.cloud_db_instance_no')
+        EnumDyField.data_source('Platform', 'data.platform_code', default_badge={
+            'indigo.500': ['classic'], 'coral.600': ['vpc']
+        }),
+
+        TextDyField.data_source('Kind', 'data.db_kind_code',
+                                default_outline_badge=['MYSQL', 'MSSQL',
+                                                       'REDIS']),
+        TextDyField.data_source('No', 'data.cloud_db_instance_no'),
+        TextDyField.data_source('Status','data.cloud_db_instance_status_name', default_state={
+            'safe': ['created', 'running'], #확인필요
+            'disable': ['terminated']
+        }),
+        DateTimeDyField.data_source("Created", "data.create_date"),
+        TextDyField.data_source('Zone', 'data.zone.zone_name'),
 
     ],
     search=[

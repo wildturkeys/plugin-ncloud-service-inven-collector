@@ -58,7 +58,8 @@ class CloudDBConnector(NCloudBaseConnector):
         if response_dict.get("cloud_db_instance_list"):
 
             for cloud_db_instance in response_dict.get("cloud_db_instance_list"):
+                region_code = cloud_db_instance.get("region").get("region_code")
                 cloud_db = response_cloud_db_cls(self._create_model_obj(ncloud_cloud_db_cls, cloud_db_instance))
-
+                cloud_db.region_code = region_code
                 yield cloud_db
 
