@@ -9,8 +9,13 @@ from spaceone.inventory.libs.schema.resource import CloudServiceTypeResource, Cl
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 
+
 instance_total_count_conf = os.path.join(current_dir, 'widget/instance_total_count.yaml')
+
+count_by_region_conf = os.path.join(current_dir, 'widget/count_by_region.yaml')
+count_by_project_conf = os.path.join(current_dir, 'widget/count_by_project.yaml')
 count_by_type_conf = os.path.join(current_dir, 'widget/count_by_type.yaml')
+
 
 cst_lb = CloudServiceTypeResource()
 cst_lb.name = 'Load Balancer'
@@ -52,6 +57,8 @@ cst_lb._metadata = CloudServiceTypeMeta.set_meta(
     ],
     widget=[
         CardWidget.set(**get_data_from_yaml(instance_total_count_conf)),
+        ChartWidget.set(**get_data_from_yaml(count_by_region_conf)),
+        ChartWidget.set(**get_data_from_yaml(count_by_project_conf)),
         ChartWidget.set(**get_data_from_yaml(count_by_type_conf)),
     ]
 )

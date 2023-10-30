@@ -1,15 +1,20 @@
 ---
 cloud_service_group: Networking
 cloud_service_type: Load Balancer
-name: Count By Type
+name: Count By Region
 query:
   aggregate:
     - group:
         keys:
           - name: name
-            key: data.load_balancer_network_type
+            key: region_code
         fields:
           - name: value
             operator: count
 options:
-  chart_type: DONUT
+  chart_type: COLUMN
+  name_options:
+    key: name
+    reference:
+      resource_type: inventory.Region
+      reference_key: region_code
