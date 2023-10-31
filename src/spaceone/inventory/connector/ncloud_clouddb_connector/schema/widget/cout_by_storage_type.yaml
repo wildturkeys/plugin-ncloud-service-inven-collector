@@ -1,0 +1,15 @@
+---
+cloud_service_group: Database
+cloud_service_type: CloudDB
+name: Count By Storage Type
+query:
+  aggregate:
+    - group:
+        keys:
+          - name: name
+            key: data.data_storage_type
+        fields:
+          - name: value
+            operator: count
+options:
+  chart_type: DONUT

@@ -27,7 +27,7 @@ details = ItemDynamicLayout.set_fields('Details', fields=[
 
 
     ])
-db_server = TableDynamicLayout.set_fields('DB Server', root_path='cloud_db_server_instance_list', fields=[
+db_server = TableDynamicLayout.set_fields('DB Server', root_path='data.cloud_db_server_instance_list', fields=[
     TextDyField.data_source('Name', 'cloud_db_server_name'),
     EnumDyField.data_source('Status', 'cloud_db_server_instance_status_name',
                             default_state={
@@ -38,8 +38,7 @@ db_server = TableDynamicLayout.set_fields('DB Server', root_path='cloud_db_serve
                                 'disable': ['stopped']}
                             ),
     EnumDyField.data_source('Server Role','cloud_db_server_role.code_name',
-                            default_badge={'indigo.500': ['Master'],
-                                           'coral.600': ['Standby Master']}),
+                            default_outline_badge=['Master', 'Standby Master', 'Hidden Master']),
     DateTimeDyField.data_source('Created','create_date'),
     TextDyField.data_source('No', 'cloud_db_server_instance_no'),
     TextDyField.data_source('Storage Size','data_storage_size'),
@@ -48,4 +47,13 @@ db_server = TableDynamicLayout.set_fields('DB Server', root_path='cloud_db_serve
 
 ])
 
-SERVICE_DETAILS = CloudServiceMeta.set_layouts([details, db_server])
+access_control_group = TableDynamicLayout.set_fields('Access Control Group', root_path='data.access_control_group_list', fields=[
+    TextDyField.data_source('Name','access_control_group_name'),
+    TextDyField.data_source('No','access_control_group_configuration_no'),
+    TextDyField.data_source('Description','access_control_group_description'),
+    DateTimeDyField.data_source('Created','create_date'),
+    TextDyField.data_source('Is Default','is_default')
+
+    ])
+
+SERVICE_DETAILS = CloudServiceMeta.set_layouts([details, db_server, access_control_group])

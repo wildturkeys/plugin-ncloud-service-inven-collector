@@ -18,6 +18,12 @@ _LOGGER = logging.getLogger(__name__)
 # region_code	str		[optional]
 # region_name	str		[optional]
 
+class NCloudAccessControlGroup(Model):
+    access_control_group_configuration_no =StringType(serialize_when_none=False)
+    access_control_group_description = StringType(serialize_when_none=False)
+    access_control_group_name= StringType(serialize_when_none=False)
+    create_date = DateTimeType()
+    is_default = BooleanType(serialize_when_none=False)
 
 
 class NCloudServer(Model):
@@ -67,7 +73,9 @@ class NcloudCloudDB(Model):
 
 class CloudDB(NcloudCloudDB):
     platform_code = StringType(default="classic")
+
     cloud_db_server_instance_list = ListType(ModelType(NCloudServer), serialize_when_none=False)
+    access_control_group_list = ListType(ModelType(NCloudAccessControlGroup), serialize_when_none=False)
 
     @property
     def name(self) -> str:

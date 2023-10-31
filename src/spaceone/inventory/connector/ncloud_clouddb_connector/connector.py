@@ -7,7 +7,7 @@ from ncloud_clouddb.api.v2_api import V2Api
 from ncloud_clouddb.rest import ApiException
 
 from spaceone.inventory.connector.ncloud_connector import NCloudBaseConnector
-from spaceone.inventory.connector.ncloud_clouddb_connector.schema.data import NcloudCloudDB, CloudDB, NCloudServer
+from spaceone.inventory.connector.ncloud_clouddb_connector.schema.data import NcloudCloudDB, CloudDB, NCloudServer, NCloudAccessControlGroup
 from spaceone.inventory.connector.ncloud_clouddb_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_clouddb_connector.schema.service_type import CLOUD_SERVICE_TYPES
 from spaceone.inventory.libs.schema.resource import CloudServiceResponse
@@ -43,9 +43,19 @@ class CloudDBConnector(NCloudBaseConnector):
             resources.extend(
                 self._convert_cloud_service_response(self.list_cloud_db_instances(NcloudCloudDB,
                                                                                   CloudDB,
-                                                                                  db_kind_code='MYSQL',
+                                                                                  db_kind_code='MYSQL', region_no='1'
                                                                                   )))
 
+            # resources.extend(
+            #     self._convert_cloud_service_response(self.list_cloud_db_instances(NcloudCloudDB,
+            #                                                                       CloudDB,
+            #                                                                       db_kind_code='MSSQL',
+            #                                                                       )))
+            # resources.extend(
+            #     self._convert_cloud_service_response(self.list_cloud_db_instances(NcloudCloudDB,
+            #                                                                       CloudDB,
+            #                                                                       db_kind_code='REDIS',
+            #                                                                       )))
         return resources
 
     def list_cloud_db_instances(self, ncloud_cloud_db_cls:Type[NcloudCloudDB],
@@ -66,6 +76,9 @@ class CloudDBConnector(NCloudBaseConnector):
                 cloud_db.cloud_db_server_instance_list = self._list_server_instances(
                     cloud_db_instance.get("cloud_db_server_instance_list")
                 )
+                cloud_db.access_control_group_list = self._list_access_control_group_instances(
+                    cloud_db_instance.get("access_control_group_list")
+                )
                 yield cloud_db
 
     def _list_server_instances(self, server_instances, **kwargs) -> List[Type[NCloudServer]]:
@@ -74,6 +87,16 @@ class CloudDBConnector(NCloudBaseConnector):
 
         for server_instance in server_instances:
             server = NCloudServer(self._create_model_obj(NCloudServer, server_instance))
+            resources_list.append(server)
+
+        return resources_list
+
+    def _list_access_control_group_instances(self, access_control_group_instances, **kwargs) -> List[Type[NCloudAccessControlGroup]]:
+
+        resources_list = []
+
+        for access_control_group_instance in access_control_group_instances:
+            server = NCloudAccessControlGroup(self._create_model_obj(NCloudAccessControlGroup, access_control_group_instance))
             resources_list.append(server)
 
         return resources_list
