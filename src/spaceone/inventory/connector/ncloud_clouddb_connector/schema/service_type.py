@@ -11,9 +11,11 @@ from spaceone.inventory.libs.schema.resource import CloudServiceTypeResource, Cl
 current_dir = os.path.abspath(os.path.dirname(__file__))
 
 total_instance_count_conf = os.path.join(current_dir, 'widget/total_instance_count.yaml')
+# total_cpu_count_conf = os.path.join(current_dir, 'widget/total_cpu_count.yaml')
 
 count_by_region_conf = os.path.join(current_dir,'widget/count_by_region.yaml')
 count_by_project_conf = os.path.join(current_dir,'widget/count_by_project.yaml')
+# count_by_storage_type_conf = os.path.join(current_dir,'widget/count_by_storage_type.yaml')
 
 
 cst_cloud_db = CloudServiceTypeResource()
@@ -52,9 +54,11 @@ cst_cloud_db._metadata = CloudServiceTypeMeta.set_meta(
     ],
     widget=[
         CardWidget.set(**get_data_from_yaml(total_instance_count_conf)),
+        # CardWidget.set(**get_data_from_yaml(total_cpu_count_conf)),
 
         ChartWidget.set(**get_data_from_yaml(count_by_region_conf)),
         ChartWidget.set(**get_data_from_yaml(count_by_project_conf)),
+        # ChartWidget.set(**get_data_from_yaml(count_by_storage_type_conf))
     ]
 
 
