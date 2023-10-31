@@ -40,7 +40,7 @@ cst_cloud_db._metadata = CloudServiceTypeMeta.set_meta(
         TextDyField.data_source('Kind', 'data.db_kind_code',
                                 default_outline_badge=['MYSQL', 'MSSQL',
                                                        'REDIS']),
-        TextDyField.data_source('No', 'data.cloud_db_instance_no'),
+        TextDyField.data_source('Cloud DB ID', 'data.cloud_db_instance_no'),
         TextDyField.data_source('Status','data.cloud_db_instance_status_name', default_state={
             'safe': ['created', 'running'], #확인필요
             'disable': ['terminated']

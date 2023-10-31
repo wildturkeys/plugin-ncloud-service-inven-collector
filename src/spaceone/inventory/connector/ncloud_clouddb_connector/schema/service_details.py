@@ -9,7 +9,7 @@ details = ItemDynamicLayout.set_fields('Details', fields=[
     TextDyField.data_source('Kind', 'data.db_kind_code',
                             default_outline_badge=['MYSQL', 'MSSQL',
                                                    'REDIS']),
-    TextDyField.data_source('No', 'data.cloud_db_instance_no'),
+    TextDyField.data_source('Cloud DB ID', 'data.cloud_db_instance_no'),
     EnumDyField.data_source('Status', 'data.cloud_db_instance_status_name', default_state={
         'safe': ['created', 'running'],  # 확인필요
         'disable': ['terminated']
@@ -40,7 +40,7 @@ db_server = TableDynamicLayout.set_fields('DB Server', root_path='data.cloud_db_
     EnumDyField.data_source('Server Role','cloud_db_server_role.code_name',
                             default_outline_badge=['Master', 'Standby Master', 'Hidden Master']),
     DateTimeDyField.data_source('Created','create_date'),
-    TextDyField.data_source('No', 'cloud_db_server_instance_no'),
+    TextDyField.data_source('Server ID', 'cloud_db_server_instance_no'),
     TextDyField.data_source('Storage Size','data_storage_size'),
     TextDyField.data_source('Used Storage Size', 'used_data_storage_size'),
     DateTimeDyField.data_source('Uptime','uptime'),
@@ -49,7 +49,6 @@ db_server = TableDynamicLayout.set_fields('DB Server', root_path='data.cloud_db_
 
 access_control_group = TableDynamicLayout.set_fields('Access Control Group', root_path='data.access_control_group_list', fields=[
     TextDyField.data_source('Name','access_control_group_name'),
-    TextDyField.data_source('No','access_control_group_configuration_no'),
     TextDyField.data_source('Description','access_control_group_description'),
     DateTimeDyField.data_source('Created','create_date'),
     TextDyField.data_source('Is Default','is_default')

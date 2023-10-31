@@ -13,7 +13,7 @@ details = ItemDynamicLayout.set_fields('Details', fields=[
                                 'safe': ['created'],
                                 'disable': ['terminated']
                             }),
-    TextDyField.data_source('No', 'data.nas_volume_instance_no'),
+    TextDyField.data_source('Nas Volume ID', 'data.nas_volume_instance_no'),
     SizeField.data_source('Volume Total Size', 'data.volume_size', type="size",
                           options={"source_unit": "BYTES", "display_unit": "GB"}),
     SizeField.data_source('Volume Size', 'data.volume_size', type="size",
@@ -56,7 +56,7 @@ acl_server = TableDynamicLayout.set_fields('ACL Server', root_path='data.nas_vol
                                             'hard shutting down', 'terminating', 'copying', 'repairing', ],
                                 'disable': ['stopped']}
                             ),
-    TextDyField.data_source('No','server_instance_no', reference={"resource_type": "inventory.CloudService",
+    TextDyField.data_source('Server ID','server_instance_no', reference={"resource_type": "inventory.CloudService",
                                                                   "reference_key": "reference.resource_id"}),
     TextDyField.data_source('IP', 'private_ip'),
     TextDyField.data_source('Zone', 'zone.zone_code'),

@@ -3,7 +3,7 @@ from spaceone.inventory.libs.schema.dynamic_layout import ItemDynamicLayout, Tab
 from spaceone.inventory.libs.schema.resource import CloudServiceMeta
 
 details = ItemDynamicLayout.set_fields('Details', fields=[
-    TextDyField.data_source("No", "data.vpc_no"),
+    TextDyField.data_source("VPC ID", "data.vpc_no"),
     TextDyField.data_source("Name", "data.vpc_name"),
     EnumDyField.data_source("Status", "data.vpc_status.code.code",
                             default_state={
