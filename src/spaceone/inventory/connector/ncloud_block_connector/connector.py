@@ -87,7 +87,10 @@ class BlockConnector(NCloudBaseConnector):
                 dic["zone_code"] = block_storage.zone.get('zone_code')
 
             if block_storage.region and block_storage.region.get('code_name'):
-                dic["region_coder"] = block_storage.region.get('code_name')
+                dic["region_code"] = block_storage.region.get('code_name')
+
+            if block_storage.server_name:
+                dic["server_name"] = block_storage.server_name
 
             rtn_list.append(Block(dic))
 

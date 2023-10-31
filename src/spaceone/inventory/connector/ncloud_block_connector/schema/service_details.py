@@ -7,7 +7,7 @@ details = ItemDynamicLayout.set_fields('Details', fields=[
     EnumDyField.data_source('Platform', 'data.platform_code', default_badge={
         'indigo.500': ['classic'], 'coral.600': ['vpc']
     }),
-    TextDyField.data_source('Name', 'data.block_storage_instance_name'),
+    TextDyField.data_source('Name', 'data.block_storage_name'),
     SizeField.data_source('Size(GB)', 'data.block_storage_size', options={
         'display_unit': 'GB',
         'source_unit': 'Byte'
