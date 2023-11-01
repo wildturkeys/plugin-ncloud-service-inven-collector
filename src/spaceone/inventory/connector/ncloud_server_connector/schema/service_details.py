@@ -4,6 +4,10 @@ from spaceone.inventory.libs.schema.resource import CloudServiceMeta
 
 # TAB
 details = ItemDynamicLayout.set_fields('Details', fields=[
+    TextDyField.data_source('Name', 'data.server_name'),
+    EnumDyField.data_source('Platform', 'data.platform_code', default_badge={
+                'indigo.500': ['classic'], 'coral.600': ['vpc']
+            }),
     EnumDyField.data_source('Status', 'data.server_instance_status_name',
                             default_state={
                                 'safe': ['running'],
@@ -18,6 +22,7 @@ details = ItemDynamicLayout.set_fields('Details', fields=[
                           options={"source_unit": "BYTES", "display_unit": "GB"}),
     TextDyField.data_source('Instance Type', 'data.server_instance_type.code_name'),
     TextDyField.data_source('Image', 'data.server_image_name'),
+    TextDyField.data_source('OS', 'data.os.os_distro'),
     TextDyField.data_source('Zone', 'data.zone_code'),
     TextDyField.data_source('Region', 'data.region_code'),
     DateTimeDyField.data_source("Created", "data.create_date"),
