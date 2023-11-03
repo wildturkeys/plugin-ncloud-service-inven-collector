@@ -24,7 +24,7 @@ subnet = TableDynamicLayout.set_fields('Subnet', root_path='data.subnet',
                                                                    default_badge={'indigo.500': ['Public'],
                                                                                   'coral.600': ['Private']}
                                                                    ),
-                                           TextDyField.data_source('No', 'subnet_no'),
+                                           TextDyField.data_source('Subnet ID', 'subnet_no'),
                                            EnumDyField.data_source('Usage Type', 'usage_type.code_name',
                                                                    default_outline_badge=['General',
                                                                                           'LoadBalancer Only',
@@ -48,7 +48,7 @@ acl = TableDynamicLayout.set_fields('Network ACL', root_path='data.acl',
                                                                     'safe': ['RUN'],
                                                                     'available': ['SET', 'INIT'],
                                                                     'disable': ['TERMTING']}),
-                                        TextDyField.data_source('No', 'network_acl_no'),
+                                        TextDyField.data_source('Network ACL ID', 'network_acl_no'),
                                         DateTimeDyField.data_source("Created", "create_date"),
                                         TextDyField.data_source('Description', 'network_acl_description'),
 
@@ -66,7 +66,7 @@ nat_gateway = TableDynamicLayout.set_fields('NAT Gateway', root_path='data.nat_g
                                                 DateTimeDyField.data_source('Created', 'create_date'),
                                                 TextDyField.data_source('Zone', 'zone_code'),
                                                 TextDyField.data_source('Public IP', 'public_ip'),
-                                                TextDyField.data_source('No', 'nat_gateway_instance_no'),
+                                                TextDyField.data_source('Nat Gateway ID', 'nat_gateway_instance_no'),
                                                 TextDyField.data_source('Description', 'nat_gateway_description')
 
                                             ])

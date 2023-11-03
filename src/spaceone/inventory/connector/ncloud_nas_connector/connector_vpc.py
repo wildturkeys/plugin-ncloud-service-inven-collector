@@ -57,11 +57,11 @@ class NasVPCConnector(NasConnector):
             if response_dict.get("nas_volume_instance_list"):
 
                 for nas_volume_instance in response_dict.get("nas_volume_instance_list"):
-                    # region_code = nas_volume_instance.get("region").get("region_code")
+                    #region_code = nas_volume_instance.get("region").get("region_code")
 
                     # 고쳐야 함
                     nas_volume = response_nas_volume_cls(self._create_model_obj(ncloud_nas_volume_cls, nas_volume_instance))
-                    # nas_volume.region_code = region_code
+                    #nas_volume.region_code = region_code
                     nas_volume.volume_size_gb = round(nas_volume.volume_size / 1024 / 1024 / 1024)
                     nas_volume.snapshot_volume_size_gb = round(nas_volume.snapshot_volume_size / 1024 / 1024 / 1024)
 
@@ -78,45 +78,3 @@ class NasVPCConnector(NasConnector):
             logging.error(traceback.format_exc())
             logging.error(e)
             raise
-
-
-    # def get_resources(self) -> List[Type[CloudServiceResponse]]:
-    #
-    #     resources = []
-
-        # for region in self.regions:
-
-            # region_code = region.get('region_code')
-
-            # self._access_control_rules_dict \
-            #     = dict(self._access_control_rules_dict,
-            #            **self._sort_access_control_group_rules_group_by_acg_no(region_code=region_code))
-            #
-            # for image_product in self._list_image_product(region_code=region_code):
-            #     self._server_images_dict[image_product.product_code] = image_product.product_name
-
-            # resources.extend(
-            #     self._convert_cloud_service_response(self.list_nas_volume_instances(NcloudNasVolume,
-            #                                                                     NasVolume,
-            #                                                                     region_code =region.get(
-            #                                                                         'region_code'))))
-
-        # return resources
-
-    # def list_nas_volume_instances(self, ncloud_nas_volume_cls: Type[NcloudNasVolume],
-    #                               response_nas_volume_cls: Type[NasVolume], **kwargs) -> Iterator:
-    #
-    #     response = self.api_client_v2.get_vnas_instance_list(
-    #         self._ncloud_cls.GetNasVolumeInstanceListRequest(**kwargs))
-    #     response_dict = response.to_dict()
-    #
-    #
-    #     if response_dict.get("nas_volume_instance_list"):
-    #
-    #         for nas_volume_instance in response_dict.get("nas_volume_instance_list"):
-    #
-    #             nas_volume = response_nas_volume_cls(self._create_model_obj(ncloud_nas_volume_cls, nas_volume_instance))
-    #             # nas_volume.region_code = nas_volume_instance.get("region_cde")
-    #
-    #
-    #             yield nas_volume

@@ -85,7 +85,7 @@ class NasVolume(NcloudNasVolume):
     nas_volume_server_instance_list = ListType(ModelType(NCloudServer), serialize_when_none=False)
     platform_code = StringType(default="classic")
     snapshot_volume_size_gb = IntType(serialize_when_none=False)
-
+    volume_size_gb = IntType(serialize_when_none=False)
     @property
     def name(self) -> str:
         return self.volume_name
@@ -103,6 +103,9 @@ class NasVolume(NcloudNasVolume):
 
 class NasVolumeVPC(NCloudNasVolumeVPC, NasVolume):
     platform_code = StringType(default="vpc")
+    snapshot_volume_size_gb = IntType(serialize_when_none=False)
+    volume_size_gb = IntType(serialize_when_none=False)
+
 
     def reference(self):
         return {

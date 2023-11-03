@@ -43,7 +43,7 @@ class CloudDBConnector(NCloudBaseConnector):
             resources.extend(
                 self._convert_cloud_service_response(self.list_cloud_db_instances(NcloudCloudDB,
                                                                                   CloudDB,
-                                                                                  db_kind_code='MYSQL', region_no='1'
+                                                                                  db_kind_code='MYSQL'
                                                                                   )))
 
             # resources.extend(
