@@ -38,7 +38,7 @@ db_server = TableDynamicLayout.set_fields('DB Server', root_path='data.cloud_db_
                                 'disable': ['stopped']}
                             ),
     EnumDyField.data_source('Server Role','cloud_db_server_role.code_name',
-                            default_outline_badge=['Master', 'Standby Master', 'Hidden Master']),
+                            default_outline_badge=['Master', 'Standby Master', 'Hidden Master','Stand Alone']),
     DateTimeDyField.data_source('Created','create_date'),
     TextDyField.data_source('Server ID', 'cloud_db_server_instance_no'),
     TextDyField.data_source('Storage Size','data_storage_size'),
