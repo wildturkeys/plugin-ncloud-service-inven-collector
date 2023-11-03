@@ -46,16 +46,16 @@ class CloudDBConnector(NCloudBaseConnector):
                                                                                   db_kind_code='MYSQL'
                                                                                   )))
 
-            # resources.extend(
-            #     self._convert_cloud_service_response(self.list_cloud_db_instances(NcloudCloudDB,
-            #                                                                       CloudDB,
-            #                                                                       db_kind_code='MSSQL',
-            #                                                                       )))
-            # resources.extend(
-            #     self._convert_cloud_service_response(self.list_cloud_db_instances(NcloudCloudDB,
-            #                                                                       CloudDB,
-            #                                                                       db_kind_code='REDIS',
-            #                                                                       )))
+            resources.extend(
+                self._convert_cloud_service_response(self.list_cloud_db_instances(NcloudCloudDB,
+                                                                                  CloudDB,
+                                                                                  db_kind_code='MSSQL',
+                                                                                  )))
+            resources.extend(
+                self._convert_cloud_service_response(self.list_cloud_db_instances(NcloudCloudDB,
+                                                                                  CloudDB,
+                                                                                  db_kind_code='REDIS',
+                                                                                  )))
         return resources
 
     def list_cloud_db_instances(self, ncloud_cloud_db_cls:Type[NcloudCloudDB],

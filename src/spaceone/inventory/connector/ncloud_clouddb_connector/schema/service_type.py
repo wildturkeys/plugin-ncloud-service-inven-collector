@@ -37,7 +37,7 @@ cst_cloud_db._metadata = CloudServiceTypeMeta.set_meta(
             'indigo.500': ['classic'], 'coral.600': ['vpc']
         }),
 
-        TextDyField.data_source('Kind', 'data.db_kind_code',
+        EnumDyField.data_source('Kind', 'data.db_kind_code',
                                 default_outline_badge=['MYSQL', 'MSSQL',
                                                        'REDIS']),
         TextDyField.data_source('Cloud DB ID', 'data.cloud_db_instance_no'),

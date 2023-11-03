@@ -6,7 +6,7 @@ from spaceone.inventory.libs.schema.resource import CloudServiceMeta
 details = ItemDynamicLayout.set_fields('Details', fields=[
     TextDyField.data_source('Name','data.cloud_db_service_name'),
 
-    TextDyField.data_source('Kind', 'data.db_kind_code',
+    EnumDyField.data_source('Kind', 'data.db_kind_code',
                             default_outline_badge=['MYSQL', 'MSSQL',
                                                    'REDIS']),
     TextDyField.data_source('Cloud DB ID', 'data.cloud_db_instance_no'),
