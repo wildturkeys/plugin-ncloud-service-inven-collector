@@ -1,16 +1,20 @@
 import os
-from spaceone.inventory.libs.common_parser import *
-from spaceone.inventory.libs.schema.dynamic_widget import ChartWidget, CardWidget
-from spaceone.inventory.libs.schema.dynamic_field import TextDyField, SearchField, DateTimeDyField, EnumDyField, \
-    SizeField
-from spaceone.inventory.libs.schema.resource import CloudServiceTypeResource, CloudServiceTypeResponse, \
-    CloudServiceTypeMeta
 
 from spaceone.inventory.conf.cloud_service_conf import *
+from spaceone.inventory.libs.common_parser import *
+from spaceone.inventory.libs.schema.dynamic_field import TextDyField, SearchField, EnumDyField, DateTimeDyField,\
+    SizeField
+from spaceone.inventory.libs.schema.dynamic_widget import ChartWidget, CardWidget
+from spaceone.inventory.libs.schema.resource import CloudServiceTypeResource, CloudServiceTypeResponse, \
+    CloudServiceTypeMeta
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 
 instance_total_count_conf = os.path.join(current_dir, 'widget/total_instance_count.yaml')
+volume_total_size_conf = os.path.join(current_dir, 'widget/total_volume_size.yaml')
+
+count_by_region_conf = os.path.join(current_dir, 'widget/count_by_region.yaml')
+count_by_project_conf = os.path.join(current_dir, 'widget/count_by_project.yaml')
 count_by_type_conf = os.path.join(current_dir, 'widget/count_by_type.yaml')
 
 cst_block = CloudServiceTypeResource()
@@ -52,8 +56,8 @@ cst_block._metadata = CloudServiceTypeMeta.set_meta(
                                                 'detachFailed'],
                                     'disable': ['terminated']}),
         TextDyField.data_source('Volume ID', 'data.block_storage_instance_no'),
-        TextDyField.data_source('Volume Type', 'data.block_storage_type.code'),
-        EnumDyField.data_source('Disk Type', 'data.disk_detail_type.code',
+        TextDyField.data_source('Volume Type', 'data.block_storage_type'),
+        EnumDyField.data_source('Disk Type', 'data.block_storage_disk_type',
                                 default_badge={'indigo.500': ['SSD'],
                                                'coral.600': ['HDD']}
                                 ),
@@ -63,21 +67,28 @@ cst_block._metadata = CloudServiceTypeMeta.set_meta(
             "resource_type": "inventory.CloudService",
             "reference_key": "reference.resource_id"}),
         TextDyField.data_source('Server Name', 'data.server_name'),
-        TextDyField.data_source('Zone', 'data.zone.zone_code'),
+        EnumDyField.data_source('Encrypted', 'data.is_encrypted_volume',
+                                default_badge={'indigo.500': ["true"],
+                                               'coral.600': ["false"]}),
+        TextDyField.data_source('Zone', 'data.zone_code'),
+        DateTimeDyField.data_source("Created", "data.create_date")
     ],
     search=[
         SearchField.set(name='Status', key='data.block_storage_instance_status_name'),
         SearchField.set(name='Volume ID', key='data.block_storage_instance_no'),
-        SearchField.set(name='Volume Type', key='data.block_storage_type.code'),
-        SearchField.set(name='Disk Type', key='data.disk_detail_type.code'),
+        SearchField.set(name='Volume Type', key='data.block_storage_type'),
+        SearchField.set(name='Disk Type', key='data.block_storage_disk_type'),
         SearchField.set(name='MAX IOPS', key='data.max_iops_throughput'),
         SearchField.set(name='Device', key='data.device_name'),
         SearchField.set(name='Server ID', key='data.server_instance_no'),
         SearchField.set(name='Server Name', key='data.server_name'),
-        SearchField.set(name='Zone Name', key='data.zone.zone_code')
+        SearchField.set(name='Zone Name', key='data.zone_code')
     ],
     widget=[
         CardWidget.set(**get_data_from_yaml(instance_total_count_conf)),
+        CardWidget.set(**get_data_from_yaml(volume_total_size_conf)),
+        ChartWidget.set(**get_data_from_yaml(count_by_region_conf)),
+        ChartWidget.set(**get_data_from_yaml(count_by_project_conf)),
         ChartWidget.set(**get_data_from_yaml(count_by_type_conf)),
     ]
 )

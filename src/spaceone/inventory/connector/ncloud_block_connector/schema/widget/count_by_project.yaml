@@ -1,0 +1,20 @@
+---
+cloud_service_group: Compute
+cloud_service_type: Volume
+name: Count By Project
+query:
+  aggregate:
+    - group:
+        keys:
+          - name: name
+            key: project_id
+        fields:
+          - name: value
+            operator: count
+options:
+  chart_type: COLUMN
+  name_options:
+    key: name
+    reference:
+      resource_type: inventory.Project
+      reference_key: project_id

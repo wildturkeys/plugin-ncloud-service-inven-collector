@@ -1,0 +1,17 @@
+---
+cloud_service_group: Storage
+cloud_service_type: Nas
+name: Count By Volume Size
+query:
+  aggregate:
+    - group:
+        keys:
+          - name: name
+            key: data.volume_size_gb
+        fields:
+          - name: value
+            operator: count
+options:
+  chart_type: TREEMAP
+  name_options:
+    key: name

@@ -1,13 +1,13 @@
 ---
 cloud_service_group: Networking
 cloud_service_type: Load Balancer
-name: Count by Type
+name: Count By Type
 query:
   aggregate:
     - group:
         keys:
           - name: name
-            key: data.server_instance_type.code_name
+            key: data.load_balancer_network_type
         fields:
           - name: value
             operator: count

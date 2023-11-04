@@ -1,7 +1,9 @@
 from schematics import Model
-from schematics.types import StringType, ListType, BooleanType, ModelType, PolyModelType, DictType
+from schematics.types import StringType, ListType, BooleanType, ModelType, PolyModelType
+
 from .dynamic_field import TextDyField, StateDyField, BadgeDyField, ListDyField, DictDyField, DateTimeDyField, \
     ImageDyField, EnumDyField, SizeField, ProgressField
+
 
 class BaseDynamicWidgetKeyFields(Model):
     key = StringType(serialize_when_none=False)
@@ -32,7 +34,8 @@ class BaseDynamicWidgetQueryAggregateGroupFields(Model):
 
 class BaseDynamicWidgetQueryAggregateGroup(Model):
     keys = ListType(ModelType(BaseDynamicWidgetQueryAggregateGroupKeys), serialize_when_none=False)
-    _fields = ListType(ModelType(BaseDynamicWidgetQueryAggregateGroupFields), serialize_when_none=False, serialized_name='fields')
+    _fields = ListType(ModelType(BaseDynamicWidgetQueryAggregateGroupFields), serialize_when_none=False,
+                       serialized_name='fields')
 
 
 class BaseDynamicWidgetQueryAggregateCount(Model):
@@ -57,7 +60,8 @@ class BaseDynamicWidgetQueryAggregateProjectField(Model):
 
 
 class BaseDynamicWidgetQueryAggregateProject(Model):
-    _fields = ListType(ModelType(BaseDynamicWidgetQueryAggregateProjectField), serialize_when_none=False, serialized_name='fields')
+    _fields = ListType(ModelType(BaseDynamicWidgetQueryAggregateProjectField), serialize_when_none=False,
+                       serialized_name='fields')
 
 
 class BaseDynamicWidgetQueryAggregate(Model):
@@ -82,7 +86,7 @@ class BaseDynamicWidgetQuery(Model):
 
 class BaseDynamicWidgetOptions(Model):
     value_options = PolyModelType([TextDyField, StateDyField, BadgeDyField, ListDyField, DictDyField, DateTimeDyField,
-                                  ImageDyField, EnumDyField, SizeField, ProgressField], serialize_when_none=False)
+                                   ImageDyField, EnumDyField, SizeField, ProgressField], serialize_when_none=False)
     name_options = PolyModelType([TextDyField, StateDyField, BadgeDyField, ListDyField, DictDyField, DateTimeDyField,
                                   ImageDyField, EnumDyField, SizeField, ProgressField], serialize_when_none=False)
     chart_type = StringType(choices=('COLUMN', 'DONUT', 'TREEMAP'), serialize_when_none=False)

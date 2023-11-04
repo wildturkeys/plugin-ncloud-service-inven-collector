@@ -42,23 +42,6 @@ class NCloudServer(Model):
     uptime = DateTimeType()
 
 
-class NCloudBlock(Model):
-    block_storage_name = StringType(serialize_when_none=False)
-    block_storage_instance_description = StringType(serialize_when_none=False)
-    block_storage_type = DictType(StringType, serialize_when_none=False)
-    block_storage_instance_no = StringType(serialize_when_none=False)
-    block_storage_size = IntType(serialize_when_none=False)
-    device_name = StringType(serialize_when_none=False)
-    region_code = StringType(serialize_when_none=False)
-    block_storage_instance_status_name = StringType(serialize_when_none=False)
-    server_instance_no = StringType(serialize_when_none=False)
-    server_name = StringType(serialize_when_none=False)
-    zone = DictType(StringType, serialize_when_none=False)
-    create_date = DateTimeType()
-    disk_detail_type = DictType(StringType, serialize_when_none=False)
-    max_iops_throughput = IntType(serialize_when_none=False)
-
-
 class NCloudNetworkInterface(Model):
     network_interface_name = StringType(serialize_when_none=False)
     network_interface_description = StringType(serialize_when_none=False)
@@ -91,6 +74,7 @@ class NetworkInterface(Model):
     is_default = BooleanType(serialize_when_none=False)
     network_interface_description = StringType(serialize_when_none=False)
     server_instance_no = StringType(serialize_when_none=False)
+    access_control_group_no_list = ListType(StringType, serialize_when_none=False)
 
 
 class NCloudAccessControlGroup(Model):
@@ -99,6 +83,12 @@ class NCloudAccessControlGroup(Model):
     access_control_group_configuration_no = StringType(serialize_when_none=False)
     create_date = DateTimeType(serialize_when_none=False)
     is_default_group = StringType(serialize_when_none=False)
+
+
+class NCloudServerImageProduct(Model):
+    product_code = StringType(serialize_when_none=False)
+    product_name = StringType(serialize_when_none=False)
+    os_information = StringType(serialize_when_none=False)
 
 
 class NCloudAccessControlGroupServerInstance(Model):
@@ -122,12 +112,6 @@ class NCloudServerVPC(NCloudServer):
     vpc_no = StringType(serialize_when_none=False)
     subnet_no = StringType(serialize_when_none=False)
     zone_code = StringType(serialize_when_none=False)
-
-
-class NCloudBlockVPC(NCloudBlock):
-    block_storage_disk_type = DictType(StringType, serialize_when_none=False)
-    is_encrypted_volume = BooleanType(serialize_when_none=False)
-    block_storage_disk_detail_type = DictType(StringType, serialize_when_none=False)
 
 
 class NCloudAccessControlVPC(Model):
@@ -156,7 +140,7 @@ class Server(NCloudServer):
     nics = ListType(ModelType(NetworkInterface), serialize_when_none=False, default=[])
     os = DictType(StringType, serialize_when_none=False)
     primary_ip_address = StringType(serialize_when_none=False)
-    disks = ListType(ModelType('Disk'), serialize_when_none=False, default=[])
+    block_storages = ListType(ModelType('Block'), serialize_when_none=False, default=[])
     security_groups = ListType(ModelType(NCloudAccessControlRule), serialize_when_none=False, default=[])
     zone_code = StringType(serialize_when_none=False)
     region_code = StringType(serialize_when_none=False)
@@ -179,6 +163,7 @@ class Server(NCloudServer):
 
 class ServerVPC(NCloudServerVPC, Server):
     platform_code = StringType(default="vpc")
+    block_storages = ListType(ModelType('BlockVPC'), serialize_when_none=False, default=[])
 
     def reference(self):
         return {
@@ -195,16 +180,3 @@ class AccessControlRule(Model):
     flow = StringType(serialize_when_none=False)
     protocol = StringType(serialize_when_none=False)
     ip = StringType(serialize_when_none=False)
-
-
-class Disk(Model):
-    block_storage_name = StringType(serialize_when_none=False)
-    block_storage_size = IntType(serialize_when_none=False)
-    block_storage_type = StringType(serialize_when_none=False)
-    block_storage_instance_status_name = StringType(serialize_when_none=False)
-    block_storage_disk_type = StringType(serialize_when_none=False)
-    block_storage_instance_no = StringType(serialize_when_none=False)
-    server_instance_no = StringType(serialize_when_none=False)
-    device_name = StringType(serialize_when_none=False)
-    max_iops_throughput = IntType(serialize_when_none=False)
-    is_encrypted_volume = BooleanType(serialize_when_none=False)

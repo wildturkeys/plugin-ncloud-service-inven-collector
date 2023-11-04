@@ -1,11 +1,12 @@
 import concurrent.futures
+import json
 import logging
 import time
-import json
+
 from spaceone.core.service import *
+
 from spaceone.inventory.conf.cloud_service_conf import *
 from spaceone.inventory.libs.schema.resource import RegionResource, RegionResponse, ErrorResourceResponse
-from spaceone.inventory.conf.cloud_service_conf import *
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -38,7 +39,6 @@ class CollectorService(BaseService):
         """
         options = params['options']
         secret_data = params.get('secret_data', {})
-
 
         return {}
 
@@ -129,7 +129,6 @@ class CollectorService(BaseService):
     def _match_execute_manager(cloud_service_groups):
         return [CLOUD_SERVICE_GROUP_MAP[_cloud_service_group] for _cloud_service_group in cloud_service_groups
                 if _cloud_service_group in CLOUD_SERVICE_GROUP_MAP]
-
 
     @staticmethod
     def match_region_info(region_name):

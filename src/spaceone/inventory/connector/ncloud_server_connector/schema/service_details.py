@@ -1,12 +1,13 @@
-from schematics.types import ModelType, PolyModelType, StringType
-from spaceone.inventory.libs.schema.resource import CloudServiceMeta, CloudServiceResource, CloudServiceResponse
-from spaceone.inventory.libs.schema.dynamic_field import TextDyField, DateTimeDyField, EnumDyField, ListDyField, \
-    SizeField
-from spaceone.inventory.libs.schema.dynamic_layout import ItemDynamicLayout, SimpleTableDynamicLayout, \
-    TableDynamicLayout
+from spaceone.inventory.libs.schema.dynamic_field import TextDyField, DateTimeDyField, EnumDyField, SizeField
+from spaceone.inventory.libs.schema.dynamic_layout import ItemDynamicLayout, TableDynamicLayout
+from spaceone.inventory.libs.schema.resource import CloudServiceMeta
 
 # TAB
 details = ItemDynamicLayout.set_fields('Details', fields=[
+    TextDyField.data_source('Name', 'data.server_name'),
+    EnumDyField.data_source('Platform', 'data.platform_code', default_badge={
+                'indigo.500': ['classic'], 'coral.600': ['vpc']
+            }),
     EnumDyField.data_source('Status', 'data.server_instance_status_name',
                             default_state={
                                 'safe': ['running'],
@@ -21,6 +22,7 @@ details = ItemDynamicLayout.set_fields('Details', fields=[
                           options={"source_unit": "BYTES", "display_unit": "GB"}),
     TextDyField.data_source('Instance Type', 'data.server_instance_type.code_name'),
     TextDyField.data_source('Image', 'data.server_image_name'),
+    TextDyField.data_source('OS', 'data.os.os_distro'),
     TextDyField.data_source('Zone', 'data.zone_code'),
     TextDyField.data_source('Region', 'data.region_code'),
     DateTimeDyField.data_source("Created", "data.create_date"),
@@ -42,7 +44,7 @@ port_forwarding = ItemDynamicLayout.set_fields('Port Forwarding', fields=[
     TextDyField.data_source('Internal Port', 'data.port_forwarding_internal_port'),
 ])
 
-disk = TableDynamicLayout.set_fields('Disk', root_path='data.disks', fields=[
+block_storages = TableDynamicLayout.set_fields('Disk', root_path='data.block_storages', fields=[
     TextDyField.data_source('Name', 'block_storage_name'),
     SizeField.data_source('Size(GB)', 'block_storage_size', options={
         'display_unit': 'GB',
@@ -55,23 +57,29 @@ disk = TableDynamicLayout.set_fields('Disk', root_path='data.disks', fields=[
                                 'warning': ['Initialized', 'creating', 'copying', 'terminating', 'repairing',
                                             'detachFailed'],
                                 'disable': ['terminated']}),
-    TextDyField.data_source('Volume ID', 'block_storage_instance_no',
-                            reference={"resource_type": "inventory.CloudService",
-                                       "reference_key": "reference.resource_id"}),
-    TextDyField.data_source('Volume Type', 'block_storage_type.code'),
+    TextDyField.data_source('Volume ID', 'block_storage_instance_no'),
+    TextDyField.data_source('Volume Type', 'block_storage_type'),
     EnumDyField.data_source('Disk Type', 'block_storage_disk_type',
                             default_badge={'indigo.500': ['SSD'],
                                            'coral.600': ['HDD']}
                             ),
     TextDyField.data_source('MAX IOPS', 'max_iops_throughput'),
-    TextDyField.data_source('Device', 'device_name')
+    TextDyField.data_source('Device', 'device_name'),
+    TextDyField.data_source('Server ID', 'server_instance_no', reference={
+        "resource_type": "inventory.CloudService",
+        "reference_key": "reference.resource_id"}),
+    EnumDyField.data_source('Encrypted', 'is_encrypted_volume',
+                            default_badge={'indigo.500': ["true"],
+                                           'coral.600': ["false"]}),
+    DateTimeDyField.data_source("Created", "create_date")
+
 ])
 
-nic = TableDynamicLayout.set_fields('NIC', root_path='data.nics', fields=[
+nics = TableDynamicLayout.set_fields('NIC', root_path='data.nics', fields=[
     TextDyField.data_source('Name', 'network_interface_name'),
     TextDyField.data_source('IP Addresses', 'ip'),
     TextDyField.data_source('Status', 'network_interface_status_name'),
-    TextDyField.data_source('Device', 'device'),
+    TextDyField.data_source('Device', 'device_name'),
     TextDyField.data_source('Default', 'is_default'),
     TextDyField.data_source('Description', 'network_interface_description'),
 ])
@@ -88,4 +96,4 @@ security_groups = TableDynamicLayout.set_fields('Security Groups', root_path='da
     TextDyField.data_source('Description', 'access_control_rule_description'),
 ])
 
-SERVICE_DETAILS = CloudServiceMeta.set_layouts([details, port_forwarding, nic, disk, security_groups])
+SERVICE_DETAILS = CloudServiceMeta.set_layouts([details, port_forwarding, nics, block_storages, security_groups])

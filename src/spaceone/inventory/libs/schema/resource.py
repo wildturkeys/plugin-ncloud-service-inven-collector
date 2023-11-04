@@ -1,5 +1,6 @@
 from schematics import Model
 from schematics.types import ListType, StringType, PolyModelType, DictType, ModelType, BooleanType, FloatType
+
 from .dynamic_layout import BaseLayoutField, QuerySearchTableDynamicLayout
 from .dynamic_search import BaseDynamicSearch
 from .dynamic_widget import BaseDynamicWidget

@@ -6,6 +6,9 @@ from schematics.types import ModelType, StringType, IntType, ListType, BooleanTy
 _LOGGER = logging.getLogger(__name__)
 
 
+
+
+
 class NCloudServer(Model):
     server_name = StringType(serialize_when_none=False)
     server_instance_type = DictType(StringType, serialize_when_none=False)
@@ -38,7 +41,7 @@ class NCloudServer(Model):
     server_instance_operation = DictType(StringType, serialize_when_none=False)
     server_instance_status = DictType(StringType, serialize_when_none=False)
     server_description = StringType(serialize_when_none=False)
-    base_block_stroage_disk_detail_type = DictType(StringType, serialize_when_none=False)
+    base_block_storage_disk_detail_type = DictType(StringType, serialize_when_none=False)
     user_data = StringType(serialize_when_none=False)
     region = DictType(StringType, serialize_when_none=False)
 
@@ -73,10 +76,16 @@ class NcloudNasVolume(Model):
     # nas_volume_server_instance_list = ListType(ModelType(NCloudServer),serialize_when_none=False )
 
 
+class NCloudNasVolumeVPC(NcloudNasVolume):
+    nas_volume_instance_no = StringType(serialize_when_none=False)
+    volume_name = StringType(serialize_when_none=False)
+    zone_code = StringType(serialize_when_none=False)
+
 class NasVolume(NcloudNasVolume):
     nas_volume_server_instance_list = ListType(ModelType(NCloudServer), serialize_when_none=False)
     platform_code = StringType(default="classic")
-
+    snapshot_volume_size_gb = IntType(serialize_when_none=False)
+    volume_size_gb = IntType(serialize_when_none=False)
     @property
     def name(self) -> str:
         return self.volume_name
@@ -89,4 +98,17 @@ class NasVolume(NcloudNasVolume):
         return {
             "resource_id": self.nas_volume_instance_no,
             "external_link": f"https://console.ncloud.com/nas/volume"
+        }
+
+
+class NasVolumeVPC(NCloudNasVolumeVPC, NasVolume):
+    platform_code = StringType(default="vpc")
+    snapshot_volume_size_gb = IntType(serialize_when_none=False)
+    volume_size_gb = IntType(serialize_when_none=False)
+
+
+    def reference(self):
+        return {
+            "resource_id": self.nas_volume_instance_no,
+            "external_link": "https://console.ncloud.com/vpc-nas/volume"
         }

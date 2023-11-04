@@ -1,8 +1,7 @@
 import logging
 
 from schematics import Model
-from schematics.types import ModelType, StringType, IntType, ListType, BooleanType, DictType, DateTimeType, \
-    PolyModelType
+from schematics.types import ModelType, StringType, IntType, ListType, BooleanType, DictType, DateTimeType
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -45,8 +44,36 @@ class NCloudLB(Model):
     load_balancer_rule_list = ListType(ModelType(NCloudLBRule), serialize_when_none=False)
     network_usage_type = DictType(StringType, serialize_when_none=False)
     virtual_ip = StringType(serialize_when_none=False)
-    region_code = StringType(serialize_when_none=False)
     create_date = DateTimeType()
+
+
+class NCloudLBVPC(Model):
+    load_balancer_name = StringType(serialize_when_none=False)
+    load_balancer_description = StringType(serialize_when_none=False)
+    load_balancer_domain = StringType(serialize_when_none=False)
+    load_balancer_instance_no = StringType(serialize_when_none=False)
+    load_balancer_instance_operation = DictType(StringType, serialize_when_none=False)
+    load_balancer_instance_status = StringType(serialize_when_none=False)
+    load_balancer_instance_status_name = StringType(serialize_when_none=False)
+    load_balancer_ip_list = ListType(StringType, serialize_when_none=False)
+    load_balancer_listener_no_list = ListType(StringType, serialize_when_none=False)
+    load_balancer_network_type = DictType(StringType, serialize_when_none=False)
+    load_balancer_type = DictType(StringType, serialize_when_none=False)
+    region_code = StringType(serialize_when_none=False)
+    subnet_no_list = ListType(StringType, serialize_when_none=False)
+    throughput_type = DictType(StringType, serialize_when_none=False)
+    vpc_no = ListType(StringType, serialize_when_none=False)
+    create_date = DateTimeType()
+
+
+class NCloudLBListenerVPC(Model):
+    load_balancer_instance_no = StringType(serialize_when_none=False)
+    load_balancer_listener_no = StringType(serialize_when_none=False)
+    load_balancer_rule_no_list = ListType(StringType, serialize_when_none=False)
+    port = IntType(serialize_when_none=False)
+    protocol_type = DictType(StringType, serialize_when_none=False)
+    ssl_certificate_no = StringType(serialize_when_none=False)
+    use_http2 = BooleanType(serialize_when_none=False)
 
 
 class LBServerInstance(Model):
@@ -67,11 +94,41 @@ class LBServerInstance(Model):
     server_status = StringType(serialize_when_none=False)
 
 
-class LB(NCloudLB):
-    load_balanced_server_instance_list = ListType(ModelType(LBServerInstance), serialize_when_none=False)
+class LBListener(Model):
+
+    load_balancer_instance_name = StringType(serialize_when_none=False)
+    load_balancer_instance_no = StringType(serialize_when_none=False)
+    load_balancer_instance_port = StringType(serialize_when_none=False)
+    load_balancer_instance_status_name = StringType(serialize_when_none=False)
+    protocol_type = StringType(serialize_when_none=False)
+
+    health_check_path = StringType(serialize_when_none=False)
+
+    server_instance_name = StringType(serialize_when_none=False)
+    server_instance_no = StringType(serialize_when_none=False)
+    server_instance_port = StringType(serialize_when_none=False)
+    server_instance_status_name = StringType(serialize_when_none=False)
+
+
+class LB(Model):
+    load_balancer_name = StringType(serialize_when_none=False)
+    load_balancer_description = StringType(serialize_when_none=False)
+    load_balancer_domain = StringType(serialize_when_none=False)
+    load_balancer_instance_no = StringType(serialize_when_none=False)
+    load_balancer_instance_operation = DictType(StringType, serialize_when_none=False)
+    load_balancer_instance_status_name = StringType(serialize_when_none=False)
+    load_balancer_instance_status_code = StringType(serialize_when_none=False)
+    load_balancer_ip_list = ListType(StringType, serialize_when_none=False)
+    load_balancer_network_type = StringType(serialize_when_none=False)
+    load_balancer_type = StringType(serialize_when_none=False)
+    region_code = StringType(serialize_when_none=False)
+    throughput_type = StringType(serialize_when_none=False)
+
+    load_balancer_listener_list = ListType(ModelType(LBListener), serialize_when_none=False, default=[])
     load_balanced_server_instance_count = IntType(serialize_when_none=False)
 
     platform_code = StringType(default="classic")
+    create_date = DateTimeType()
 
     @property
     def instance_type(self) -> str:
@@ -86,5 +143,16 @@ class LB(NCloudLB):
     def reference(self):
         return {
             "resource_id": self.load_balancer_instance_no,
-            "external_link": f"https://console.ncloud.com/load-balancer/loadBalancer"
+            "external_link": "https://console.ncloud.com/load-balancer/loadBalancer"
+        }
+
+
+class LBVPC(LB):
+    platform_code = StringType(default="vpc")
+    vpc_no = ListType(StringType, serialize_when_none=False)
+
+    def reference(self):
+        return {
+            "resource_id": self.load_balancer_instance_no,
+            "external_link": "https://console.ncloud.com/vpc-load-balancer/loadBalancer"
         }

@@ -1,15 +1,16 @@
 import logging
+from typing import Iterable, List
+from typing import Type
+
 import ncloud_loadbalancer
 from ncloud_loadbalancer.api.v2_api import V2Api
 from ncloud_loadbalancer.rest import ApiException
-from typing import Optional, Type
-from spaceone.inventory.connector.ncloud_lb_connector.schema.data import NCloudLB, LB, LBServerInstance
-from spaceone.inventory.connector.ncloud_lb_connector.schema.service_details import SERVICE_DETAILS
+
 from spaceone.inventory.connector.ncloud_connector import NCloudBaseConnector
+from spaceone.inventory.connector.ncloud_lb_connector.schema.data import NCloudLB, LB, LBListener
+from spaceone.inventory.connector.ncloud_lb_connector.schema.service_details import SERVICE_DETAILS
 from spaceone.inventory.connector.ncloud_lb_connector.schema.service_type import CLOUD_SERVICE_TYPES
 from spaceone.inventory.libs.schema.resource import CloudServiceResponse
-
-from typing import Iterator, List
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -22,6 +23,12 @@ class LbConnector(NCloudBaseConnector):
 
     _ncloud_cls = ncloud_loadbalancer
     _ncloud_api_v2 = V2Api
+    _api_exception_cls = ApiException
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.load_balanced_server_instance_dict = {}
 
     def get_resources(self) -> List[Type[CloudServiceResponse]]:
 
@@ -36,64 +43,84 @@ class LbConnector(NCloudBaseConnector):
 
         return resources
 
-    def list_load_balancer_instances(self, **kwargs) -> Iterator:
+    def list_load_balancer_instances(self, **kwargs) -> Iterable[LB]:
 
-        try:
+        yield from self._list_load_balancer_instances(**kwargs)
 
-            response = self.api_client_v2.get_load_balancer_instance_list(
-                ncloud_loadbalancer.GetLoadBalancerInstanceListRequest(**kwargs))
+    def _list_load_balancer_instances(self, **kwargs) -> List[Type[LB]]:
 
-            response_dict = response.to_dict()
+        response = self.api_client_v2.get_load_balancer_instance_list(
+            ncloud_loadbalancer.GetLoadBalancerInstanceListRequest(**kwargs))
 
-            if response_dict.get("load_balancer_instance_list"):
+        rtn_list: LB = []
+        response_dict = response.to_dict()
 
-                for load_balancer_instance in response_dict.get("load_balancer_instance_list"):
+        if response_dict.get("load_balancer_instance_list"):
+            for load_balancer_instance in response_dict.get("load_balancer_instance_list"):
+                rtn_list.append(self.__convert_load_balancer_instance(
+                    self._create_model_obj(NCloudLB, load_balancer_instance),
+                    load_balanced_server_instance_list=load_balancer_instance.get(
+                        "load_balanced_server_instance_list"), **kwargs))
 
-                    load_balancer = LB(self._create_model_obj(NCloudLB, load_balancer_instance))
+        return rtn_list
 
-                    if load_balancer_instance.get("load_balanced_server_instance_list"):
-                        load_balancer.load_balanced_server_instance_list = self._list_load_balancer_instance(
-                            load_balancer_instance.get("load_balanced_server_instance_list"))
-                        load_balancer.load_balanced_server_instance_count = len(load_balancer.load_balanced_server_instance_list)
+    def __convert_load_balancer_instance(self, load_balancer_instance: NCloudLB, **kwargs) -> LB:
 
-                    if kwargs.get("region_no"):
-                        for region in self.regions:
-                            if region.get("region_no") == kwargs.get("region_no"):
-                                load_balancer.region_code = region.get("region_code")
+        lb_obj = LB()
+        lb_obj.load_balancer_name = load_balancer_instance.load_balancer_name
+        lb_obj.load_balancer_description = load_balancer_instance.load_balancer_description
+        lb_obj.load_balancer_instance_no = load_balancer_instance.load_balancer_instance_no
 
-                    yield load_balancer
+        if load_balancer_instance.get('virtual_ip'):
+            lb_obj.load_balancer_ip_list = str(load_balancer_instance.virtual_ip).split(",")
 
-        except ApiException as e:
-            logging.error(e)
-            raise
+        lb_obj.load_balancer_domain = load_balancer_instance.domain_name
+        lb_obj.load_balancer_instance_status_name = load_balancer_instance.load_balancer_instance_status_name
+        lb_obj.load_balancer_network_type = load_balancer_instance.network_usage_type.get("code_name")
+        lb_obj.create_date = load_balancer_instance.create_date
 
-    def _list_load_balancer_instance(self, load_balancer_instance_list) -> List[LBServerInstance]:
+        if kwargs.get("region_no"):
+            for region in self.regions:
+                if region.get("region_no") == kwargs.get("region_no"):
+                    lb_obj.region_code = region.get("region_code")
+
+        if 'load_balanced_server_instance_list' in kwargs:
+            lb_obj.load_balancer_listener_list = self.__convert_list_load_balancer_listener(
+                kwargs.get('load_balanced_server_instance_list'),
+                lb_obj.load_balancer_name,
+                lb_obj.load_balancer_instance_no
+            )
+
+        return lb_obj
+
+    def __convert_list_load_balancer_listener(self, load_balanced_server_instance_list: list,
+                                              load_balancer_instance_name: str,
+                                              load_balancer_instance_no: str) -> List[LBListener]:
 
         rtn_list = []
 
-        for load_balancer_instance in load_balancer_instance_list:
+        for load_balanced_server_instance in load_balanced_server_instance_list:
 
-            server_instance = load_balancer_instance.get("server_instance")
-            server_health_check_status_list = load_balancer_instance.get("server_health_check_status_list", [])
-
-            server_instance_obj = {}
+            server_instance = load_balanced_server_instance.get("server_instance")
+            server_health_check_status_list = load_balanced_server_instance.get("server_health_check_status_list", [])
 
             for server_health_check_status in server_health_check_status_list:
-                server_instance_obj["protocol_type"] = server_health_check_status.get("protocol_type")
-                server_instance_obj["load_balancer_port"] = server_health_check_status.get("load_balancer_port")
-                server_instance_obj["server_port"] = server_health_check_status.get("server_port")
-                server_instance_obj["l7_health_check_path"] = server_health_check_status.get("l7_health_check_path")
-                server_instance_obj["proxy_protocol_use_yn"] = server_health_check_status.get("proxy_protocol_use_yn")
-                server_instance_obj["server_status"] = str(server_health_check_status.get("server_status", "")).lower()
-                server_instance_obj["server_name"] = server_instance.get("server_name")
-                server_instance_obj["server_instance_type"] = server_instance.get("server_instance_type")
-                server_instance_obj["public_ip"] = server_instance.get("public_ip")
-                server_instance_obj["private_ip"] = server_instance.get("private_ip")
-                server_instance_obj["server_instance_status_name"] = server_instance.get("server_instance_status_name")
-                server_instance_obj["server_instance_no"] = server_instance.get("server_instance_no")
-                server_instance_obj["zone"] = server_instance.get("zone")
-                server_instance_obj["internet_line_type"] = server_instance.get("internet_line_type")
+                lb_listener_obj = LBListener()
 
-                rtn_list.append(LBServerInstance(server_instance_obj))
+                lb_listener_obj.load_balancer_instance_name = load_balancer_instance_name
+                lb_listener_obj.load_balancer_instance_no = load_balancer_instance_no
+                lb_listener_obj.load_balancer_instance_port = str(server_health_check_status.get("load_balancer_port"))
+                lb_listener_obj.protocol_type = server_health_check_status.get("protocol_type").get("code_name")
+                lb_listener_obj.load_balancer_instance_status_name = str(
+                    server_health_check_status.get("server_status")).lower()
+
+                lb_listener_obj.health_check_path = server_health_check_status.get("l7_health_check_path")
+
+                lb_listener_obj.server_instance_name = server_instance.get("server_name")
+                lb_listener_obj.server_instance_no = server_instance.get("server_instance_no")
+                lb_listener_obj.server_instance_port = str(server_health_check_status.get("server_port"))
+                lb_listener_obj.server_instance_status_name = server_instance.get("server_instance_status_name")
+
+                rtn_list.append(lb_listener_obj)
 
         return rtn_list

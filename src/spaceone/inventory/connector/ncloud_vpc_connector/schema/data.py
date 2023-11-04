@@ -1,18 +1,20 @@
 import logging
 
 from schematics import Model
-from schematics.types import ModelType, StringType, IntType, ListType, BooleanType, DictType, DateTimeType
+from schematics.types import ModelType, StringType, ListType, DictType, DateTimeType
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class NcloudVPC(Model):
+    platform_code = StringType(default="vpc")
     create_date = DateTimeType()
     ipv4_cidr_block = StringType(serialize_when_none=False)
     region_code = StringType(serialize_when_none=False)
     vpc_name = StringType(serialize_when_none=False)
     vpc_no = StringType(serialize_when_none=False)
     vpc_status = DictType(StringType, serialize_when_none=False)
+
 
 class NcloudSubnet(Model):
     subnet_no = StringType(serialize_when_none=False)
@@ -37,26 +39,28 @@ class NcloudACL(Model):
     vpc_no = StringType(serialize_when_none=False)
     create_date = DateTimeType()
 
+
 class NcloudNatGateway(Model):
     vpc_no = StringType(serialize_when_none=False)
-    nat_gateway_instance_no	= StringType(serialize_when_none=False)
+    nat_gateway_instance_no = StringType(serialize_when_none=False)
     nat_gateway_name = StringType(serialize_when_none=False)
-    public_ip= StringType(serialize_when_none=False)
+    public_ip = StringType(serialize_when_none=False)
 
-    nat_gateway_instance_status	= DictType(StringType, serialize_when_none=False)
+    nat_gateway_instance_status = DictType(StringType, serialize_when_none=False)
 
     nat_gateway_instance_status_name = StringType(serialize_when_none=False)
     nat_gateway_instance_operation = DictType(StringType, serialize_when_none=False)
 
-    create_date	= DateTimeType()
-    nat_gateway_description	= StringType(serialize_when_none=False)
+    create_date = DateTimeType()
+    nat_gateway_description = StringType(serialize_when_none=False)
     zone_code = StringType(serialize_when_none=False)
 
 
 class VPC(NcloudVPC):
-    subnet = ListType(ModelType(NcloudSubnet),serialize_when_none=False)
-    acl = ListType(ModelType(NcloudACL),serialize_when_none=False)
-    nat_gateway = ListType(ModelType(NcloudNatGateway),serialize_when_none=False)
+    subnet = ListType(ModelType(NcloudSubnet), serialize_when_none=False)
+    acl = ListType(ModelType(NcloudACL), serialize_when_none=False)
+    nat_gateway = ListType(ModelType(NcloudNatGateway), serialize_when_none=False)
+
     @property
     def name(self) -> str:
         return self.vpc_name
