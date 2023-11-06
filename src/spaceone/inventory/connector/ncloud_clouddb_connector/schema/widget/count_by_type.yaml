@@ -1,0 +1,15 @@
+---
+cloud_service_group: Database
+cloud_service_type: CloudDB
+name: Count By type
+query:
+  aggregate:
+    - group:
+        keys:
+          - name: name
+            key: data.db_kind_code
+        fields:
+          - name: value
+            operator: count
+options:
+  chart_type: DONUT

@@ -15,7 +15,8 @@ total_instance_count_conf = os.path.join(current_dir, 'widget/total_instance_cou
 
 count_by_region_conf = os.path.join(current_dir,'widget/count_by_region.yaml')
 count_by_project_conf = os.path.join(current_dir,'widget/count_by_project.yaml')
-# count_by_storage_type_conf = os.path.join(current_dir,'widget/count_by_storage_type.yaml')
+count_by_type_conf = os.path.join(current_dir,'widget/count_by_type.yaml')
+count_by_storage_type_conf = os.path.join(current_dir,'widget/count_by_storage_type.yaml')
 
 
 cst_cloud_db = CloudServiceTypeResource()
@@ -47,7 +48,7 @@ cst_cloud_db._metadata = CloudServiceTypeMeta.set_meta(
         }),
         DateTimeDyField.data_source("Created", "data.create_date"),
         TextDyField.data_source('Zone', 'data.zone.zone_name'),
-
+        TextDyField.data_source('Storage Type','data.data_storage_type.code_name')
     ],
     search=[
 
@@ -58,7 +59,8 @@ cst_cloud_db._metadata = CloudServiceTypeMeta.set_meta(
 
         ChartWidget.set(**get_data_from_yaml(count_by_region_conf)),
         ChartWidget.set(**get_data_from_yaml(count_by_project_conf)),
-        # ChartWidget.set(**get_data_from_yaml(count_by_storage_type_conf))
+        ChartWidget.set(**get_data_from_yaml(count_by_type_conf)),
+        ChartWidget.set(**get_data_from_yaml(count_by_storage_type_conf))
     ]
 
 
