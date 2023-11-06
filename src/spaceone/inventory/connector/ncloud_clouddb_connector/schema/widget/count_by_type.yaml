@@ -1,16 +1,15 @@
 ---
 cloud_service_group: Database
 cloud_service_type: CloudDB
-name: Total Cpu Count
+name: Count By type
 query:
   aggregate:
     - group:
+        keys:
+          - name: name
+            key: data.db_kind_code
         fields:
           - name: value
-            key: data.cpu_count
-            operator: sum
+            operator: count
 options:
-  value_options:
-    key: value
-    options:
-      default: 0
+  chart_type: DONUT

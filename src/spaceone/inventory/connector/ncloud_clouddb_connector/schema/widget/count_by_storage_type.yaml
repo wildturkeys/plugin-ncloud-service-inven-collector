@@ -7,7 +7,7 @@ query:
     - group:
         keys:
           - name: name
-            key: data.data_storage_type
+            key: data.data_storage_type.code_name
         fields:
           - name: value
             operator: count
