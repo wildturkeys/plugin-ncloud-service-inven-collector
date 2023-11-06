@@ -8,4 +8,5 @@ from spaceone.inventory.connector.ncloud_server_connector.connector import Serve
 from spaceone.inventory.connector.ncloud_server_connector.connector_vpc import ServerVPCConnector
 from spaceone.inventory.connector.ncloud_vpc_connector.connector import VpcConnector
 from spaceone.inventory.connector.ncloud_clouddb_connector.connector import CloudDBConnector
+from spaceone.inventory.connector.ncloud_object_storage_connector.connector import ObjectStorageConnector
 

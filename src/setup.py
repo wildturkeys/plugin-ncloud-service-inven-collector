@@ -35,7 +35,8 @@ setup(
         'spaceone-api',
         'spaceone-tester',
         'ncloud-sdk',
-        'schematics'
+        'schematics',
+        'boto3'
     ],
     package_data={
         'spaceone': ['inventory/connector/*/schema/widget/*.yaml']

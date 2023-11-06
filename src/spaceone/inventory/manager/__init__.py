@@ -8,4 +8,6 @@ from spaceone.inventory.manager.ncloud_server_manager import ServerConnectorMana
 from spaceone.inventory.manager.ncloud_server_manager import ServerVPCConnectorManager
 from spaceone.inventory.manager.ncloud_vpc_manager import VpcConnectorManager
 from spaceone.inventory.manager.ncloud_clouddb_manager import CloudDBConnectorManager
+from spaceone.inventory.manager.ncloud_object_storage_manager import ObjectStorageConnectorManager
+
 

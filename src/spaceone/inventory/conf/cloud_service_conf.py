@@ -16,7 +16,8 @@ CLOUD_SERVICE_GROUP_MAP = {
     'Block': 'BlockConnectorManager',
     'BlockVPC': 'BlockVPCConnectorManager',
     'VPC': 'VpcConnectorManager',
-    'CloudDB':'CloudDBConnectorManager'
+    'CloudDB':'CloudDBConnectorManager',
+    'ObjectStorage':'ObjectStorageConnectorManager'
 
 }
 
