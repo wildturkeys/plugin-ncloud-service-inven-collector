@@ -1,7 +1,7 @@
 ---
 cloud_service_group: Database
 cloud_service_type: CloudDB
-name: Total Count
+name: Total Cpu Count
 query:
   aggregate:
     - group:
